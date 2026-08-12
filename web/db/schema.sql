@@ -2,119 +2,65 @@
 -- Safe to run repeatedly: all structural operations are idempotent.
 
 CREATE TABLE IF NOT EXISTS rooms (
-  code                    TEXT PRIMARY KEY,
-  creator_id              TEXT NOT NULL,
-  state                   TEXT NOT NULL,
-  max_players             INT NOT NULL DEFAULT 8,
-  black_cards_per_player  INT NOT NULL DEFAULT 0,
-  white_cards_per_player  INT NOT NULL DEFAULT 0,
-  points_to_win           INT NOT NULL DEFAULT 5,
-  hand_size               INT NOT NULL DEFAULT 5,
-  use_standard_deck       BOOLEAN NOT NULL DEFAULT true,
-  card_creation_enabled   BOOLEAN NOT NULL DEFAULT true,
-  black_deck              JSONB NOT NULL DEFAULT '[]',
-  white_deck              JSONB NOT NULL DEFAULT '[]',
-  player_order            JSONB NOT NULL DEFAULT '[]',
-  current_round           JSONB,
-  created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at              TIMESTAMPTZ NOT NULL DEFAULT now()
+  code TEXT PRIMARY KEY, creator_id TEXT NOT NULL, state TEXT NOT NULL,
+  max_players INT NOT NULL DEFAULT 8, black_cards_per_player INT NOT NULL DEFAULT 0,
+  white_cards_per_player INT NOT NULL DEFAULT 0, points_to_win INT NOT NULL DEFAULT 5,
+  hand_size INT NOT NULL DEFAULT 5, use_standard_deck BOOLEAN NOT NULL DEFAULT true,
+  card_creation_enabled BOOLEAN NOT NULL DEFAULT true, black_deck JSONB NOT NULL DEFAULT '[]',
+  white_deck JSONB NOT NULL DEFAULT '[]', player_order JSONB NOT NULL DEFAULT '[]', current_round JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ALTER TABLE rooms ADD COLUMN IF NOT EXISTS card_creation_enabled BOOLEAN NOT NULL DEFAULT true;
 
 CREATE TABLE IF NOT EXISTS users (
-  id             BIGSERIAL PRIMARY KEY,
-  username       TEXT NOT NULL,
-  display_name   TEXT NOT NULL,
-  password_hash  TEXT NOT NULL,
-  created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
-  last_login_at  TIMESTAMPTZ
+  id BIGSERIAL PRIMARY KEY, username TEXT NOT NULL, display_name TEXT NOT NULL, password_hash TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(), last_login_at TIMESTAMPTZ
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username_lower ON users ((lower(username)));
-
 CREATE TABLE IF NOT EXISTS auth_sessions (
-  token_hash  TEXT PRIMARY KEY,
-  user_id     BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  expires_at  TIMESTAMPTZ NOT NULL,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+  token_hash TEXT PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  expires_at TIMESTAMPTZ NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_auth_sessions_user ON auth_sessions(user_id);
 
 CREATE TABLE IF NOT EXISTS players (
-  id           TEXT NOT NULL,
-  room_code    TEXT NOT NULL REFERENCES rooms(code) ON DELETE CASCADE,
-  user_id      BIGINT REFERENCES users(id) ON DELETE SET NULL,
-  nickname     TEXT NOT NULL,
-  score        INT NOT NULL DEFAULT 0,
-  hand         JSONB NOT NULL DEFAULT '[]',
-  cards_ready  BOOLEAN NOT NULL DEFAULT false,
-  black_cards  JSONB NOT NULL DEFAULT '[]',
-  white_cards  JSONB NOT NULL DEFAULT '[]',
-  connected    BOOLEAN NOT NULL DEFAULT true,
-  last_active  TIMESTAMPTZ NOT NULL DEFAULT now(),
-  joined_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-  PRIMARY KEY (id, room_code)
+  id TEXT NOT NULL, room_code TEXT NOT NULL REFERENCES rooms(code) ON DELETE CASCADE,
+  user_id BIGINT REFERENCES users(id) ON DELETE SET NULL, nickname TEXT NOT NULL, score INT NOT NULL DEFAULT 0,
+  hand JSONB NOT NULL DEFAULT '[]', cards_ready BOOLEAN NOT NULL DEFAULT false,
+  black_cards JSONB NOT NULL DEFAULT '[]', white_cards JSONB NOT NULL DEFAULT '[]', connected BOOLEAN NOT NULL DEFAULT true,
+  last_active TIMESTAMPTZ NOT NULL DEFAULT now(), joined_at TIMESTAMPTZ NOT NULL DEFAULT now(), PRIMARY KEY(id,room_code)
 );
 ALTER TABLE players ADD COLUMN IF NOT EXISTS user_id BIGINT REFERENCES users(id) ON DELETE SET NULL;
-CREATE INDEX IF NOT EXISTS idx_players_room_code ON players(room_code);
-CREATE INDEX IF NOT EXISTS idx_players_user_id ON players(user_id);
+CREATE INDEX IF NOT EXISTS idx_players_room_code ON players(room_code); CREATE INDEX IF NOT EXISTS idx_players_user_id ON players(user_id);
 
 CREATE TABLE IF NOT EXISTS deck_cards (
-  id         SERIAL PRIMARY KEY,
-  type       TEXT NOT NULL CHECK (type IN ('blackCards', 'whiteCards')),
-  text       TEXT NOT NULL,
-  count      INT NOT NULL DEFAULT 1,
-  is_native  BOOLEAN NOT NULL DEFAULT false,
-  is_hidden  BOOLEAN NOT NULL DEFAULT false,
-  UNIQUE (type, text)
+ id SERIAL PRIMARY KEY, type TEXT NOT NULL CHECK(type IN('blackCards','whiteCards')), text TEXT NOT NULL,
+ count INT NOT NULL DEFAULT 1, is_native BOOLEAN NOT NULL DEFAULT false, is_hidden BOOLEAN NOT NULL DEFAULT false, UNIQUE(type,text)
 );
 
 CREATE TABLE IF NOT EXISTS user_cards (
-  id                         BIGSERIAL PRIMARY KEY,
-  user_id                    BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  type                       TEXT NOT NULL CHECK (type IN ('blackCards', 'whiteCards')),
-  text                       TEXT NOT NULL,
-  owned                      BOOLEAN NOT NULL DEFAULT true,
-  times_used                 INT NOT NULL DEFAULT 0,
-  matches_used               INT NOT NULL DEFAULT 0,
-  times_seen                 INT NOT NULL DEFAULT 0,
-  times_won                  INT NOT NULL DEFAULT 0,
-  duplicate_creation_count   INT NOT NULL DEFAULT 0,
-  created_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE (user_id, type, text)
+ id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ type TEXT NOT NULL CHECK(type IN('blackCards','whiteCards')), text TEXT NOT NULL, owned BOOLEAN NOT NULL DEFAULT true,
+ is_player_card BOOLEAN NOT NULL DEFAULT false, times_used INT NOT NULL DEFAULT 0, matches_used INT NOT NULL DEFAULT 0,
+ times_seen INT NOT NULL DEFAULT 0, times_won INT NOT NULL DEFAULT 0, duplicate_creation_count INT NOT NULL DEFAULT 0,
+ created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now(), UNIQUE(user_id,type,text)
 );
 ALTER TABLE user_cards ADD COLUMN IF NOT EXISTS owned BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE user_cards ADD COLUMN IF NOT EXISTS is_player_card BOOLEAN NOT NULL DEFAULT false;
 CREATE INDEX IF NOT EXISTS idx_user_cards_user ON user_cards(user_id);
 
 CREATE TABLE IF NOT EXISTS match_history (
-  id               SERIAL PRIMARY KEY,
-  room_code        TEXT NOT NULL,
-  ranking          JSONB NOT NULL,
-  winner_nickname  TEXT,
-  finished_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+ id SERIAL PRIMARY KEY, room_code TEXT NOT NULL, ranking JSONB NOT NULL, winner_nickname TEXT, finished_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-
 CREATE TABLE IF NOT EXISTS match_players (
-  id            BIGSERIAL PRIMARY KEY,
-  room_code     TEXT NOT NULL,
-  user_id       BIGINT REFERENCES users(id) ON DELETE SET NULL,
-  nickname      TEXT NOT NULL,
-  final_score   INT NOT NULL DEFAULT 0,
-  rounds_won    INT NOT NULL DEFAULT 0,
-  won_match     BOOLEAN NOT NULL DEFAULT false,
-  finished_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE (room_code, user_id)
+ id BIGSERIAL PRIMARY KEY, room_code TEXT NOT NULL, user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
+ nickname TEXT NOT NULL, final_score INT NOT NULL DEFAULT 0, rounds_won INT NOT NULL DEFAULT 0,
+ won_match BOOLEAN NOT NULL DEFAULT false, finished_at TIMESTAMPTZ NOT NULL DEFAULT now(), UNIQUE(room_code,user_id)
 );
-CREATE INDEX IF NOT EXISTS idx_match_players_user ON match_players(user_id);
-CREATE INDEX IF NOT EXISTS idx_match_players_finished ON match_players(finished_at DESC);
-
+CREATE INDEX IF NOT EXISTS idx_match_players_user ON match_players(user_id); CREATE INDEX IF NOT EXISTS idx_match_players_finished ON match_players(finished_at DESC);
 CREATE TABLE IF NOT EXISTS card_match_usage (
-  room_code   TEXT NOT NULL,
-  user_id     BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  type        TEXT NOT NULL CHECK (type IN ('blackCards', 'whiteCards')),
-  text        TEXT NOT NULL,
-  used_count  INT NOT NULL DEFAULT 0,
-  seen_count  INT NOT NULL DEFAULT 0,
-  won_count   INT NOT NULL DEFAULT 0,
-  PRIMARY KEY (room_code, user_id, type, text)
+ room_code TEXT NOT NULL, user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ type TEXT NOT NULL CHECK(type IN('blackCards','whiteCards')), text TEXT NOT NULL,
+ used_count INT NOT NULL DEFAULT 0, seen_count INT NOT NULL DEFAULT 0, won_count INT NOT NULL DEFAULT 0,
+ PRIMARY KEY(room_code,user_id,type,text)
 );
