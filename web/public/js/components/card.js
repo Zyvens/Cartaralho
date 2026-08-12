@@ -1,98 +1,11 @@
-/* ============================================================
-   Card Component
-   ============================================================ */
-const CardComponent = {
-
-  /**
-   * Create a black (prompt) card.
-   * @param {string} text
-   * @param {object} options  { large, winner, animated, mini }
-   * @returns {HTMLElement}
-   */
-  createBlackCard(text, options = {}) {
-    const card = document.createElement('div');
-    const classes = ['game-card', 'black'];
-    if (options.large) classes.push('card-large');
-    if (options.mini) classes.push('card-mini');
-    if (options.winner) classes.push('winner');
-    if (options.animated === false) card.style.animation = 'none';
-    card.className = classes.join(' ');
-    card.innerHTML = `
-      <div class="card-text">${this._formatBlackText(text)}</div>
-      <div class="card-watermark">
-        CARTA PARA CA<span style="color:white; text-decoration:underline;">RTA</span>RALHO
-      </div>
-    `;
-    return card;
-  },
-
-  /**
-   * Create a white (response) card.
-   */
-  createWhiteCard(text, options = {}) {
-    const card = document.createElement('div');
-    const classes = ['game-card', 'white'];
-    if (options.large) classes.push('card-large');
-    if (options.mini) classes.push('card-mini');
-    if (options.winner) classes.push('winner');
-    if (options.animated === false) card.style.animation = 'none';
-    card.className = classes.join(' ');
-    card.innerHTML = `
-      <div class="card-text">${text}</div>
-      <div class="card-watermark" style="color: #000; opacity: 0.5;">
-        CARTA PARA CA<span style="color:#ef4444; text-decoration:underline;">RTA</span>RALHO
-      </div>
-    `;
-    return card;
-  },
-
-  /**
-   * Create a selectable white card (for the player's hand).
-   */
-  createSelectableWhiteCard(text, index, onClick) {
-    const card = this.createWhiteCard(text);
-    card.classList.add('selectable');
-    card.dataset.index = index;
-    card.addEventListener('click', () => {
-      if (typeof onClick === 'function') onClick(index, card);
-    });
-    return card;
-  },
-
-  /**
-   * Create an anonymous white card (for host voting).
-   */
-  createAnonymousCard(text, index, onClick) {
-    const card = this.createWhiteCard(text, { large: true });
-    card.classList.add('selectable');
-    card.dataset.index = index;
-    card.addEventListener('click', () => {
-      if (typeof onClick === 'function') onClick(index, card);
-    });
-    return card;
-  },
-
-  /**
-   * Create a mini card with a delete button (for card creation screen).
-   */
-  createDeletableCard(text, type, onDelete) {
-    const card = type === 'black'
-      ? this.createBlackCard(text, { mini: true })
-      : this.createWhiteCard(text, { mini: true });
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'card-delete-btn';
-    deleteBtn.innerHTML = '✕';
-    deleteBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (typeof onDelete === 'function') onDelete();
-    });
-    card.style.position = 'relative';
-    card.appendChild(deleteBtn);
-    return card;
-  },
-
-  /** Highlight blanks in black card text */
-  _formatBlackText(text) {
-    return text.replace(/_{3,}/g, '<span style="border-bottom:2px solid rgba(139,92,246,0.6);padding:0 0.5em;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>');
-  },
+const CardComponent={
+ _data(value){return typeof value==='object'&&value?{text:String(value.text||''),materialTier:value.materialTier||'standard',borderTier:value.borderTier||'standard',isPlayerCard:!!value.isPlayerCard}:{text:String(value||''),materialTier:'standard',borderTier:'standard',isPlayerCard:false};},
+ _escape(v){const d=document.createElement('div');d.textContent=String(v||'');return d.innerHTML;},
+ _decorate(card,data){if(data.materialTier!=='standard')card.classList.add(`tier-${data.materialTier}`);if(data.borderTier!=='standard')card.classList.add(`border-${data.borderTier}`);if(data.isPlayerCard||data.materialTier!=='standard'||data.borderTier!=='standard'){const badge=document.createElement('div');badge.className='card-progression-badge';const material={copper:'BRONZE',silver:'PRATA',gold:'OURO',platinum:'PLATINA'}[data.materialTier]||'';const border=data.borderTier!=='standard'?` · borda ${data.borderTier}`:'';badge.textContent=`★ ${material||'DE JOGADOR'}${border}`;card.appendChild(badge);}return card;},
+ createBlackCard(value,options={}){const data=this._data(value),card=document.createElement('div'),classes=['game-card','black'];if(options.large)classes.push('card-large');if(options.mini)classes.push('card-mini');if(options.winner)classes.push('winner');if(options.animated===false)card.style.animation='none';card.className=classes.join(' ');card.innerHTML=`<div class="card-text">${this._formatBlackText(data.text)}</div><div class="card-watermark">CARTA PARA CA<span style="color:white;text-decoration:underline">RTA</span>RALHO</div>`;return this._decorate(card,data);},
+ createWhiteCard(value,options={}){const data=this._data(value),card=document.createElement('div'),classes=['game-card','white'];if(options.large)classes.push('card-large');if(options.mini)classes.push('card-mini');if(options.winner)classes.push('winner');if(options.animated===false)card.style.animation='none';card.className=classes.join(' ');card.innerHTML=`<div class="card-text">${this._escape(data.text)}</div><div class="card-watermark" style="color:#000;opacity:.5">CARTA PARA CA<span style="color:#ef4444;text-decoration:underline">RTA</span>RALHO</div>`;return this._decorate(card,data);},
+ createSelectableWhiteCard(value,index,onClick){const card=this.createWhiteCard(value);card.classList.add('selectable');card.dataset.index=index;card.addEventListener('click',()=>typeof onClick==='function'&&onClick(index,card));return card;},
+ createAnonymousCard(value,index,onClick){const card=this.createWhiteCard(value,{large:true});card.classList.add('selectable');card.dataset.index=index;card.addEventListener('click',()=>typeof onClick==='function'&&onClick(index,card));return card;},
+ createDeletableCard(value,type,onDelete){const card=type==='black'?this.createBlackCard(value,{mini:true}):this.createWhiteCard(value,{mini:true}),btn=document.createElement('button');btn.className='card-delete-btn';btn.innerHTML='✕';btn.addEventListener('click',e=>{e.stopPropagation();typeof onDelete==='function'&&onDelete();});card.style.position='relative';card.appendChild(btn);return card;},
+ _formatBlackText(text){return this._escape(text).replace(/_{3,}/g,'<span style="border-bottom:2px solid rgba(139,92,246,.6);padding:0 .5em">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>');}
 };
