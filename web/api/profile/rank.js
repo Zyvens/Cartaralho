@@ -1,21 +1,2 @@
-const { sql } = require('../../lib/db');
-const { withErrors, ok, requireMethod } = require('../../lib/http');
-
-module.exports = withErrors(async (req, res) => {
-  if (!requireMethod(req, res, 'GET')) return;
-  const rows = await sql`
-    SELECT u.id, u.display_name, u.username,
-           COUNT(mp.id)::int AS matches,
-           COALESCE(SUM(mp.final_score), 0)::int AS points,
-           COALESCE(SUM(mp.rounds_won), 0)::int AS rounds_won,
-           COALESCE(SUM(CASE WHEN mp.won_match THEN 1 ELSE 0 END), 0)::int AS wins
-    FROM users u
-    LEFT JOIN match_players mp ON mp.user_id = u.id
-    GROUP BY u.id
-    ORDER BY points DESC, wins DESC, rounds_won DESC, matches ASC, u.display_name ASC
-    LIMIT 100`;
-  const recent = await sql`
-    SELECT room_code, ranking, winner_nickname, finished_at
-    FROM match_history ORDER BY finished_at DESC LIMIT 20`;
-  ok(res, { rank: rows, recentMatches: recent });
-});
+const{sql}=require('../../lib/db');const{withErrors,ok,requireMethod}=require('../../lib/http');
+module.exports=withErrors(async(req,res)=>{if(!requireMethod(req,res,'GET'))return;const seasons=await sql`SELECT id,name,starts_at,ends_at,is_active FROM seasons ORDER BY starts_at DESC`,requested=String(req.query?.season||'current'),active=seasons.find(s=>s.is_active)||seasons[0]||null,seasonId=requested==='all'?null:(requested==='current'?active?.id:Number(requested)||active?.id);let rows;if(seasonId){rows=await sql`SELECT u.id AS user_id,u.display_name,u.username,u.avatar_data,COUNT(mp.id)::int matches,COALESCE(SUM(mp.final_score),0)::int points,COALESCE(SUM(mp.rounds_won),0)::int rounds_won,COALESCE(SUM(CASE WHEN mp.won_match THEN 1 ELSE 0 END),0)::int wins FROM users u LEFT JOIN match_players mp ON mp.user_id=u.id AND mp.season_id=${seasonId} GROUP BY u.id ORDER BY points DESC,wins DESC,rounds_won DESC,matches ASC,u.display_name ASC LIMIT 100`;}else{rows=await sql`SELECT u.id AS user_id,u.display_name,u.username,u.avatar_data,COUNT(mp.id)::int matches,COALESCE(SUM(mp.final_score),0)::int points,COALESCE(SUM(mp.rounds_won),0)::int rounds_won,COALESCE(SUM(CASE WHEN mp.won_match THEN 1 ELSE 0 END),0)::int wins FROM users u LEFT JOIN match_players mp ON mp.user_id=u.id GROUP BY u.id ORDER BY points DESC,wins DESC,rounds_won DESC,matches ASC,u.display_name ASC LIMIT 100`;}const recent=seasonId?await sql`SELECT room_code,ranking,winner_nickname,finished_at FROM match_history WHERE season_id=${seasonId} ORDER BY finished_at DESC LIMIT 20`:await sql`SELECT room_code,ranking,winner_nickname,finished_at FROM match_history ORDER BY finished_at DESC LIMIT 20`;ok(res,{rank:rows,recentMatches:recent,seasons,currentSeason:active,selectedSeason:seasonId||'all'});});

@@ -14,9 +14,16 @@ ALTER TABLE rooms ADD COLUMN IF NOT EXISTS card_creation_enabled BOOLEAN NOT NUL
 
 CREATE TABLE IF NOT EXISTS users (
   id BIGSERIAL PRIMARY KEY, username TEXT NOT NULL, display_name TEXT NOT NULL, password_hash TEXT NOT NULL,
+  email TEXT, avatar_data TEXT, bio TEXT, recovery_hash TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(), last_login_at TIMESTAMPTZ
 );
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_data TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS bio TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS recovery_hash TEXT;
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username_lower ON users ((lower(username)));
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_lower ON users ((lower(email))) WHERE email IS NOT NULL;
+
 CREATE TABLE IF NOT EXISTS auth_sessions (
   token_hash TEXT PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   expires_at TIMESTAMPTZ NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -25,13 +32,19 @@ CREATE INDEX IF NOT EXISTS idx_auth_sessions_user ON auth_sessions(user_id);
 
 CREATE TABLE IF NOT EXISTS players (
   id TEXT NOT NULL, room_code TEXT NOT NULL REFERENCES rooms(code) ON DELETE CASCADE,
-  user_id BIGINT REFERENCES users(id) ON DELETE SET NULL, nickname TEXT NOT NULL, score INT NOT NULL DEFAULT 0,
-  hand JSONB NOT NULL DEFAULT '[]', cards_ready BOOLEAN NOT NULL DEFAULT false,
+  user_id BIGINT REFERENCES users(id) ON DELETE SET NULL, visual_id TEXT, nickname TEXT NOT NULL, avatar_data TEXT,
+  score INT NOT NULL DEFAULT 0, hand JSONB NOT NULL DEFAULT '[]', cards_ready BOOLEAN NOT NULL DEFAULT false,
   black_cards JSONB NOT NULL DEFAULT '[]', white_cards JSONB NOT NULL DEFAULT '[]', connected BOOLEAN NOT NULL DEFAULT true,
-  last_active TIMESTAMPTZ NOT NULL DEFAULT now(), joined_at TIMESTAMPTZ NOT NULL DEFAULT now(), PRIMARY KEY(id,room_code)
+  active BOOLEAN NOT NULL DEFAULT true, last_active TIMESTAMPTZ NOT NULL DEFAULT now(), joined_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY(id,room_code)
 );
 ALTER TABLE players ADD COLUMN IF NOT EXISTS user_id BIGINT REFERENCES users(id) ON DELETE SET NULL;
-CREATE INDEX IF NOT EXISTS idx_players_room_code ON players(room_code); CREATE INDEX IF NOT EXISTS idx_players_user_id ON players(user_id);
+ALTER TABLE players ADD COLUMN IF NOT EXISTS visual_id TEXT;
+ALTER TABLE players ADD COLUMN IF NOT EXISTS avatar_data TEXT;
+ALTER TABLE players ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT true;
+CREATE INDEX IF NOT EXISTS idx_players_room_code ON players(room_code);
+CREATE INDEX IF NOT EXISTS idx_players_user_id ON players(user_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_players_room_user ON players(room_code,user_id) WHERE user_id IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS deck_cards (
  id SERIAL PRIMARY KEY, type TEXT NOT NULL CHECK(type IN('blackCards','whiteCards')), text TEXT NOT NULL,
@@ -41,23 +54,39 @@ CREATE TABLE IF NOT EXISTS deck_cards (
 CREATE TABLE IF NOT EXISTS user_cards (
  id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
  type TEXT NOT NULL CHECK(type IN('blackCards','whiteCards')), text TEXT NOT NULL, owned BOOLEAN NOT NULL DEFAULT true,
- is_player_card BOOLEAN NOT NULL DEFAULT false, times_used INT NOT NULL DEFAULT 0, matches_used INT NOT NULL DEFAULT 0,
+ is_player_card BOOLEAN NOT NULL DEFAULT false, is_favorite BOOLEAN NOT NULL DEFAULT false,
+ times_used INT NOT NULL DEFAULT 0, matches_used INT NOT NULL DEFAULT 0,
  times_seen INT NOT NULL DEFAULT 0, times_won INT NOT NULL DEFAULT 0, duplicate_creation_count INT NOT NULL DEFAULT 0,
  created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now(), UNIQUE(user_id,type,text)
 );
 ALTER TABLE user_cards ADD COLUMN IF NOT EXISTS owned BOOLEAN NOT NULL DEFAULT true;
 ALTER TABLE user_cards ADD COLUMN IF NOT EXISTS is_player_card BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE user_cards ADD COLUMN IF NOT EXISTS is_favorite BOOLEAN NOT NULL DEFAULT false;
 CREATE INDEX IF NOT EXISTS idx_user_cards_user ON user_cards(user_id);
 
-CREATE TABLE IF NOT EXISTS match_history (
- id SERIAL PRIMARY KEY, room_code TEXT NOT NULL, ranking JSONB NOT NULL, winner_nickname TEXT, finished_at TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE IF NOT EXISTS seasons (
+ id BIGSERIAL PRIMARY KEY, name TEXT NOT NULL UNIQUE, starts_at TIMESTAMPTZ NOT NULL DEFAULT now(), ends_at TIMESTAMPTZ, is_active BOOLEAN NOT NULL DEFAULT true
 );
+INSERT INTO seasons(name,is_active) SELECT 'Temporada 1',true WHERE NOT EXISTS (SELECT 1 FROM seasons);
+
+CREATE TABLE IF NOT EXISTS match_history (
+ id SERIAL PRIMARY KEY, room_code TEXT NOT NULL, ranking JSONB NOT NULL, winner_nickname TEXT,
+ season_id BIGINT REFERENCES seasons(id) ON DELETE SET NULL, finished_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+ALTER TABLE match_history ADD COLUMN IF NOT EXISTS season_id BIGINT REFERENCES seasons(id) ON DELETE SET NULL;
+
 CREATE TABLE IF NOT EXISTS match_players (
  id BIGSERIAL PRIMARY KEY, room_code TEXT NOT NULL, user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
- nickname TEXT NOT NULL, final_score INT NOT NULL DEFAULT 0, rounds_won INT NOT NULL DEFAULT 0,
- won_match BOOLEAN NOT NULL DEFAULT false, finished_at TIMESTAMPTZ NOT NULL DEFAULT now(), UNIQUE(room_code,user_id)
+ nickname TEXT NOT NULL, avatar_data TEXT, final_score INT NOT NULL DEFAULT 0, rounds_won INT NOT NULL DEFAULT 0,
+ won_match BOOLEAN NOT NULL DEFAULT false, season_id BIGINT REFERENCES seasons(id) ON DELETE SET NULL,
+ finished_at TIMESTAMPTZ NOT NULL DEFAULT now(), UNIQUE(room_code,user_id)
 );
-CREATE INDEX IF NOT EXISTS idx_match_players_user ON match_players(user_id); CREATE INDEX IF NOT EXISTS idx_match_players_finished ON match_players(finished_at DESC);
+ALTER TABLE match_players ADD COLUMN IF NOT EXISTS avatar_data TEXT;
+ALTER TABLE match_players ADD COLUMN IF NOT EXISTS season_id BIGINT REFERENCES seasons(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_match_players_user ON match_players(user_id);
+CREATE INDEX IF NOT EXISTS idx_match_players_finished ON match_players(finished_at DESC);
+CREATE INDEX IF NOT EXISTS idx_match_players_season ON match_players(season_id);
+
 CREATE TABLE IF NOT EXISTS card_match_usage (
  room_code TEXT NOT NULL, user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
  type TEXT NOT NULL CHECK(type IN('blackCards','whiteCards')), text TEXT NOT NULL,
