@@ -15,7 +15,8 @@
     "productName": "Cartaralho",
     "files": [
       "**/*",
-      "!tools/**/*"
+      "!tools/**/*",
+      "!web/**/*"
     ],
     "directories": {
       "output": "dist"
