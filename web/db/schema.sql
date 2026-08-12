@@ -81,7 +81,6 @@ CREATE TABLE IF NOT EXISTS seasons (
 ALTER TABLE seasons ADD COLUMN IF NOT EXISTS season_key TEXT;
 ALTER TABLE seasons ADD COLUMN IF NOT EXISTS finalized_at TIMESTAMPTZ;
 CREATE UNIQUE INDEX IF NOT EXISTS idx_seasons_key ON seasons(season_key) WHERE season_key IS NOT NULL;
-INSERT INTO seasons(name,is_active) SELECT 'Temporada 1',true WHERE NOT EXISTS (SELECT 1 FROM seasons);
 
 CREATE TABLE IF NOT EXISTS match_history (
  id SERIAL PRIMARY KEY, room_code TEXT NOT NULL, ranking JSONB NOT NULL, winner_nickname TEXT,
