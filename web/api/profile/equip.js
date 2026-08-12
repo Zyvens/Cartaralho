@@ -1,0 +1,2 @@
+const{withErrors,ok,requireMethod,getBody}=require('../../lib/http');const{requireUser}=require('../../lib/auth');const{equip}=require('../../lib/metaGame');
+module.exports=withErrors(async(req,res)=>{if(!requireMethod(req,res,'POST'))return;const user=await requireUser(req,res);if(!user)return;const{titleKey,frameKey}=getBody(req);const equipped=await equip(user.id,titleKey||null,frameKey||null);ok(res,{equipped});});
