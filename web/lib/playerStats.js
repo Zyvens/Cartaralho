@@ -1,0 +1,67 @@
+const { sql } = require('./db');
+
+async function ensureOwnedCards(userId, type, texts) {
+  if (!userId) return;
+  for (const raw of texts || []) {
+    const text = String(raw || '').trim();
+    if (!text) continue;
+    await sql`INSERT INTO user_cards (user_id, type, text, owned)
+              VALUES (${userId}, ${type}, ${text}, true)
+              ON CONFLICT (user_id, type, text) DO UPDATE SET owned = true, updated_at = now()`;
+  }
+}
+
+async function markCreatedDuplicates(room, userId, type, texts) {
+  if (!userId) return;
+  const otherUserIds = Array.from(room.players.values()).map(p => p.userId).filter(id => id && String(id) !== String(userId));
+  for (const raw of texts || []) {
+    const text = String(raw || '').trim();
+    if (!text) continue;
+    await ensureOwnedCards(userId, type, [text]);
+    if (otherUserIds.length) {
+      await sql`UPDATE user_cards SET duplicate_creation_count = duplicate_creation_count + 1, updated_at = now()
+                WHERE user_id = ANY(${otherUserIds}) AND type = ${type} AND lower(text) = lower(${text})`;
+    }
+  }
+}
+
+async function recordUse(roomCode, userId, type, text) {
+  if (!userId || !text) return;
+  await sql`INSERT INTO user_cards (user_id, type, text, owned, times_used)
+            VALUES (${userId}, ${type}, ${text}, false, 1)
+            ON CONFLICT (user_id, type, text) DO UPDATE SET times_used = user_cards.times_used + 1, updated_at = now()`;
+  const existing = await sql`SELECT used_count FROM card_match_usage WHERE room_code=${roomCode} AND user_id=${userId} AND type=${type} AND text=${text}`;
+  await sql`INSERT INTO card_match_usage (room_code,user_id,type,text,used_count) VALUES (${roomCode},${userId},${type},${text},1)
+            ON CONFLICT (room_code,user_id,type,text) DO UPDATE SET used_count=card_match_usage.used_count+1`;
+  if (!existing.length) {
+    await sql`UPDATE user_cards SET matches_used = matches_used + 1 WHERE user_id=${userId} AND type=${type} AND text=${text}`;
+  }
+}
+
+async function recordSeen(room, type, text) {
+  if (!text) return;
+  for (const p of room.players.values()) {
+    if (!p.userId) continue;
+    await sql`INSERT INTO user_cards (user_id,type,text,owned,times_seen) VALUES (${p.userId},${type},${text},false,1)
+              ON CONFLICT (user_id,type,text) DO UPDATE SET times_seen=user_cards.times_seen+1, updated_at=now()`;
+  }
+}
+
+async function recordBlackWin(userId, text) {
+  if (!userId || !text) return;
+  await sql`INSERT INTO user_cards (user_id,type,text,owned,times_won) VALUES (${userId},'blackCards',${text},false,1)
+            ON CONFLICT (user_id,type,text) DO UPDATE SET times_won=user_cards.times_won+1, updated_at=now()`;
+}
+
+async function finalizeMatch(room) {
+  const ranking = Array.from(room.players.entries()).map(([playerId,p]) => ({ playerId, userId:p.userId || null, nickname:p.nickname, score:p.score })).sort((a,b)=>b.score-a.score);
+  const top = ranking[0];
+  for (const row of ranking) {
+    if (!row.userId) continue;
+    await sql`INSERT INTO match_players (room_code,user_id,nickname,final_score,rounds_won,won_match)
+              VALUES (${room.code},${row.userId},${row.nickname},${row.score},${row.score},${!!top && row.playerId===top.playerId})
+              ON CONFLICT (room_code,user_id) DO UPDATE SET final_score=EXCLUDED.final_score, rounds_won=EXCLUDED.rounds_won, won_match=EXCLUDED.won_match, finished_at=now()`;
+  }
+}
+
+module.exports={ensureOwnedCards,markCreatedDuplicates,recordUse,recordSeen,recordBlackWin,finalizeMatch};
