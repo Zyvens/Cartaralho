@@ -3,27 +3,4 @@ const gameManager = require('../../lib/gameManager');
 const roomStore = require('../../lib/roomStore');
 const { broadcast } = require('../../lib/pusherServer');
 const { applyPresenceSweep } = require('../../lib/roomEvents');
-
-module.exports = withErrors(async (req, res) => {
-  if (!requireMethod(req, res, 'POST')) return;
-  const { playerId, code, blackCards, whiteCards } = getBody(req);
-  if (!playerId || !code) return fail(res, 400, 'playerId e code são obrigatórios.');
-
-  const room = await roomStore.loadRoom(code);
-  if (!room) return fail(res, 404, 'Sala não encontrada.');
-
-  const swept = await applyPresenceSweep(room);
-  if (swept.deleted) return fail(res, 404, 'Sala não encontrada.');
-
-  const { allReady } = await gameManager.submitCards(room, playerId, blackCards || [], whiteCards || []);
-  await roomStore.saveRoom(room);
-
-  const playerStatuses = gameManager.getPlayerList(room).map(p => ({ nickname: p.nickname, cardsReady: p.cardsReady }));
-  await broadcast(room.code, 'cards_submitted', { playerStatuses });
-
-  if (allReady) {
-    await broadcast(room.code, 'all_cards_ready', { message: 'Todos os jogadores enviaram suas cartas! O jogo pode ser iniciado.' });
-  }
-
-  ok(res);
-});
+module.exports=withErrors(async(req,res)=>{if(!requireMethod(req,res,'POST'))return;const{playerId,code,blackCards,whiteCards,createdBlackCards,createdWhiteCards}=getBody(req);if(!playerId||!code)return fail(res,400,'playerId e code são obrigatórios.');const room=await roomStore.loadRoom(code);if(!room)return fail(res,404,'Sala não encontrada.');const swept=await applyPresenceSweep(room);if(swept.deleted)return fail(res,404,'Sala não encontrada.');const{allReady}=await gameManager.submitCards(room,playerId,blackCards||[],whiteCards||[],{createdBlackCards:createdBlackCards||[],createdWhiteCards:createdWhiteCards||[]});await roomStore.saveRoom(room);const statuses=gameManager.getPlayerList(room).map(p=>({nickname:p.nickname,cardsReady:p.cardsReady}));await broadcast(room.code,'cards_submitted',{playerStatuses:statuses});if(allReady)await broadcast(room.code,'all_cards_ready',{message:'Todos os jogadores estão prontos! O jogo pode ser iniciado.'});ok(res);});
