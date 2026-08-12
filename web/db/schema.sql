@@ -8,9 +8,11 @@ CREATE TABLE IF NOT EXISTS rooms (
   hand_size INT NOT NULL DEFAULT 5, use_standard_deck BOOLEAN NOT NULL DEFAULT true,
   card_creation_enabled BOOLEAN NOT NULL DEFAULT true, black_deck JSONB NOT NULL DEFAULT '[]',
   white_deck JSONB NOT NULL DEFAULT '[]', player_order JSONB NOT NULL DEFAULT '[]', current_round JSONB,
+  insufficient_since TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ALTER TABLE rooms ADD COLUMN IF NOT EXISTS card_creation_enabled BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE rooms ADD COLUMN IF NOT EXISTS insufficient_since TIMESTAMPTZ;
 
 CREATE TABLE IF NOT EXISTS users (
   id BIGSERIAL PRIMARY KEY, username TEXT NOT NULL, display_name TEXT NOT NULL, password_hash TEXT NOT NULL,
