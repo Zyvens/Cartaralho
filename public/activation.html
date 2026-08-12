@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Ativação do Cartaralho</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+    }
+    .activation-card {
+      background: rgba(25, 25, 25, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 40px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    .logo-row { font-size: 1.5rem; }
+    .hwid-box {
+      background: #111;
+      border: 1px dashed var(--accent-primary);
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+      color: var(--accent-primary);
+    }
+    .input {
+      width: 100%;
+      background: #111;
+      border: 1px solid #333;
+      color: #fff;
+      padding: 15px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      resize: vertical;
+      font-family: monospace;
+      min-height: 80px;
+    }
+    .btn { width: 100%; }
+    #error-msg {
+      color: var(--accent-danger);
+      margin-top: 15px;
+      font-size: 0.9rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="activation-card">
+    <div class="home-logo" style="margin-bottom: 20px;">
+      <div class="logo-row logo-outlined">CARTA PARA</div>
+      <div class="logo-row logo-outlined">CA<span class="logo-rta">RTA</span>RALHO</div>
+    </div>
+    
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px;">
+      O jogo está bloqueado. Envie o seu <strong>Código da Máquina</strong> abaixo para o desenvolvedor obter sua chave de ativação.
+    </p>
+
+    <div class="hwid-box" id="hwid-display">CARREGANDO...</div>
+
+    <textarea id="serial-input" class="input" placeholder="Cole o Serial de Liberação aqui..."></textarea>
+    
+    <button id="activate-btn" class="btn btn-primary btn-lg">Desbloquear Jogo</button>
+
+    <div id="error-msg">Serial Inválido. Verifique se copiou corretamente.</div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    // Receber HWID do processo principal
+    ipcRenderer.on('hwid', (event, hwid) => {
+      document.getElementById('hwid-display').innerText = hwid;
+    });
+
+    // Enviar tentativa de ativação
+    document.getElementById('activate-btn').addEventListener('click', () => {
+      const serial = document.getElementById('serial-input').value.trim();
+      if (!serial) return;
+      
+      const btn = document.getElementById('activate-btn');
+      btn.innerText = "Verificando...";
+      btn.disabled = true;
+
+      ipcRenderer.send('try-activate', serial);
+    });
+
+    // Receber falha na ativação
+    ipcRenderer.on('activation-failed', () => {
+      const btn = document.getElementById('activate-btn');
+      btn.innerText = "Desbloquear Jogo";
+      btn.disabled = false;
+      
+      const errorMsg = document.getElementById('error-msg');
+      errorMsg.style.display = 'block';
+    });
+  </script>
+</body>
+</html>

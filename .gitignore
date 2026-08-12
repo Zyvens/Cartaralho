@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+!build/installer.nsh
+
+# License signing key — NEVER commit. Leaking this lets anyone forge activation serials.
+tools/secret_private_key.pem
+npm-debug.log*
+.env
+.env.local
+.vercel
+*.log
+Thumbs.db
+.DS_Store
