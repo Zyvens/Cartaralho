@@ -2,7 +2,8 @@ const { withErrors, ok, fail, requireMethod, getBody } = require('../../lib/http
 const gameManager = require('../../lib/gameManager');
 const roomStore = require('../../lib/roomStore');
 const { broadcast } = require('../../lib/pusherServer');
-const { applyPresenceSweep, broadcastPlayerListUpdate, broadcastNewRound, broadcastGameOver } = require('../../lib/roomEvents');
+const { applyPresenceSweep, broadcastPlayerListUpdate, broadcastNewRound, broadcastGameOver, reconcilePlayerMinimum } = require('../../lib/roomEvents');
+const { GAME_STATES } = require('../../lib/constants');
 
 module.exports = withErrors(async (req, res) => {
   if (!requireMethod(req, res, 'POST')) return;
@@ -10,43 +11,43 @@ module.exports = withErrors(async (req, res) => {
   if (!playerId || !code) return fail(res, 400, 'playerId e code são obrigatórios.');
 
   const room = await roomStore.loadRoom(code);
-  if (!room) return ok(res); // already gone — leaving is idempotent
+  if (!room) return ok(res);
 
   const swept = await applyPresenceSweep(room);
-  if (swept.deleted) return ok(res);
+  if (swept.deleted || swept.gameOver) return ok(res);
 
-  const result = gameManager.removePlayer(room, playerId, true);
+  const result = gameManager.removePlayer(room, String(playerId), true);
   if (!result.removed) return ok(res);
 
   if (result.destroyed) {
-    await broadcast(room.code, 'room_closed', { message: 'O Host desconectou. A sala foi encerrada.' });
+    await broadcast(room.code, 'room_closed', { message: 'O Host saiu antes da partida começar. A sala foi encerrada.' });
     await roomStore.deleteRoom(room.code);
     return ok(res);
   }
 
-  if (room.players.size === 0) {
+  const liveState=[GAME_STATES.EM_ANDAMENTO,GAME_STATES.VOTACAO,GAME_STATES.RESULTADO_RODADA].includes(room.state);
+  if (!liveState && gameManager.activeCount(room) === 0) {
     await roomStore.deleteRoom(room.code);
     return ok(res);
   }
 
   await roomStore.saveRoom(room);
-  await broadcast(room.code, 'player_left', { nickname: result.nickname });
+  await broadcast(room.code, 'player_left', { nickname: result.nickname, canRejoin: liveState, message: liveState ? `${result.nickname} saiu da mesa e pode reingressar pelo código enquanto a partida existir.` : undefined });
 
-  if (result.gameOver) {
-    await broadcastGameOver(room, 'Jogadores insuficientes. O jogo acabou!');
-  } else {
-    await broadcastPlayerListUpdate(room);
-    if (result.czarDropped && room.currentRound) {
-      await broadcast(room.code, 'round_skipped', { message: 'O Czar abandonou a partida. Pulando rodada...' });
-      const { gameOver: nextGameOver } = gameManager.nextRound(room);
+  const minimum = await reconcilePlayerMinimum(room);
+  if (minimum.ended) return ok(res);
+
+  await broadcastPlayerListUpdate(room);
+  if (!minimum.waiting && (result.masterDropped || result.czarDropped) && room.currentRound) {
+    const master = room.players.get(String(room.currentRound.hostId));
+    if (!master || master.active === false) {
+      await broadcast(room.code, 'round_skipped', { message: 'O Mestre saiu da partida. Pulando a rodada...' });
+      const { gameOver: nextGameOver } = await gameManager.nextRound(room);
       await roomStore.saveRoom(room);
-      if (nextGameOver) {
-        await broadcastGameOver(room, 'O jogo acabou! Não há mais cartas pretas.');
-      } else {
-        await broadcastNewRound(room);
-      }
+      if (nextGameOver) await broadcastGameOver(room, 'O jogo acabou! Não há mais cartas pretas.');
+      else await broadcastNewRound(room);
     }
   }
 
-  ok(res);
+  ok(res, { minimumGrace: minimum.waiting ? minimum : null });
 });
