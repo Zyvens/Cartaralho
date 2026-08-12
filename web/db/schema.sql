@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS user_cards (
   user_id                    BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   type                       TEXT NOT NULL CHECK (type IN ('blackCards', 'whiteCards')),
   text                       TEXT NOT NULL,
+  owned                      BOOLEAN NOT NULL DEFAULT true,
   times_used                 INT NOT NULL DEFAULT 0,
   matches_used               INT NOT NULL DEFAULT 0,
   times_seen                 INT NOT NULL DEFAULT 0,
@@ -82,6 +83,7 @@ CREATE TABLE IF NOT EXISTS user_cards (
   updated_at                 TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE (user_id, type, text)
 );
+ALTER TABLE user_cards ADD COLUMN IF NOT EXISTS owned BOOLEAN NOT NULL DEFAULT true;
 CREATE INDEX IF NOT EXISTS idx_user_cards_user ON user_cards(user_id);
 
 CREATE TABLE IF NOT EXISTS match_history (
