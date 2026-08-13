@@ -1,6 +1,7 @@
 (()=>{
 const rarityLabels={common:'Comum',rare:'Incomum',superrare:'Raro',epic:'Épico',legendary:'Lendário'};
 const frameNames={bronze:'Bronze',silver:'Silver',gold:'Gold',platinum:'Platinum'};
+const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 function captureProfileDraft(pm){
   if(!pm?.overlay)return;
@@ -88,7 +89,7 @@ if(window.SocialUI){
   const basePersonRow=SocialUI.personRow.bind(SocialUI);
   SocialUI.personRow=function(x,type){
     if(type!=='outgoing')return basePersonRow(x,type);
-    return `<article class="social-person">${this.avatar(x)}<button class="social-person-name" data-public-user="${x.user_id}"><b>${String(x.display_name||'')}</b><small>@${String(x.username||'')}</small></button><div class="social-person-actions social-pending-actions"><span>Pendente</span><button class="social-cancel-button" data-friend-action="decline:${x.id}">Cancelar</button></div></article>`;
+    return `<article class="social-person">${this.avatar(x)}<button class="social-person-name" data-public-user="${x.user_id}"><b>${safe(x.display_name)}</b><small>@${safe(x.username)}</small></button><div class="social-person-actions social-pending-actions"><span>Pendente</span><button class="social-cancel-button" data-friend-action="decline:${x.id}">Cancelar</button></div></article>`;
   };
 }
 
