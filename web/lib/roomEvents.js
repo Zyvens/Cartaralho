@@ -5,73 +5,13 @@ const LIVE_STATES=new Set([GAME_STATES.EM_ANDAMENTO,GAME_STATES.VOTACAO,GAME_STA
 
 async function broadcastPlayerListUpdate(room){await broadcast(room.code,'player_list_update',{players:gameManager.getPlayerList(room),state:room.state,playerCount:gameManager.activeCount(room),maxPlayers:room.maxPlayers});}
 async function broadcastNewRound(room){const r=room.currentRound,p=room.players.get(r.hostId);await broadcast(room.code,'new_round',{roundNumber:r.number,blackCard:r.blackCard,hostNickname:p?p.nickname:'Desconhecido',hostId:r.hostId,scores:gameManager.getScoresForRoom(room)});}
-async function broadcastGameOver(room,message){const ranking=gameManager.calculateRanking(room),{seasonId}=await playerStats.finalizeMatch(room);await broadcast(room.code,'game_over',{message,ranking,winnerNickname:ranking[0]?.nickname||'Desconhecido'});await sql`INSERT INTO match_history(room_code,ranking,winner_nickname,season_id) VALUES(${room.code},${JSON.stringify(ranking)},${ranking[0]?.nickname||null},${seasonId})`;}
+async function broadcastGameOver(room,message,options={}){const ranking=gameManager.calculateRanking(room),{seasonId,economy}=await playerStats.finalizeMatch(room,{validForRewards:options.validForRewards!==false});await broadcast(room.code,'game_over',{message,ranking,winnerNickname:ranking[0]?.nickname||'Desconhecido',economy:economy?{engineVersion:economy.engineVersion,effectivePlayers:economy.effectivePlayers,effort:economy.effort,survivalBonus:economy.survivalBonus,validForRewards:economy.validForRewards,payouts:(economy.payouts||[]).map(p=>({userId:p.userId,position:p.position,total:p.total,placement:p.placement,survival:p.survival,consolation:p.consolation}))}:null});await sql`INSERT INTO match_history(room_code,ranking,winner_nickname,season_id) VALUES(${room.code},${JSON.stringify(ranking)},${ranking[0]?.nickname||null},${seasonId})`;}
 
-function getMinimumGrace(room){
-  if(!room||!LIVE_STATES.has(room.state)||!room.insufficientSince)return null;
-  const endsAt=room.insufficientSince+MINIMUM_GRACE_MS;
-  return{active:true,startedAt:new Date(room.insufficientSince).toISOString(),endsAt:new Date(endsAt).toISOString(),remainingSeconds:Math.max(0,Math.ceil((endsAt-Date.now())/1000)),activePlayers:gameManager.activeCount(room),minPlayers:MIN_PLAYERS};
-}
+function getMinimumGrace(room){if(!room||!LIVE_STATES.has(room.state)||!room.insufficientSince)return null;const endsAt=room.insufficientSince+MINIMUM_GRACE_MS;return{active:true,startedAt:new Date(room.insufficientSince).toISOString(),endsAt:new Date(endsAt).toISOString(),remainingSeconds:Math.max(0,Math.ceil((endsAt-Date.now())/1000)),activePlayers:gameManager.activeCount(room),minPlayers:MIN_PLAYERS};}
 
-async function advanceAfterRecoveredMinimum(room){
-  if(!room.currentRound)return;
-  if(room.state===GAME_STATES.RESULTADO_RODADA){
-    const{gameOver}=await gameManager.nextRound(room);await roomStore.saveRoom(room);
-    if(gameOver)await broadcastGameOver(room,'O jogo acabou! Não há mais cartas pretas.');else await broadcastNewRound(room);
-    return;
-  }
-  if(![GAME_STATES.EM_ANDAMENTO,GAME_STATES.VOTACAO].includes(room.state))return;
-  const master=room.players.get(String(room.currentRound.hostId));
-  if(master&&master.active!==false)return;
-  await broadcast(room.code,'round_skipped',{message:'O Mestre da rodada não está mais ativo. A rodada foi pulada.'});
-  const{gameOver}=await gameManager.nextRound(room);await roomStore.saveRoom(room);
-  if(gameOver)await broadcastGameOver(room,'O jogo acabou! Não há mais cartas pretas.');else await broadcastNewRound(room);
-}
+async function advanceAfterRecoveredMinimum(room){if(!room.currentRound)return;if(room.state===GAME_STATES.RESULTADO_RODADA){const{gameOver}=await gameManager.nextRound(room);await roomStore.saveRoom(room);if(gameOver)await broadcastGameOver(room,'O jogo acabou! Não há mais cartas pretas.');else await broadcastNewRound(room);return;}if(![GAME_STATES.EM_ANDAMENTO,GAME_STATES.VOTACAO].includes(room.state))return;const master=room.players.get(String(room.currentRound.hostId));if(master&&master.active!==false)return;await broadcast(room.code,'round_skipped',{message:'O Mestre da rodada não está mais ativo. A rodada foi pulada.'});const{gameOver}=await gameManager.nextRound(room);await roomStore.saveRoom(room);if(gameOver)await broadcastGameOver(room,'O jogo acabou! Não há mais cartas pretas.');else await broadcastNewRound(room);}
 
-async function reconcilePlayerMinimum(room){
-  if(!room)return{waiting:false,ended:false};
-  if(!LIVE_STATES.has(room.state)){
-    if(room.insufficientSince){room.insufficientSince=null;await roomStore.saveRoom(room);}
-    return{waiting:false,ended:false};
-  }
-  const activePlayers=gameManager.activeCount(room);
-  if(activePlayers>=MIN_PLAYERS){
-    const wasWaiting=!!room.insufficientSince;
-    if(wasWaiting){
-      room.insufficientSince=null;await roomStore.saveRoom(room);
-      await broadcast(room.code,'insufficient_players_cancelled',{message:'Jogadores suficientes novamente. A partida continua!',activePlayers,minPlayers:MIN_PLAYERS});
-      await advanceAfterRecoveredMinimum(room);
-    }
-    return{waiting:false,ended:false,resumed:wasWaiting,activePlayers,minPlayers:MIN_PLAYERS};
-  }
-  if(!room.insufficientSince){
-    room.insufficientSince=Date.now();await roomStore.saveRoom(room);
-    const grace=getMinimumGrace(room);
-    await broadcast(room.code,'insufficient_players_started',{...grace,message:`A mesa ficou com menos de ${MIN_PLAYERS} jogadores. Aguardando 1 minuto antes de encerrar.`});
-    return{waiting:true,ended:false,...grace};
-  }
-  const grace=getMinimumGrace(room);
-  if(!grace||grace.remainingSeconds<=0){
-    room.insufficientSince=null;room.state=GAME_STATES.FINALIZADA;await roomStore.saveRoom(room);
-    await broadcastGameOver(room,'A mesa ficou com jogadores insuficientes por 1 minuto. Partida encerrada automaticamente.');
-    return{waiting:false,ended:true,activePlayers,minPlayers:MIN_PLAYERS};
-  }
-  return{waiting:true,ended:false,...grace};
-}
+async function reconcilePlayerMinimum(room){if(!room)return{waiting:false,ended:false};if(!LIVE_STATES.has(room.state)){if(room.insufficientSince){room.insufficientSince=null;await roomStore.saveRoom(room);}return{waiting:false,ended:false};}const activePlayers=gameManager.activeCount(room);if(activePlayers>=MIN_PLAYERS){const wasWaiting=!!room.insufficientSince;if(wasWaiting){room.insufficientSince=null;await roomStore.saveRoom(room);await broadcast(room.code,'insufficient_players_cancelled',{message:'Jogadores suficientes novamente. A partida continua!',activePlayers,minPlayers:MIN_PLAYERS});await advanceAfterRecoveredMinimum(room);}return{waiting:false,ended:false,resumed:wasWaiting,activePlayers,minPlayers:MIN_PLAYERS};}if(!room.insufficientSince){room.insufficientSince=Date.now();await roomStore.saveRoom(room);const grace=getMinimumGrace(room);await broadcast(room.code,'insufficient_players_started',{...grace,message:`A mesa ficou com menos de ${MIN_PLAYERS} jogadores. Aguardando 1 minuto antes de encerrar.`});return{waiting:true,ended:false,...grace};}const grace=getMinimumGrace(room);if(!grace||grace.remainingSeconds<=0){room.insufficientSince=null;room.state=GAME_STATES.FINALIZADA;await roomStore.saveRoom(room);await broadcastGameOver(room,'A mesa ficou com jogadores insuficientes por 1 minuto. Partida encerrada automaticamente.',{validForRewards:false});return{waiting:false,ended:true,activePlayers,minPlayers:MIN_PLAYERS};}return{waiting:true,ended:false,...grace};}
 
-async function applyPresenceSweep(room){
-  const events=gameManager.sweepPresence(room);
-  const changed=events.disconnected.length||events.removed.length;
-  if(changed)await roomStore.saveRoom(room);
-  for(const d of events.disconnected)await broadcast(room.code,'player_disconnected',{nickname:d.nickname,userId:d.playerId});
-  for(const r of events.removed){
-    await broadcast(room.code,'player_left',{nickname:r.nickname,canRejoin:true,message:`${r.nickname} foi removido por 2 minutos de inatividade e pode reingressar usando o código da sala.`});
-    if(r.destroyed){await broadcast(room.code,'room_closed',{message:'O Host saiu antes da partida começar. A sala foi encerrada.'});await roomStore.deleteRoom(room.code);return{deleted:true};}
-  }
-  const minimum=await reconcilePlayerMinimum(room);
-  if(minimum.ended)return{deleted:false,gameOver:true,minimumGrace:null};
-  if(!minimum.waiting&&events.removed.some(r=>r.masterDropped||r.czarDropped))await advanceAfterRecoveredMinimum(room);
-  if(changed)await broadcastPlayerListUpdate(room);
-  return{deleted:false,gameOver:false,minimumGrace:getMinimumGrace(room)};
-}
+async function applyPresenceSweep(room){const events=gameManager.sweepPresence(room);const changed=events.disconnected.length||events.removed.length;if(changed)await roomStore.saveRoom(room);for(const d of events.disconnected)await broadcast(room.code,'player_disconnected',{nickname:d.nickname,userId:d.playerId});for(const r of events.removed){await broadcast(room.code,'player_left',{nickname:r.nickname,canRejoin:true,message:`${r.nickname} foi removido por 2 minutos de inatividade e pode reingressar usando o código da sala.`});if(r.destroyed){await broadcast(room.code,'room_closed',{message:'O Host saiu antes da partida começar. A sala foi encerrada.'});await roomStore.deleteRoom(room.code);return{deleted:true};}}const minimum=await reconcilePlayerMinimum(room);if(minimum.ended)return{deleted:false,gameOver:true,minimumGrace:null};if(!minimum.waiting&&events.removed.some(r=>r.masterDropped||r.czarDropped))await advanceAfterRecoveredMinimum(room);if(changed)await broadcastPlayerListUpdate(room);return{deleted:false,gameOver:false,minimumGrace:getMinimumGrace(room)};}
 module.exports={broadcastPlayerListUpdate,broadcastNewRound,broadcastGameOver,applyPresenceSweep,reconcilePlayerMinimum,getMinimumGrace,MINIMUM_GRACE_MS};
