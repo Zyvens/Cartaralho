@@ -20,6 +20,10 @@ test('carta branca e preta nunca colidem',()=>{
  assert.equal(identity.sameCanonicalCard('white','Mesmo texto','black','Mesmo texto'),false);
 });
 
+test('controles e caracteres invisíveis não alteram a identidade',()=>{
+ assert.equal(identity.sameCanonicalCard('white','A\u0001 B\u200B','whiteCards','A B'),true);
+});
+
 test('autoria só é original na partida de origem conhecida',()=>{
  assert.equal(identity.creationKind({origin_match_id:'ABC123',origin_uncertain:false},'ABC123'),'original');
  assert.equal(identity.creationKind({origin_match_id:'ABC123',origin_uncertain:false},'XYZ999'),'independent');
