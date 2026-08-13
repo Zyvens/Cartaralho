@@ -3,6 +3,14 @@ const esc=v=>{const d=document.createElement('div');d.textContent=String(v??'');
 const tierLabel=t=>({standard:'Padrão',copper:'Bronze',silver:'Prata',gold:'Ouro',platinum:'Platina'}[t]||'Padrão');
 const borderLabel=t=>({standard:'Padrão',bronze:'Bronze',silver:'Prata',gold:'Ouro',platinum:'Platina'}[t]||'Padrão');
 
+function polishHomeCopy(){
+  const copy=document.getElementById('home-play-copy');
+  if(!copy)return;
+  copy.classList.add('home-play-copy-centered');
+  const title=copy.querySelector('h2');
+  if(title&&!title.querySelector('.home-copy-line'))title.innerHTML='<span class="home-copy-line home-copy-line-first">Abra uma mesa</span><span class="home-copy-line home-copy-line-second"> e deixe o bom senso do lado de fora.</span>';
+}
+
 function polishPlayIdentity(){
   const form=document.getElementById('play-form');if(!form)return;
   form.querySelector('#match-avatar')?.remove();
@@ -17,9 +25,10 @@ function polishPlayIdentity(){
   const input=group.querySelector('#match-nickname');if(input)input.placeholder='Seu apelido nesta partida';
 }
 
-const observer=new MutationObserver(()=>polishPlayIdentity());
+const observer=new MutationObserver(()=>{polishPlayIdentity();polishHomeCopy();});
 observer.observe(document.documentElement,{childList:true,subtree:true});
 document.addEventListener('click',e=>{if(e.target.closest('#btn-play'))setTimeout(polishPlayIdentity,0);});
+setTimeout(polishHomeCopy,0);
 
 if(window.ProfessionalUI){
   ProfessionalUI.renderCards=async function(panel){
