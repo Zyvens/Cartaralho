@@ -9,7 +9,10 @@ module.exports=withErrors(async(req,res)=>{
  if(!requireMethod(req,res,'POST'))return;
  const user=await requireUser(req,res);if(!user)return;
  if(process.env.PAID_CARD_CREATION_ENABLED==='false')return fail(res,503,'Criação paga temporariamente indisponível.');
- const{code,type,text,creationId}=getBody(req),room=await roomStore.loadRoom(code);
+ const{code,type,text,creationId}=getBody(req);
+ if(!code)return fail(res,400,'Código da sala é obrigatório.');
+ if(String(creationId||'').trim().length<8)return fail(res,400,'Identificador de criação inválido.');
+ const room=await roomStore.loadRoom(code);
  if(!room)return fail(res,404,'Sala não encontrada.');
  const player=Array.from(room.players.values()).find(p=>String(p.userId)===String(user.id));
  if(!player||player.active===false)return fail(res,403,'Você não está ativo nesta sala.');
