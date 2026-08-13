@@ -1,6 +1,8 @@
 (()=>{
 const rarityLabels={common:'Comum',rare:'Incomum',superrare:'Raro',epic:'Épico',legendary:'Lendário'};
-const frameNames={bronze:'Bronze',silver:'Silver',gold:'Gold',platinum:'Platinum'};
+const frameNames={bronze:'Bronze',silver:'Prata',gold:'Ouro',platinum:'Platina'};
+const frameDescriptions={bronze:'Tenha 5 cartas Bronze no seu baralho.',silver:'Tenha 5 cartas Prata no seu baralho.',gold:'Tenha 5 cartas Ouro no seu baralho.',platinum:'Tenha 5 cartas Platina no seu baralho.'};
+const baseFrameKeys=['bronze','silver','gold','platinum'];
 const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 function captureProfileDraft(pm){
@@ -17,7 +19,14 @@ function captureProfileDraft(pm){
 function normalizeProfileData(pm){
   if(!pm?.data)return;
   pm.data.titles?.forEach(t=>{t.rarityInfo=t.rarityInfo||{};t.rarityInfo.label=rarityLabels[t.rarity]||t.rarityInfo.label||'Comum';});
-  pm.data.frames?.forEach(f=>{if(frameNames[f.key])f.name=frameNames[f.key];});
+  if(Array.isArray(pm.data.frames)){
+    pm.data.frames=pm.data.frames.filter(f=>baseFrameKeys.includes(f.key));
+    pm.data.frames.forEach(f=>{
+      f.name=frameNames[f.key]||f.name;
+      f.description=frameDescriptions[f.key]||f.description;
+    });
+    if(pm.data.equipped?.frameKey&&!baseFrameKeys.includes(pm.data.equipped.frameKey))pm.data.equipped.frameKey=null;
+  }
 }
 
 function bindProfileDraft(pm){
@@ -65,15 +74,27 @@ if(window.ProfileModal){
     return baseOpen(tab);
   };
 
+  const baseRender=ProfileModal.render.bind(ProfileModal);
+  ProfileModal.render=function(){normalizeProfileData(this);return baseRender();};
+
   const baseRenderTab=ProfileModal.renderTab.bind(ProfileModal);
   ProfileModal.renderTab=function(){
     normalizeProfileData(this);
     const r=baseRenderTab();
     if(this.activeTab==='frames'){
       const legend=this.overlay?.querySelector('.profile-modal-legend');
-      if(legend)legend.outerHTML='<div class="frame-progression-legend"><b>Progressão das molduras</b><span>● Copper/Bronze</span><span>● Silver</span><span>● Gold</span><span>● Platinum</span></div>';
+      if(legend)legend.outerHTML='<div class="frame-progression-legend"><span>● Bronze</span><span>● Prata</span><span>● Ouro</span><span>● Platina</span></div>';
     }
     bindProfileDraft(this);ensureProfileFooter(this);return r;
+  };
+
+  ProfileModal.frameCard=function(f){
+    const equipped=this.data.equipped.frameKey===f.key;
+    const pct=Math.min(100,(Number(f.progress||0)/Math.max(1,Number(f.target||1)))*100);
+    return `<article class="profile-modal-unlock profile-modal-frame-item frame-tier-${safe(f.key)} ${f.unlocked?'unlocked':'locked'} ${equipped?'equipped':''}">
+      <div class="profile-modal-frame-sample">${this.avatar(this.draftAvatar,64,f.key)}</div>
+      <div class="profile-modal-frame-copy"><div class="profile-modal-unlock-top">${equipped?'<span class="profile-modal-equipped-pill">EQUIPADO</span>':''}</div><h3>${safe(f.name)}</h3><p>${safe(f.description)}</p><div class="profile-modal-progress"><span style="width:${pct}%"></span></div><div class="profile-modal-unlock-foot"><small>${Math.min(Number(f.progress||0),Number(f.target||0))}/${f.target}</small>${f.unlocked?`<button type="button" class="profile-modal-equip-button" data-equip-frame="${safe(f.key)}">${equipped?'Usando':'Equipar'}</button>`:'<span>Bloqueada</span>'}</div></div>
+    </article>`;
   };
 
   ProfileModal.equipTitle=function(key){
@@ -93,6 +114,5 @@ if(window.SocialUI){
   };
 }
 
-// Mantém a escala de raridade de títulos/badges independente da progressão material/molduras.
 window.CartaralhoRarityLabels=rarityLabels;
 })();
