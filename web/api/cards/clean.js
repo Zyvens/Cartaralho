@@ -5,8 +5,10 @@ const cleanCards=require('../../lib/cleanCards');
 
 module.exports=withErrors(async(req,res)=>{
  const user=await requireUser(req,res);if(!user)return;
- if(req.method==='GET')return ok(res,{paidCardCreationEnabled:process.env.PAID_CARD_CREATION_ENABLED!=='false',inventory:await cleanCards.getInventory(user.id,20)});
+ const enabled=process.env.PAID_CARD_CREATION_ENABLED!=='false';
+ if(req.method==='GET')return ok(res,{paidCardCreationEnabled:enabled,inventory:await cleanCards.getInventory(user.id,20)});
  if(req.method!=='POST')return fail(res,405,'Método não permitido. Use GET ou POST.');
+ if(!enabled)return fail(res,503,'Compra de Cartas Limpas temporariamente indisponível. Seus créditos permanecem preservados.');
  const{action='purchase',type,purchaseId}=getBody(req);
  if(action!=='purchase')return fail(res,400,'Ação inválida.');
  const result=await cleanCards.purchase(user.id,type,purchaseId);
