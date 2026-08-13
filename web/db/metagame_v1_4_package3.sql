@@ -1,0 +1,6 @@
+-- Cartaralho v1.4 — Pacote 3 (1/4): base de Cartas Limpas.
+ALTER TABLE dirty_coin_ledger DROP CONSTRAINT IF EXISTS dirty_coin_ledger_transaction_type_check;
+ALTER TABLE dirty_coin_ledger ADD CONSTRAINT dirty_coin_ledger_transaction_type_check CHECK(transaction_type IN('starter_grant','match_placement','match_survival','match_consolation','mission_reward','clean_card_purchase','adjustment'));
+CREATE TABLE IF NOT EXISTS clean_card_wallets(user_id BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,white_balance INT NOT NULL DEFAULT 0 CHECK(white_balance>=0),black_balance INT NOT NULL DEFAULT 0 CHECK(black_balance>=0),updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS clean_card_ledger(id BIGSERIAL PRIMARY KEY,user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,card_type TEXT NOT NULL CHECK(card_type IN('white','black')),amount INT NOT NULL,transaction_type TEXT NOT NULL CHECK(transaction_type IN('starter_grant','purchase','creation_consume','adjustment')),idempotency_key TEXT NOT NULL UNIQUE,reference_type TEXT,reference_id TEXT,metadata JSONB NOT NULL DEFAULT '{}',created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE INDEX IF NOT EXISTS idx_clean_card_ledger_user_created ON clean_card_ledger(user_id,created_at DESC);
