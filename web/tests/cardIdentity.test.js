@@ -2,7 +2,7 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const identity=require('../lib/cardIdentity');
-const rewards=require('../lib/playerStats');
+const rewards=require('../lib/gameLogic');
 
 test('identidade ignora caixa e espaços não significativos',()=>{assert.equal(identity.sameCanonicalCard('whiteCards','Minha Carta','white','  MINHA   CARTA '),true);});
 test('NFKC unifica representações equivalentes',()=>{assert.equal(identity.sameCanonicalCard('blackCards','ＡＢＣ','black','ABC'),true);});
