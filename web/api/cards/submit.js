@@ -7,42 +7,5 @@ const { applyPresenceSweep } = require('../../lib/roomEvents');
 const { validateCards } = require('../../lib/validators');
 const { GAME_STATES } = require('../../lib/constants');
 const canonicalSubmission = require('../../lib/canonicalSubmission');
-
-async function inferCreated(room,player,type,texts){
- if(!player?.userId)return [];
- const created=[];
- for(const raw of texts||[]){
-  const text=String(raw||'').trim();
-  if(!text)continue;
-  const resolved=await canonicalSubmission.resolveSubmittedCard({type,text,userId:player.userId,creatorName:player.nickname,matchId:room.code});
-  if(resolved.isCreation)created.push(text);
- }
- return created;
-}
-
-module.exports=withErrors(async(req,res)=>{
- if(!requireMethod(req,res,'POST'))return;
- const{playerId,code,blackCards=[],whiteCards=[]}=getBody(req);
- if(!playerId||!code)return fail(res,400,'playerId e code são obrigatórios.');
- const room=await roomStore.loadRoom(code);
- if(!room)return fail(res,404,'Sala não encontrada.');
- const swept=await applyPresenceSweep(room);
- if(swept.deleted)return fail(res,404,'Sala não encontrada.');
- const player=room.players.get(String(playerId));
- if(!player||player.active===false)return fail(res,400,'Você não está nesta sala.');
- if(player.cardsReady)return fail(res,400,'Você já concluiu suas Cartas de Jogador.');
- if(![GAME_STATES.CADASTRO_CARTAS,GAME_STATES.AGUARDANDO_JOGADORES].includes(room.state))return fail(res,400,'Não é possível enviar cartas neste momento.');
- const validation=validateCards(blackCards,whiteCards);
- if(!validation.valid)return fail(res,400,validation.error);
-
- // A autoria é decidida no servidor: se a conta já possuía a identidade, é reutilização;
- // se não possuía, é criação. A partida de origem decide original x recriação independente.
- const createdBlackCards=await inferCreated(room,player,'blackCards',blackCards);
- const createdWhiteCards=await inferCreated(room,player,'whiteCards',whiteCards);
- const{allReady}=await gameManager.submitCards(room,playerId,blackCards,whiteCards,{createdBlackCards,createdWhiteCards});
- await roomStore.saveRoom(room);
- const statuses=gameManager.getPlayerList(room).map(p=>({nickname:p.nickname,cardsReady:p.cardsReady}));
- await broadcast(room.code,'cards_submitted',{playerStatuses:statuses});
- if(allReady)await broadcast(room.code,'all_cards_ready',{message:'Todos os jogadores estão prontos! O jogo pode ser iniciado.'});
- ok(res);
-});
+async function inferCreated(player,type,texts){if(!player?.userId)return [];const created=[];for(const raw of texts||[]){const text=String(raw||'').trim();if(!text)continue;const inferred=await canonicalSubmission.inferSubmittedCard({type,text,userId:player.userId});if(inferred.isCreation)created.push(text);}return created;}
+module.exports=withErrors(async(req,res)=>{if(!requireMethod(req,res,'POST'))return;const{playerId,code,blackCards=[],whiteCards=[]}=getBody(req);if(!playerId||!code)return fail(res,400,'playerId e code são obrigatórios.');const room=await roomStore.loadRoom(code);if(!room)return fail(res,404,'Sala não encontrada.');const swept=await applyPresenceSweep(room);if(swept.deleted)return fail(res,404,'Sala não encontrada.');const player=room.players.get(String(playerId));if(!player||player.active===false)return fail(res,400,'Você não está nesta sala.');if(player.cardsReady)return fail(res,400,'Você já concluiu suas Cartas de Jogador.');if(![GAME_STATES.CADASTRO_CARTAS,GAME_STATES.AGUARDANDO_JOGADORES].includes(room.state))return fail(res,400,'Não é possível enviar cartas neste momento.');const validation=validateCards(blackCards,whiteCards);if(!validation.valid)return fail(res,400,validation.error);const createdBlackCards=await inferCreated(player,'blackCards',blackCards);const createdWhiteCards=await inferCreated(player,'whiteCards',whiteCards);const{allReady}=await gameManager.submitCards(room,playerId,blackCards,whiteCards,{createdBlackCards,createdWhiteCards});await roomStore.saveRoom(room);const statuses=gameManager.getPlayerList(room).map(p=>({nickname:p.nickname,cardsReady:p.cardsReady}));await broadcast(room.code,'cards_submitted',{playerStatuses:statuses});if(allReady)await broadcast(room.code,'all_cards_ready',{message:'Todos os jogadores estão prontos! O jogo pode ser iniciado.'});ok(res);});
