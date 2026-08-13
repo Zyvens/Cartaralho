@@ -65,13 +65,13 @@ CREATE TABLE IF NOT EXISTS canonical_card_legacy_milestones (
 WITH normalized_origins AS (
   SELECT co.*,
          CASE co.type WHEN 'whiteCards' THEN 'white' ELSE 'black' END AS canonical_type,
-         lower(regexp_replace(btrim(translate(normalize(COALESCE(co.text,''),NFKC),U&'\200B\200C\200D\2060\FEFF','')),'[[:space:]]+',' ','g')) AS normalized_text
+         lower(regexp_replace(btrim(regexp_replace(translate(translate(normalize(COALESCE(co.text,''),NFKC),E'\t\n\r\f\v','     '),U&'\200B\200C\200D\2060\FEFF',''),'[[:cntrl:]]','','g')),'[[:space:]]+',' ','g')) AS normalized_text
   FROM card_origins co
   WHERE co.type IN ('whiteCards','blackCards')
 ), normalized_user_cards AS (
   SELECT uc.*,
          CASE uc.type WHEN 'whiteCards' THEN 'white' ELSE 'black' END AS canonical_type,
-         lower(regexp_replace(btrim(translate(normalize(COALESCE(uc.text,''),NFKC),U&'\200B\200C\200D\2060\FEFF','')),'[[:space:]]+',' ','g')) AS normalized_text
+         lower(regexp_replace(btrim(regexp_replace(translate(translate(normalize(COALESCE(uc.text,''),NFKC),E'\t\n\r\f\v','     '),U&'\200B\200C\200D\2060\FEFF',''),'[[:cntrl:]]','','g')),'[[:space:]]+',' ','g')) AS normalized_text
   FROM user_cards uc
   WHERE uc.type IN ('whiteCards','blackCards')
 ), source_cards AS (
@@ -91,7 +91,7 @@ ON CONFLICT(card_type,normalized_text) DO NOTHING;
 
 WITH normalized_origins AS (
   SELECT co.*,CASE co.type WHEN 'whiteCards' THEN 'white' ELSE 'black' END AS canonical_type,
-         lower(regexp_replace(btrim(translate(normalize(COALESCE(co.text,''),NFKC),U&'\200B\200C\200D\2060\FEFF','')),'[[:space:]]+',' ','g')) AS normalized_text
+         lower(regexp_replace(btrim(regexp_replace(translate(translate(normalize(COALESCE(co.text,''),NFKC),E'\t\n\r\f\v','     '),U&'\200B\200C\200D\2060\FEFF',''),'[[:cntrl:]]','','g')),'[[:space:]]+',' ','g')) AS normalized_text
   FROM card_origins co WHERE co.type IN ('whiteCards','blackCards')
 )
 INSERT INTO canonical_card_authors(canonical_card_id,user_id,author_name_snapshot,authored_at)
@@ -103,7 +103,7 @@ ON CONFLICT(canonical_card_id,user_id) DO NOTHING;
 
 WITH normalized_origins AS (
   SELECT co.*,CASE co.type WHEN 'whiteCards' THEN 'white' ELSE 'black' END AS canonical_type,
-         lower(regexp_replace(btrim(translate(normalize(COALESCE(co.text,''),NFKC),U&'\200B\200C\200D\2060\FEFF','')),'[[:space:]]+',' ','g')) AS normalized_text
+         lower(regexp_replace(btrim(regexp_replace(translate(translate(normalize(COALESCE(co.text,''),NFKC),E'\t\n\r\f\v','     '),U&'\200B\200C\200D\2060\FEFF',''),'[[:cntrl:]]','','g')),'[[:space:]]+',' ','g')) AS normalized_text
   FROM card_origins co WHERE co.type IN ('whiteCards','blackCards')
 )
 INSERT INTO canonical_card_creation_events(canonical_card_id,user_id,match_id,creation_kind,created_at)
@@ -115,7 +115,7 @@ ON CONFLICT DO NOTHING;
 
 WITH normalized_user_cards AS (
   SELECT uc.*,CASE uc.type WHEN 'whiteCards' THEN 'white' ELSE 'black' END AS canonical_type,
-         lower(regexp_replace(btrim(translate(normalize(COALESCE(uc.text,''),NFKC),U&'\200B\200C\200D\2060\FEFF','')),'[[:space:]]+',' ','g')) AS normalized_text
+         lower(regexp_replace(btrim(regexp_replace(translate(translate(normalize(COALESCE(uc.text,''),NFKC),E'\t\n\r\f\v','     '),U&'\200B\200C\200D\2060\FEFF',''),'[[:cntrl:]]','','g')),'[[:space:]]+',' ','g')) AS normalized_text
   FROM user_cards uc WHERE uc.type IN ('whiteCards','blackCards')
 ), owned_candidates AS (
   SELECT nuc.id AS legacy_user_card_id,nuc.user_id,cc.id AS canonical_card_id,nuc.created_at,
