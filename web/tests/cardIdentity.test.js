@@ -29,3 +29,9 @@ test('autoria só é original na partida de origem conhecida',()=>{
  assert.equal(identity.creationKind({origin_match_id:'ABC123',origin_uncertain:false},'XYZ999'),'independent');
  assert.equal(identity.creationKind({origin_match_id:null,origin_uncertain:true},'ABC123'),'independent');
 });
+
+test('servidor decide criação pela posse anterior',()=>{
+ assert.equal(identity.submissionIsCreation(42,false),true);
+ assert.equal(identity.submissionIsCreation(42,true),false);
+ assert.equal(identity.submissionIsCreation(null,false),false);
+});

@@ -7,6 +7,7 @@ if(!process.env.DATABASE_URL){
 }else{
  const{sql}=require('../lib/db');
  const canonical=require('../lib/canonicalCards');
+ const submission=require('../lib/canonicalSubmission');
  test('concorrência preserva identidade, autoria e posse únicas',async()=>{
   const suffix=`p01_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
   const users=[];const cards=[];
@@ -22,6 +23,13 @@ if(!process.env.DATABASE_URL){
    assert.equal(String(same[0].canonicalCard.id),String(same[1].canonicalCard.id));
    const coauthors=await canonical.listAuthors(same[0].canonicalCard.id);
    assert.equal(coauthors.length,2);
+
+   const reuse=await submission.inferSubmittedCard({type:'whiteCards',text:sameText,userId:users[0].id});
+   assert.equal(reuse.isCreation,false);
+   const newCreator=await submission.inferSubmittedCard({type:'whiteCards',text:sameText,userId:users[2].id});
+   assert.equal(newCreator.isCreation,true);
+   const untouched=Number((await sql`SELECT COUNT(*)::int n FROM canonical_card_ownerships WHERE canonical_card_id=${same[0].canonicalCard.id} AND user_id=${users[2].id}`)[0].n);
+   assert.equal(untouched,0);
 
    const raceText=`Corrida ${suffix}`;
    const race=await Promise.all([

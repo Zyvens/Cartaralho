@@ -56,6 +56,10 @@ function creationKind(canonicalCard, matchId) {
   return String(canonicalCard.origin_match_id || '') === String(matchId) ? 'original' : 'independent';
 }
 
+function submissionIsCreation(userId, alreadyOwned) {
+  return Boolean(userId && !alreadyOwned);
+}
+
 module.exports = {
   canonicalCardType,
   legacyCardType,
@@ -63,5 +67,6 @@ module.exports = {
   normalizeCardText,
   canonicalIdentity,
   sameCanonicalCard,
-  creationKind
+  creationKind,
+  submissionIsCreation
 };
