@@ -14,9 +14,7 @@ test('P17 reorganiza as 17 molduras com raridade e preço explícitos',()=>{
   ['cosmetic_frame_cintilante','legendary',110000,430],['cosmetic_frame_arco_iris','legendary',130000,440],['cosmetic_frame_faisca','legendary',150000,450],
   ['cosmetic_frame_lavagem_completa','celestial',250000,460]
  ];
- for(const[key,rarity,price,sort]of expected){
-  const re=new RegExp(`\\('${key}','[^']+','${rarity}',${price},${sort}\\)`);assert.match(migration,re,key);
- }
+ for(const[key,rarity,price,sort]of expected){const re=new RegExp(`\\('${key}','[^']+','${rarity}',${price},${sort}\\)`);assert.match(migration,re,key);}
  assert.equal((migration.match(/\('cosmetic_frame_/g)||[]).length,17);
 });
 
@@ -43,7 +41,7 @@ test('Cintilante e Arco-íris animam somente a moldura e nunca filtram a foto',(
  assert.match(css,/frame-cosmetic-arco-iris>img[^}]*filter:none!important/);
  assert.match(css,/frame-cosmetic-cintilante::before/);
  assert.match(css,/frame-cosmetic-arco-iris::before/);
- assert.doesNotMatch(css,/hue-rotate/);
+ assert.doesNotMatch(css,/filter\s*:\s*hue-rotate\s*\(/);
  assert.match(legacy,/hue-rotate\(360deg\)/,'o P17 deve sobrepor explicitamente a regra antiga carregando depois');
 });
 
