@@ -16,6 +16,5 @@ module.exports=withErrors(async(req,res)=>{
  await roomStore.saveRoom(room);
  const players=gameManager.getPlayerList(room);
  await broadcast(room.code,'player_list_update',{players,state:room.state,playerCount:result.activeCount,maxPlayers:room.maxPlayers});
- if(result.allReady)await broadcast(room.code,'all_cards_ready',{message:'Todos os jogadores estão prontos! O Host pode iniciar a partida.'});
  ok(res,{ready:result.ready,allReady:result.allReady,state:room.state,players});
 });
