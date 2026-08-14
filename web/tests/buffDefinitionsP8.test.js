@@ -4,8 +4,8 @@ const assert=require('node:assert/strict');
 const{PHASES,list,get}=require('../lib/buffDefinitions');
 const keys=['buff_dedo_no_olho','buff_foi_sem_querer','buff_amigo_de_merda','buff_xo_ve_aqui','buff_mao_de_vaca','buff_testemunha_protegida','buff_toque_de_midas'];
 
-test('engine conhece exatamente os sete buffs simples do P08',()=>{
- const rows=list();assert.equal(rows.length,7);assert.deepEqual(rows.map(x=>x.key).sort(),[...keys].sort());for(const key of keys)assert.ok(get(key));
+test('engine preserva exatamente os sete buffs simples do P08 dentro do catálogo expandido',()=>{
+ const rows=list().filter(x=>keys.includes(x.key));assert.equal(rows.length,7);assert.deepEqual(rows.map(x=>x.key).sort(),[...keys].sort());for(const key of keys)assert.ok(get(key));
 });
 
 test('buffs de mão não são permitidos na escolha do Mestre',()=>{
