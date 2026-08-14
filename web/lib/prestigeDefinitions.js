@@ -15,6 +15,16 @@ const SPECIAL_TITLES={
 };
 
 const COSMETIC_EQUIP_KEYS={
+ 'cosmetic-lisa':{type:'frame',productKey:'cosmetic_frame_lisa'},
+ 'cosmetic-dupla':{type:'frame',productKey:'cosmetic_frame_dupla'},
+ 'cosmetic-pontilhada':{type:'frame',productKey:'cosmetic_frame_pontilhada'},
+ 'cosmetic-neon-roxa':{type:'frame',productKey:'cosmetic_frame_neon_roxa'},
+ 'cosmetic-faisca':{type:'frame',productKey:'cosmetic_frame_faisca'},
+ 'cosmetic-ornamental':{type:'frame',productKey:'cosmetic_frame_ornamental'},
+ 'cosmetic-cintilante':{type:'frame',productKey:'cosmetic_frame_cintilante'},
+ 'cosmetic-arco-iris':{type:'frame',productKey:'cosmetic_frame_arco_iris'},
+ 'cosmetic-folhas':{type:'frame',productKey:'cosmetic_frame_folhas'},
+ 'cosmetic-asas':{type:'frame',productKey:'cosmetic_frame_asas'},
  'cosmetic-fita-isolante':{type:'frame',productKey:'cosmetic_frame_fita_isolante'},
  'cosmetic-ouro-de-pobre':{type:'frame',productKey:'cosmetic_frame_ouro_de_pobre'},
  'cosmetic-neon-duvidoso':{type:'frame',productKey:'cosmetic_frame_neon_duvidoso'},
