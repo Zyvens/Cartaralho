@@ -1,0 +1,8 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
+const src=fs.readFileSync(path.join(__dirname,'..','lib','advancedRewards.js'),'utf8'),migration=fs.readFileSync(path.join(__dirname,'..','db','metagame_v1_4_package9.sql'),'utf8');
+test('pote saqueável acumula somente placement',()=>{assert.match(src,/pot\+=reward\.placement/);assert.doesNotMatch(src,/pot\+=reward\.survival/);assert.doesNotMatch(src,/pot\+=reward\.consolation/);});
+test('com Saqueador, colocação original é zero e sobrevivência permanece do destinatário',()=>{assert.match(src,/placement=raiders\.length\?0:Number\(r\.placement_reward/);assert.match(src,/survival=Number\(r\.survival_reward/);assert.match(src,/consolation=Number\(r\.consolation_reward/);});
+test('rateio é determinístico por user_id e resto inteiro',()=>{assert.match(src,/saqueador_participants WHERE room_code=\$\{code\} ORDER BY user_id/);assert.match(src,/Math\.floor\(pot\/raiders\.length\)/);assert.match(src,/pot%raiders\.length/);});
+test('settlement tem ledger próprio, janela e tabelas auditáveis',()=>{assert.match(src,/match_saqueador/);assert.match(src,/status='settled'/);assert.match(migration,/CREATE TABLE IF NOT EXISTS saqueador_settlements/);assert.match(migration,/CREATE TABLE IF NOT EXISTS saqueador_participants/);assert.match(migration,/CREATE TABLE IF NOT EXISTS saqueador_shares/);});
+test('crédito usa idempotency key antes de atualizar wallet',()=>{assert.match(src,/ON CONFLICT\(idempotency_key\) DO NOTHING/);assert.match(src,/UPDATE dirty_coin_wallets SET balance=balance\+COALESCE/);});
