@@ -15,7 +15,15 @@ const ACHIEVEMENTS=[
  {key:'autor-dez-adocoes',name:'Tráfico de Ideias',icon:'🔀',rarity:'superrare',description:'Suas criações somaram 10 adoções deliberadas por Espólio.',target:10,eventKey:'authored_adoption',title:{key:'traficante-de-ideias',name:'Traficante de Ideias'}},
  {key:'autor-alcance-dez',name:'Sua Desgraça se Espalha',icon:'📡',rarity:'rare',description:'Uma criação sua alcançou 10 proprietários distintos.',target:1,eventKey:'legacy_reach_10'},
  {key:'autor-viral',name:'Pegou',icon:'🦠',rarity:'epic',description:'Uma criação sua atingiu Legado Viral.',target:1,eventKey:'legacy_level_viral',title:{key:'viralizador',name:'Viralizador'}},
- {key:'autor-folclore',name:'Patrimônio Imaterial',icon:'🏛️',rarity:'legendary',description:'Uma criação sua atingiu Legado Folclore.',target:1,eventKey:'legacy_level_folclore',title:{key:'folclore-vivo',name:'Folclore Vivo'}}
+ {key:'autor-folclore',name:'Patrimônio Imaterial',icon:'🏛️',rarity:'legendary',description:'Uma criação sua atingiu Legado Folclore.',target:1,eventKey:'legacy_level_folclore',title:{key:'folclore-vivo',name:'Folclore Vivo'}},
+
+ // P19 — estatísticas persistentes que ainda não tinham badge/título próprio.
+ {key:'reciclagem-primeiro-lote',name:'Primeira Triagem',icon:'♻️',rarity:'common',description:'Recicle 10 Cartas de Jogador no Mercado Paralelo.',target:10,eventKey:'card_recycling',sumMetadata:'cardCount',title:{key:'catador-de-ideias',name:'Catador de Ideias'}},
+ {key:'mercado-primeira-compra',name:'Negócio Suspeito',icon:'🕳️',rarity:'common',description:'Faça sua primeira compra no Mercado Paralelo.',target:1,eventKey:'marketplace_purchase',title:{key:'cliente-suspeito',name:'Cliente Suspeito'}},
+ {key:'mercado-dez-compras',name:'Freguês do Beco',icon:'🛒',rarity:'rare',description:'Conclua 10 compras no Mercado Paralelo.',target:10,eventKey:'marketplace_purchase',title:{key:'frequentador-do-beco',name:'Frequentador do Beco'}},
+ {key:'lacuna-dupla-dez',name:'Dois por Um',icon:'✌️',rarity:'superrare',description:'Vença 10 rodadas em Cartas Pretas com duas lacunas.',target:10,eventKey:'double_gap_win',title:{key:'malabarista-de-lacunas',name:'Malabarista de Lacunas'}},
+ {key:'reciclagem-duzentas',name:'Economia Circular',icon:'♻️',rarity:'epic',description:'Recicle 200 Cartas de Jogador ao longo da sua conta.',target:200,eventKey:'card_recycling',sumMetadata:'cardCount',title:{key:'usina-de-ideias',name:'Usina de Ideias'}},
+ {key:'mercado-cem-compras',name:'Mercado É Meu',icon:'🕳️',rarity:'legendary',description:'Conclua 100 compras no Mercado Paralelo.',target:100,eventKey:'marketplace_purchase',title:{key:'magnata-do-mercado-paralelo',name:'Magnata do Mercado Paralelo'}}
 ];
 const LEGACY_MILESTONES=[
  {key:'adoption:first',test:s=>Number(s.adoption_count||0)>=1,xp:50},
