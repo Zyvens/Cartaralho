@@ -4,14 +4,14 @@
   const STORAGE_KEY='cartaralho:music-muted:v1';
   const AudioCtx=window.AudioContext||window.webkitAudioContext;
 
-  // Cartaralho should feel like a party that is one card away from going off the rails.
-  // The score is intentionally fast, syncopated and slightly abrasive, but still loopable.
-  const BPM=172;
+  // V2: the chaos lives in the groove and arrangement, not in wrong-sounding harmony.
+  // Fast arcade-party energy with a stable A-minor palette and a memorable hook.
+  const BPM=166;
   const STEP_SECONDS=60/BPM/2; // eighth-note grid
   const LOOKAHEAD_SECONDS=.32;
   const SCHEDULER_MS=55;
-  const MASTER_LEVEL=.048;
-  const LOOP_STEPS=64;
+  const MASTER_LEVEL=.05;
+  const LOOP_STEPS=128; // 16 bars
 
   let context=null;
   let master=null;
@@ -28,26 +28,40 @@
 
   let muted=storedMuted();
 
-  // D minor with a final A-major push: bright enough for a party, tense enough for chaos.
+  // Am -> F -> C -> G: familiar, energetic and fully inside A natural minor.
   const chords=[
-    [62,65,69], // Dm
-    [58,62,65], // Bb
-    [60,64,67], // C
-    [57,61,64], // A
+    [57,60,64], // Am
+    [53,57,60], // F
+    [48,52,55], // C
+    [55,59,62], // G
   ];
-  const roots=[38,34,36,33];
-  const bassOffsets=[0,0,12,0,7,0,10,7];
-  const lead=[
-    74,77,81,79,77,74,72,76,
-    74,70,74,77,81,77,74,72,
-    72,76,79,84,79,76,74,79,
-    73,76,81,85,84,81,76,73,
-    86,81,79,77,74,77,81,84,
-    82,77,74,70,74,77,79,81,
-    84,79,76,72,76,79,84,88,
-    85,81,76,73,76,81,85,88,
+  const roots=[45,41,36,43];
+  const barProgression=[0,1,2,3, 0,1,2,3, 1,3,0,0, 1,2,3,3];
+
+  // Bass uses only root, fifth and octave. No chromatic jumps.
+  const bassOffsets=[0,7,12,7, 0,7,12,7];
+  const leadGate=[1,0,1,1,0,1,0,1];
+
+  // One hook, then a B section and a return. Notes stay in A natural minor and favor chord tones.
+  const melodyBars=[
+    [69,null,72,76,null,72,null,69], // Am
+    [69,null,72,77,null,76,null,72], // F
+    [67,null,72,76,null,79,null,76], // C
+    [67,null,71,74,null,71,null,69], // G
+    [69,null,72,76,null,79,null,76], // Am variation
+    [69,null,72,77,null,72,null,69], // F
+    [67,null,72,76,null,72,null,67], // C
+    [67,null,71,74,null,79,null,74], // G lift
+
+    [69,72,77,76,null,72,null,69],   // F - B section
+    [71,74,79,74,null,71,null,67],   // G
+    [72,76,81,79,null,76,null,72],   // Am high answer
+    [69,72,76,81,null,79,null,76],   // Am
+    [69,72,77,81,null,77,null,72],   // F
+    [67,72,76,79,null,76,null,72],   // C
+    [71,74,79,83,null,79,null,74],   // G
+    [67,71,74,79,null,74,71,69],     // G turnaround
   ];
-  const leadGate=[1,1,0,1,1,0,1,1, 1,0,1,1,0,1,1,0];
 
   function midiToHz(note){return 440*Math.pow(2,(note-69)/12);}
 
@@ -56,28 +70,39 @@
     context=new AudioCtx();
     master=context.createGain();
     compressor=context.createDynamicsCompressor();
-    compressor.threshold.value=-18;
-    compressor.knee.value=12;
-    compressor.ratio.value=7;
-    compressor.attack.value=.004;
-    compressor.release.value=.16;
+    compressor.threshold.value=-19;
+    compressor.knee.value=14;
+    compressor.ratio.value=6;
+    compressor.attack.value=.006;
+    compressor.release.value=.18;
     master.gain.value=muted?0:MASTER_LEVEL;
     master.connect(compressor);
     compressor.connect(context.destination);
     return context;
   }
 
-  function tone(note,when,duration,type,level,detune=0,attack=.008){
+  function tone(note,when,duration,type,level,detune=0,attack=.008,cutoff=0){
     if(!context||!master||muted)return;
     const osc=context.createOscillator();
     const gain=context.createGain();
+    let sourceNode=osc;
     osc.type=type;
     osc.frequency.setValueAtTime(midiToHz(note),when);
     osc.detune.setValueAtTime(detune,when);
+
+    if(cutoff>0){
+      const filter=context.createBiquadFilter();
+      filter.type='lowpass';
+      filter.frequency.setValueAtTime(cutoff,when);
+      filter.Q.setValueAtTime(.7,when);
+      osc.connect(filter);
+      sourceNode=filter;
+    }
+
     gain.gain.setValueAtTime(.0001,when);
     gain.gain.exponentialRampToValueAtTime(level,when+attack);
     gain.gain.exponentialRampToValueAtTime(.0001,when+duration);
-    osc.connect(gain);
+    sourceNode.connect(gain);
     gain.connect(master);
     osc.start(when);
     osc.stop(when+duration+.03);
@@ -106,7 +131,7 @@
     filter.connect(gain);
     gain.connect(master);
     source.start(when);
-    source.stop(when+duration+(open ? .03 : .01));
+    source.stop(when+duration+(open?.03:.01));
   }
 
   function kick(when,accent=1){
@@ -114,81 +139,91 @@
     const osc=context.createOscillator();
     const gain=context.createGain();
     osc.type='sine';
-    osc.frequency.setValueAtTime(150,when);
-    osc.frequency.exponentialRampToValueAtTime(46,when+.095);
-    gain.gain.setValueAtTime(.34*accent,when);
-    gain.gain.exponentialRampToValueAtTime(.0001,when+.14);
+    osc.frequency.setValueAtTime(138,when);
+    osc.frequency.exponentialRampToValueAtTime(48,when+.09);
+    gain.gain.setValueAtTime(.32*accent,when);
+    gain.gain.exponentialRampToValueAtTime(.0001,when+.13);
     osc.connect(gain);
     gain.connect(master);
     osc.start(when);
-    osc.stop(when+.16);
+    osc.stop(when+.15);
   }
 
   function snare(when,accent=1){
-    noiseHit(when,.12,.13*accent,1350);
-    tone(43,when,.08,'triangle',.055*accent,-8,.003);
+    noiseHit(when,.105,.115*accent,1550);
+    tone(50,when,.065,'triangle',.032*accent,0,.003,1200);
   }
 
   function hat(when,open=false,accent=1){
-    noiseHit(when,open?.11:.035,(open?.045:.027)*accent,6500,open);
+    noiseHit(when,open?.095:.03,(open?.038:.021)*accent,7000,open);
   }
 
   function chordStab(chord,when,accent=1){
     chord.forEach((note,i)=>{
-      const detune=i===0?-5:i===1?3:7;
-      tone(note,when,STEP_SECONDS*.52,'sawtooth',.035*accent,detune,.004);
-      tone(note+12,when+.006,STEP_SECONDS*.34,'square',.012*accent,-detune,.003);
+      const detune=i===0?-2:i===1?0:2;
+      tone(note,when,STEP_SECONDS*.42,'sawtooth',.026*accent,detune,.004,2400);
+      tone(note+12,when+.004,STEP_SECONDS*.32,'triangle',.013*accent,-detune,.003,3200);
     });
   }
 
   function bass(note,when,accent=1){
-    tone(note,when,STEP_SECONDS*.72,'square',.105*accent,-4,.004);
-    tone(note-12,when,STEP_SECONDS*.68,'triangle',.075*accent,2,.004);
+    tone(note,when,STEP_SECONDS*.76,'triangle',.102*accent,0,.004,900);
+    tone(note+12,when,STEP_SECONDS*.54,'square',.026*accent,0,.004,1050);
   }
 
-  function leadHit(note,when,index){
-    const detune=(index%4===0?-8:index%4===1?5:index%4===2?-2:9);
-    tone(note,when+.008,STEP_SECONDS*.43,'square',.047,detune,.004);
-    if(index%8===7)tone(note+12,when+STEP_SECONDS*.48,STEP_SECONDS*.24,'sawtooth',.025,-detune,.003);
+  function leadHit(note,when,index,accent=1){
+    if(note===null||note===undefined)return;
+    const tinyDetune=index%2===0?-2:2;
+    tone(note,when+.008,STEP_SECONDS*.48,'triangle',.055*accent,tinyDetune,.004,3600);
+    tone(note+12,when+.012,STEP_SECONDS*.34,'square',.014*accent,-tinyDetune,.003,2600);
   }
 
+  // Controlled fill: fast, silly and energetic, but entirely built from the active chord.
   function chaosFill(chord,when,bar){
-    const notes=[chord[0]+12,chord[1]+12,chord[2]+12,chord[1]+24];
+    const notes=[chord[0]+12,chord[1]+12,chord[2]+12,chord[1]+12];
     notes.forEach((note,i)=>{
-      tone(note,when+i*STEP_SECONDS*.22,STEP_SECONDS*.18,i%2?'square':'sawtooth',.028,(bar%2?1:-1)*i*7,.002);
+      tone(note,when+i*STEP_SECONDS*.2,STEP_SECONDS*.16,i%2?'triangle':'square',.024,(i%2?-1:1)*2,.002,3000);
     });
-    kick(when+STEP_SECONDS*.46,.72);
-    snare(when+STEP_SECONDS*.72,.68);
+    if(bar===15){
+      kick(when+STEP_SECONDS*.42,.82);
+      snare(when+STEP_SECONDS*.68,.72);
+    }
   }
 
   function scheduleStep(index,when){
-    const bar=Math.floor(index/8)%8;
-    const progression=bar%4;
+    const bar=Math.floor(index/8)%16;
     const within=index%8;
+    const progression=barProgression[bar];
     const chord=chords[progression];
     const root=roots[progression];
+    const sectionB=bar>=8;
 
-    // Drums: relentless backbeat with extra kicks and end-of-bar open hats.
+    // Stable dance-punk backbone. Extra syncopated kicks appear in the second half.
     if(within===0||within===4)kick(when,within===0?1.08:.92);
-    if(within===3&&(bar%2===0))kick(when,.72);
-    if(within===5&&(bar%2===1))kick(when,.66);
-    if(within===2||within===6)snare(when,within===6?1.08:.94);
-    hat(when,within===7,within%2===0?1.08:.78);
-    if(within===1||within===5)hat(when+STEP_SECONDS*.5,false,.5);
+    if(sectionB&&within===3&&(bar%2===0))kick(when,.66);
+    if(sectionB&&within===7&&(bar%2===1))kick(when,.58);
+    if(within===2||within===6)snare(when,within===6?1.04:.94);
 
-    // Bass and sharp chord hits keep the harmony moving without turning into a pad.
-    if(within!==6||bar%2===0)bass(root+bassOffsets[within],when,within===0?1.12:.86);
-    if(within===0||within===3||within===4||(within===7&&bar%2===0))chordStab(chord,when,within===0?1.08:.82);
+    hat(when,within===7&&(bar%4===3),within%2===0?1.04:.78);
+    if(within===1||within===5)hat(when+STEP_SECONDS*.5,false,.42);
 
-    // Nervous lead line: deliberately leaves holes so the groove can punch through.
-    if(leadGate[index%leadGate.length])leadHit(lead[index%lead.length],when,index);
-
-    // Every second bar throws a tiny musical tantrum; the final bar gets the biggest fill.
-    if(within===7&&(bar%2===1))chaosFill(chord,when,bar);
-    if(bar===7&&within===6){
-      leadHit(93,when,index);
-      kick(when+STEP_SECONDS*.5,.82);
+    // Bass locks to root/fifth/octave and leaves breathing room around the backbeat.
+    if(within===0||within===2||within===4||within===6){
+      const offset=bassOffsets[within];
+      bass(root+offset,when,within===0?1.08:.84);
     }
+    if(sectionB&&within===7&&bar%2===0)bass(root+7,when,.62);
+
+    // Off-beat stabs create motion without fighting the melody.
+    if(within===1||within===3||within===5||(sectionB&&within===7)){
+      chordStab(chord,when,within===3?1:.82);
+    }
+
+    const melody=melodyBars[bar][within];
+    if(leadGate[within]&&melody!==null)leadHit(melody,when,index,sectionB?1.04:.94);
+
+    // Fills only close 4-bar phrases instead of interrupting every other bar.
+    if(within===7&&(bar===3||bar===7||bar===15))chaosFill(chord,when,bar);
   }
 
   function scheduleAhead(){
