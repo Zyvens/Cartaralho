@@ -31,10 +31,11 @@ test('mute persiste e expõe controle acessível',()=>{
   assert.match(js,/game-audio-toggle/);
 });
 
-test('botão é fixo no canto superior esquerdo e respeita safe-area',()=>{
+test('botão é fixo no canto superior direito, libera Voltar e respeita safe-area',()=>{
   assert.match(css,/position:fixed/);
   assert.match(css,/top:calc\([^)]*safe-area-inset-top/);
-  assert.match(css,/left:calc\([^)]*safe-area-inset-left/);
+  assert.match(css,/right:calc\([^)]*safe-area-inset-right/);
+  assert.match(css,/left:auto/);
   assert.match(css,/z-index:16000/);
   assert.match(css,/@media\(max-width:600px\)/);
 });
