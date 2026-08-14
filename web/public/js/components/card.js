@@ -7,5 +7,5 @@ const CardComponent={
  createSelectableWhiteCard(value,index,onClick){const card=this.createWhiteCard(value);card.classList.add('selectable');card.dataset.index=index;card.addEventListener('click',()=>typeof onClick==='function'&&onClick(index,card));return card;},
  createAnonymousCard(value,index,onClick){const card=this.createWhiteCard(value,{large:true});card.classList.add('selectable');card.dataset.index=index;card.addEventListener('click',()=>typeof onClick==='function'&&onClick(index,card));return card;},
  createDeletableCard(value,type,onDelete){const card=type==='black'?this.createBlackCard(value,{mini:true}):this.createWhiteCard(value,{mini:true}),btn=document.createElement('button');btn.className='card-delete-btn';btn.innerHTML='✕';btn.addEventListener('click',e=>{e.stopPropagation();typeof onDelete==='function'&&onDelete();});card.style.position='relative';card.appendChild(btn);return card;},
- _formatBlackText(text){return this._escape(text).replace(/_{3,}/g,'<span style="border-bottom:2px solid rgba(139,92,246,.6);padding:0 .5em">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>');}
+ _formatBlackText(text){return this._escape(text).replace(/_+/g,'<span class="black-card-gap" style="border-bottom:2px solid rgba(139,92,246,.72);padding:0 .5em">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>');}
 };
