@@ -6,7 +6,7 @@ const cardIdentity=require('../lib/cardIdentity');
 const{GAME_STATES}=require('../lib/constants');
 const defs=require('../lib/achievementDefinitions');
 
-const rewardUI=read('public/js/rewardPreviewUI.js'),previewApi=read('api/rooms/preview.js'),authClient=read('public/js/auth.js'),http=read('lib/http.js'),lobby=read('public/js/screens/lobby.js'),cardCreation=read('public/js/screens/cardCreation.js'),stackLegacy=read('public/js/cleanCardStacksFix.js'),host=read('public/js/screens/host.js'),round=read('public/js/screens/round.js'),result=read('public/js/screens/result.js'),gameplay=read('public/js/gameplayP19.js'),narrator=read('public/js/narrator.js'),playApi=read('api/game/play.js'),handApi=read('api/game/hand.js'),profileAppearance=read('public/js/profileAppearanceP19.js'),p19css=read('public/css/p19.css'),index=read('public/index.html'),backfill=read('lib/achievementBackfillP19.js'),metagameApi=read('api/profile/metagame.js'),statsApi=read('api/profile/stats.js'),pickWinner=read('api/game/pick-winner.js'),progression=read('lib/cardProgressionService.js');
+const rewardUI=read('public/js/rewardPreviewUI.js'),previewApi=read('api/rooms/preview.js'),authClient=read('public/js/auth.js'),http=read('lib/http.js'),lobby=read('public/js/screens/lobby.js'),cardCreation=read('public/js/screens/cardCreation.js'),stackLegacy=read('public/js/cleanCardStacksFix.js'),host=read('public/js/screens/host.js'),round=read('public/js/screens/round.js'),result=read('public/js/screens/result.js'),gameplay=read('public/js/gameplayP19.js'),narrator=read('public/js/narrator.js'),playApi=read('api/game/play.js'),handApi=read('api/game/hand.js'),advancedBuff=read('lib/advancedBuffEngine.js'),profileAppearance=read('public/js/profileAppearanceP19.js'),p19css=read('public/css/p19.css'),index=read('public/index.html'),backfill=read('lib/achievementBackfillP19.js'),metagameApi=read('api/profile/metagame.js'),statsApi=read('api/profile/stats.js'),pickWinner=read('api/game/pick-winner.js'),progression=read('lib/cardProgressionService.js');
 
 for(const[name,src]of[['rewardPreviewUI',rewardUI],['authClient',authClient],['lobby',lobby],['cardCreation',cardCreation],['host',host],['round',round],['result',result],['gameplayP19',gameplay],['narrator',narrator],['profileAppearanceP19',profileAppearance]])test(`${name} compila`,()=>assert.doesNotThrow(()=>new Function(src)));
 
@@ -55,6 +55,14 @@ test('round engine exige duas brancas e revela cada dupla como uma resposta',()=
  advanced.playCard(room,'3',0);const done=advanced.playCard(room,'3',0);assert.equal(done.allPlayed,true);assert.equal(room.state,GAME_STATES.VOTACAO);
  const answers=advanced.revealAnswers(room);assert.equal(answers.length,2);assert.deepEqual(answers.map(a=>a.cards.length),[2,2]);
  const winner=advanced.pickWinner(room,'1',answers[0].answerId);assert.equal(winner.winnerCards.length,2);assert.equal(players.get(String(winner.winnerId)).score,1);
+});
+
+test('Meu Jogo multiplica respostas, não confunde duas cartas de uma mesma resposta',()=>{
+ assert.match(advancedBuff,/round\.answerCount\(r,id\)>=2/);
+ assert.match(advancedBuff,/rr\.requiredSubmissions\[id\]=2/);
+ assert.match(advancedBuff,/const requiredCards=round\.required\(r,id\)/);
+ assert.match(advancedBuff,/cardsPerAnswer:round\.cardsPerAnswer\(r\)/);
+ assert.doesNotMatch(advancedBuff,/if\(round\.forUser\(r,id\)\.length>=2\).*already_double/);
 });
 
 test('UI, Narrador e resultado tratam resposta dupla como um conjunto',()=>{
