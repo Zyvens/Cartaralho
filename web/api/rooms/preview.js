@@ -6,6 +6,10 @@ const gameManager=require('../../lib/gameManager');
 const rewardPreview=require('../../lib/rewardPreview');
 module.exports=withErrors(async(req,res)=>{
  if(!requireMethod(req,res,'GET'))return;
+ // Endpoint autenticado e dinâmico: nunca deve produzir 304 sem corpo para o cliente.
+ res.setHeader('Cache-Control','private, no-store, no-cache, max-age=0, must-revalidate');
+ res.setHeader('Pragma','no-cache');
+ res.setHeader('Expires','0');
  const user=await requireUser(req,res);if(!user)return;
  const code=String(req.query?.code||'').trim().toUpperCase();
  if(code){
