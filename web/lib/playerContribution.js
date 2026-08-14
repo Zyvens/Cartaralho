@@ -6,5 +6,6 @@ function currentEligibility(room,player){return !requirementEnabled(room)||count
 function status(room,player){const contributionCount=count(player),contributionRequired=requirementEnabled(room),lootEligible=!contributionRequired||contributionCount>0;return{contributionCount,contributionRequired,lootEligible,requiresConfirmation:contributionRequired&&!lootEligible};}
 function freeze(room,player){const s=status(room,player);player.contributionCount=s.contributionCount;player.lootEligible=s.lootEligible;return s;}
 function clearFreeze(player){if(!player)return;delete player.contributionCount;delete player.lootEligible;}
-function finalEligibility(room,player){return typeof player?.lootEligible==='boolean'?player.lootEligible:currentEligibility(room,player);}
+// A liquidação revalida a seleção final e as regras atuais da sala; o snapshot de Pronto é apenas feedback de Lobby.
+function finalEligibility(room,player){return currentEligibility(room,player);}
 module.exports={cleanCount,count,requirementEnabled,currentEligibility,status,freeze,clearFreeze,finalEligibility};
