@@ -1,0 +1,10 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
+const defs=require('../lib/buffDefinitions');
+const root=path.join(__dirname,'..'),migration=fs.readFileSync(path.join(root,'db','metagame_v1_4_package9.sql'),'utf8'),engine=fs.readFileSync(path.join(root,'lib','advancedBuffEngine.js'),'utf8');
+const prices={buff_vou_fingir:400,buff_meu_jogo:450,buff_surrupiada:600,buff_censura_previa:650,buff_quem_nunca:700,buff_silencio_geral:750,buff_quero_tudo:850,buff_intervencao_federal:900,buff_apagao:950,buff_poder_subiu:1000,buff_caos_total:1100,buff_se_fode_ai:1200,buff_que_poder:1400,buff_saqueador:2500};
+test('catálogo mecânico contém os 21 buffs e os 14 avançados do P09',()=>{assert.equal(defs.list().length,21);for(const[key,price]of Object.entries(prices)){assert.ok(defs.get(key),key);assert.match(migration,new RegExp(`'${key}'[^\\n]*,${price},`));}});
+test('locks globais distinguem Surrupiada e troca de Carta Preta',()=>{assert.equal(defs.get('buff_surrupiada').globalLock,'surrupiada');assert.equal(defs.get('buff_censura_previa').globalLock,'black_swap');assert.equal(defs.get('buff_quem_nunca').globalLock,'black_swap');assert.match(migration,/PRIMARY KEY\(room_code,round_number,lock_key\)/);});
+test('engine protege Testemunha, Apagão e uma ativação por jogador/rodada',()=>{assert.match(engine,/protectedUsers\[String\(sub\.userId\)\]/);assert.match(engine,/blackoutRound===room\.currentRound\.number/);assert.match(engine,/buff_activations WHERE room_code=\$\{room\.code\} AND round_number=\$\{rn\} AND user_id=\$\{id\}/);});
+test('Intervenção queima ambos e compensa uso retirado',()=>{assert.match(engine,/status='cancelled'/);assert.match(engine,/cancelled_by_activation_id/);assert.match(engine,/cancelledRestoreQueries/);assert.match(engine,/UPDATE buff_inventory SET quantity=quantity-1/);});
+test('Que Poder usa posse temporária sem criar ownership',()=>{assert.match(engine,/temporaryPossessions/);assert.match(engine,/progressEligible:false/);assert.doesNotMatch(engine,/canonical_card_ownerships/);assert.doesNotMatch(engine,/ensureOwnedCards/);});
