@@ -16,11 +16,13 @@ test('arranjo possui bateria, baixo, staccato e viradas caóticas',()=>{
   assert.doesNotMatch(soundtrack,/function padChord\(/);
 });
 
-test('controles de áudio e preferência de mute permanecem compatíveis',()=>{
+test('preferências e API de áudio permanecem compatíveis sem botão flutuante',()=>{
   assert.match(soundtrack,/cartaralho:music-muted:v1/);
-  assert.match(soundtrack,/game-audio-toggle/);
   assert.match(soundtrack,/visibilitychange/);
   assert.match(soundtrack,/CartSoundtrack/);
+  assert.match(soundtrack,/mute\(\)\{return setMuted\(true\);\}/);
+  assert.match(soundtrack,/unmute\(\)\{return setMuted\(false\);\}/);
   assert.match(soundtrack,/pointerdown/);
   assert.match(soundtrack,/keydown/);
+  assert.doesNotMatch(soundtrack,/game-audio-toggle|installButton|document\.body\.appendChild/);
 });
