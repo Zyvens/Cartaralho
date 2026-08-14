@@ -1,0 +1,8 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
+const root=path.join(__dirname,'..'),defs=require(path.join(root,'lib','achievementDefinitions')),src=fs.readFileSync(path.join(root,'lib','achievementService.js'),'utf8'),migration=fs.readFileSync(path.join(root,'db','metagame_v1_4_package10.sql'),'utf8');
+test('milestones oficiais cobrem adoção, alcance e níveis de Legado',()=>{const keys=defs.LEGACY_MILESTONES.map(x=>x.key);for(const k of['adoption:first','reach:10','reach:25','reach:100','reach:250','reach:1000','legacy_level:viral','legacy_level:classico','legacy_level:folclore'])assert.ok(keys.includes(k),k);});
+test('Direitos Autorais Sujos pagam 20 por cento do XP',()=>{for(const m of defs.LEGACY_MILESTONES)assert.equal(m.coins,Math.round(m.xp*.20));assert.match(migration,/legacy_royalty/);});
+test('milestone só pode ser reivindicado quando rewarded_at está nulo',()=>{assert.match(src,/rewarded_at IS NULL/);assert.match(src,/legacy:\$\{cardId\}:\$\{key\}:\$\{userId\}/);assert.match(src,/ON CONFLICT\(idempotency_key\) DO NOTHING/);});
+test('reward usa creator_user_id e percorre cada coautor',()=>{assert.match(src,/canonical_card_authors a JOIN canonical_card_stats/);assert.match(src,/creator_user_id=\$\{userId\}/);assert.match(src,/for\(const s of cards\)/);});
+test('migration estende milestone existente sem criar sistema paralelo de autoria',()=>{assert.match(migration,/ALTER TABLE canonical_card_legacy_milestones/);assert.doesNotMatch(migration,/CREATE TABLE IF NOT EXISTS .*royalt/i);assert.match(migration,/xp_reward/);assert.match(migration,/coin_reward/);assert.match(migration,/rewarded_at/);});
