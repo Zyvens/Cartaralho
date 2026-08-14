@@ -1,0 +1,119 @@
+/* Cartaralho — UI/UX + Audio refinement package. Loaded last on purpose. */
+
+/* Back navigation: visible, touch friendly and safe-area aware. */
+.back-button{
+  position:sticky;top:calc(env(safe-area-inset-top,0px) + 10px);z-index:120;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:42px;padding:9px 15px;margin:0 0 18px;
+  border:1px solid rgba(255,255,255,.2);border-radius:999px;
+  background:rgba(20,20,34,.94);color:#fff!important;font-weight:800;font-family:var(--font-display);
+  box-shadow:0 8px 24px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter:blur(14px);cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+.back-button:hover{transform:translateY(-1px);border-color:rgba(168,85,247,.75);box-shadow:0 8px 25px rgba(0,0,0,.42),0 0 18px rgba(139,92,246,.22)}
+.back-button:focus-visible{outline:3px solid rgba(168,85,247,.35);outline-offset:3px}
+
+/* Rarity order is visual even when older endpoints return legacy array order. */
+.profile-modal-unlock-grid>.rarity-common,.unlock-grid>.rarity-common{order:1}
+.profile-modal-unlock-grid>.rarity-rare,.unlock-grid>.rarity-rare{order:2}
+.profile-modal-unlock-grid>.rarity-superrare,.unlock-grid>.rarity-superrare{order:3}
+.profile-modal-unlock-grid>.rarity-epic,.unlock-grid>.rarity-epic{order:4}
+.profile-modal-unlock-grid>.rarity-legendary,.unlock-grid>.rarity-legendary{order:5}
+.profile-modal-unlock-grid>.rarity-celestial,.unlock-grid>.rarity-celestial{order:6}
+
+/* Progression frames deliberately outrank ordinary cosmetics in visual presence. */
+.avatar-frame.frame-bronze,.avatar-frame.frame-silver,.avatar-frame.frame-gold,.avatar-frame.frame-platinum{
+  position:relative;padding:5px!important;isolation:isolate;overflow:visible;
+}
+.avatar-frame.frame-bronze::before,.avatar-frame.frame-silver::before,.avatar-frame.frame-gold::before,.avatar-frame.frame-platinum::before{
+  content:'';position:absolute;inset:-3px;border-radius:inherit;z-index:-1;opacity:.9;filter:blur(7px);animation:p13FramePulse 3.8s ease-in-out infinite;
+}
+.avatar-frame.frame-bronze{background:conic-gradient(from 210deg,#3d1b0a,#8a421e,#f0a05f,#6d2d12,#c66d34,#ffe0b6,#5b260e);box-shadow:0 0 0 2px #d77b3c,0 0 16px rgba(224,113,47,.68),0 0 31px rgba(159,67,25,.4),inset 0 1px 3px rgba(255,231,195,.72)}
+.avatar-frame.frame-bronze::before{background:conic-gradient(#ff9f53,#6c2c12,#ffc78d,#8f3e18,#ff9f53)}
+.avatar-frame.frame-silver{background:conic-gradient(from 195deg,#505765,#f8fbff,#8d9aaa,#ffffff,#667180,#dbeaff,#fff,#555e6b);box-shadow:0 0 0 2px #e9f4ff,0 0 18px rgba(199,225,255,.78),0 0 35px rgba(134,173,218,.44),inset 0 1px 4px rgba(255,255,255,.95)}
+.avatar-frame.frame-silver::before{background:conic-gradient(#fff,#7d91aa,#eaf7ff,#93b9dd,#fff)}
+.avatar-frame.frame-gold{background:conic-gradient(from 200deg,#684006,#d89410,#fff1a0,#a96506,#ffd84c,#fff8c8,#ca8107,#704303);box-shadow:0 0 0 2px #ffd43f,0 0 20px rgba(255,197,33,.86),0 0 42px rgba(255,153,0,.48),inset 0 1px 5px rgba(255,252,200,.98)}
+.avatar-frame.frame-gold::before{background:conic-gradient(#ffb300,#fff095,#e48800,#fff8c7,#ffb300)}
+.avatar-frame.frame-platinum{background:conic-gradient(from 190deg,#53667e,#faffff,#a8eaff,#fff,#b9b8ff,#e8ffff,#7ecde7,#fff,#65728d);box-shadow:0 0 0 2px #eaffff,0 0 22px rgba(137,234,255,.95),0 0 46px rgba(165,152,255,.58),0 0 66px rgba(91,223,255,.28),inset 0 1px 6px #fff}
+.avatar-frame.frame-platinum::before{inset:-5px;background:conic-gradient(#a9f5ff,#fff,#cabfff,#8beaff,#fff,#a9f5ff);filter:blur(9px);animation-duration:2.9s}
+@keyframes p13FramePulse{0%,100%{opacity:.55;transform:scale(.99) rotate(0deg)}50%{opacity:1;transform:scale(1.035) rotate(2deg)}}
+
+/* Mission rewards: XP and money have separate semantic badges. */
+.p10-mission-rewards{display:flex!important;flex-wrap:wrap;gap:7px!important;margin-top:8px}
+.p10-mission-rewards>span{display:inline-flex!important;align-items:center;min-height:27px;padding:4px 10px;border-radius:999px;font-size:.75rem;font-weight:900!important;line-height:1!important}
+.p10-mission-rewards>span:first-child{color:#9af3ba!important;background:rgba(34,197,94,.13)!important;border:1px solid rgba(34,197,94,.5)!important}
+.p10-mission-rewards>span:nth-child(2){color:#ffd95c!important;background:rgba(245,158,11,.14)!important;border:1px solid rgba(245,158,11,.52)!important;box-shadow:0 0 12px rgba(245,158,11,.08)}
+.p10-mission-buff{color:#d5b4ff!important;background:rgba(168,85,247,.12)!important;border:1px solid rgba(168,85,247,.4)!important}
+
+/* Option B: visual clean-card piles. */
+.clean-stack-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0 18px}
+.clean-stack-resource{position:relative;display:flex;align-items:center;gap:16px;min-height:102px;padding:14px 16px;border:1px solid rgba(255,255,255,.11);border-radius:17px;background:linear-gradient(145deg,rgba(25,25,39,.96),rgba(12,12,21,.96));overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.clean-stack-resource::after{content:'';position:absolute;inset:auto -30px -45px auto;width:110px;height:110px;border-radius:50%;filter:blur(8px);opacity:.12;pointer-events:none}
+.clean-stack-white::after{background:#fff}.clean-stack-black::after{background:#7b61ff}
+.clean-stack-visual{position:relative;flex:0 0 72px;width:72px;height:72px}
+.clean-stack-sheet,.clean-stack-empty{position:absolute;left:12px;top:5px;width:43px;height:61px;border-radius:7px;transform:translate(calc(var(--stack-i,0)*4px),calc(var(--stack-i,0)*-2px)) rotate(calc((var(--stack-i,0) - 1.5)*2deg));box-shadow:0 7px 16px rgba(0,0,0,.28)}
+.clean-stack-white .clean-stack-sheet{background:linear-gradient(145deg,#fff,#dddde6);border:1px solid rgba(255,255,255,.9)}
+.clean-stack-black .clean-stack-sheet{background:linear-gradient(145deg,#222230,#07070d);border:1px solid #4a4a63;box-shadow:0 7px 16px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.025)}
+.clean-stack-sheet::after{content:'';position:absolute;left:8px;right:8px;top:10px;height:3px;border-radius:2px;background:currentColor;opacity:.14;box-shadow:0 8px 0 currentColor,0 16px 0 currentColor}
+.clean-stack-white .clean-stack-sheet{color:#343444}.clean-stack-black .clean-stack-sheet{color:#fff}
+.clean-stack-empty{left:13px;top:5px;background:transparent!important;border:2px dashed rgba(151,151,180,.5)!important;box-shadow:none!important;transform:none}
+.clean-stack-empty::before{content:'0';position:absolute;inset:0;display:grid;place-items:center;color:rgba(160,160,184,.5);font:800 1rem var(--font-display)}
+.clean-stack-copy{min-width:0}.clean-stack-copy small{display:block;color:var(--text-secondary);font-weight:700;line-height:1.25}.clean-stack-copy b{display:block;margin-top:4px;color:#fff;font:900 1.65rem/1 var(--font-display)}
+.clean-stack-resource.compact{min-height:88px;flex:1 1 230px}.clean-stack-resource.compact .clean-stack-visual{transform:scale(.82);transform-origin:left center;margin-right:-8px}.clean-stack-resource.compact .clean-stack-copy b{font-size:1.35rem}
+.clean-stack-resource.just-consumed .clean-stack-sheet:last-child{animation:p13ConsumeCard .28s ease-out}
+@keyframes p13ConsumeCard{0%{opacity:.05;transform:translate(18px,-14px) rotate(9deg) scale(1.08)}100%{opacity:1}}
+.refined-wallets{align-items:stretch;flex-wrap:wrap}.refined-wallets .dirty-wallet{display:flex;flex-direction:column;justify-content:center;min-width:210px}
+
+/* Marketplace: communicate product contents before copy. */
+.market-clean-product .market-clean-breakdown{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 4px}
+.market-clean-unit{display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:8px;align-items:center;min-width:105px;padding:9px 11px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:rgba(255,255,255,.025)}
+.market-clean-card-icon{grid-row:1/3;width:25px;height:35px;border-radius:4px;transform:rotate(-4deg);box-shadow:4px 3px 0 rgba(255,255,255,.06)}
+.market-clean-unit.white .market-clean-card-icon{background:#f7f7f3;border:1px solid #fff}.market-clean-unit.black .market-clean-card-icon{background:#09090f;border:1px solid #4f4f66}
+.market-clean-unit b{font:900 .96rem var(--font-display)}.market-clean-unit small{color:var(--text-muted);font-size:.68rem;text-transform:none!important;letter-spacing:0!important}
+
+/* Buff presentation: a semantic yellow BUFF pill, rarity, and unique hero icon. */
+.buff-type-pill{display:inline-flex!important;align-items:center!important;width:max-content;padding:4px 9px!important;border:1px solid rgba(250,204,21,.58)!important;border-radius:999px!important;background:rgba(250,204,21,.14)!important;color:#ffe46b!important;font:900 .67rem/1 var(--font-display)!important;letter-spacing:.08em!important;text-transform:uppercase!important}
+.buff-rarity-pill{display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;font:800 .66rem/1 var(--font-display);letter-spacing:.04em;text-transform:uppercase;border:1px solid currentColor;background:rgba(255,255,255,.035)}
+.buff-rarity-pill.rarity-common{color:#e5e7eb}.buff-rarity-pill.rarity-rare{color:#56db91}.buff-rarity-pill.rarity-superrare{color:#64a8ff}.buff-rarity-pill.rarity-epic{color:#c678ff}.buff-rarity-pill.rarity-legendary{color:#f7d64d}
+.buff-presentation-row{display:flex;gap:7px;align-items:center;margin-bottom:10px}.buff-card-top .buff-icon{display:grid!important;place-items:center!important;flex:0 0 48px!important;width:48px!important;height:48px!important;border-radius:14px!important;background:linear-gradient(145deg,rgba(250,204,21,.13),rgba(139,92,246,.09))!important;border:1px solid rgba(250,204,21,.18)!important;font-size:1.65rem!important;box-shadow:inset 0 1px rgba(255,255,255,.05)}
+.market-buff-product{position:relative}.market-buff-presentation{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}.market-buff-icon{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:radial-gradient(circle at 35% 25%,rgba(255,224,86,.18),rgba(139,92,246,.08));border:1px solid rgba(255,224,86,.18);font-size:1.6rem}.market-buff-product>.buff-type-pill{margin-bottom:9px}
+.market-buff-product.rarity-common{border-color:rgba(229,231,235,.18)}.market-buff-product.rarity-rare{border-color:rgba(34,197,94,.28)}.market-buff-product.rarity-superrare{border-color:rgba(59,130,246,.3)}.market-buff-product.rarity-epic{border-color:rgba(168,85,247,.34)}.market-buff-product.rarity-legendary{border-color:rgba(250,204,21,.34);box-shadow:inset 0 0 22px rgba(250,204,21,.025)}
+
+/* Room settings: description always belongs below its option. */
+.config-group.checkbox-group{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:5px!important}
+.config-group.checkbox-group>label{display:flex!important;align-items:flex-start!important;gap:10px!important;width:100%;font-weight:700;line-height:1.35}
+.config-group.checkbox-group>label input{flex:0 0 auto;margin-top:1px}
+.config-group.checkbox-group>small{display:block!important;margin:0 0 0 30px!important;max-width:680px;line-height:1.45!important;color:var(--text-muted)!important}
+
+/* Reward explanation: right-column card on desktop, between create and rules on mobile. */
+.create-room-layout{display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr)!important;grid-template-areas:'config rules' 'config reward'!important;align-items:start!important;gap:20px!important}
+.create-room-layout>.config-panel{grid-area:config}.create-room-layout>.rules-panel{grid-area:rules}.create-room-layout>.reward-preview-panel{grid-area:reward}
+.reward-preview-panel{padding:16px;border:1px solid rgba(255,255,255,.09);border-radius:18px;background:rgba(13,13,22,.78);box-shadow:0 12px 30px rgba(0,0,0,.16)}
+.reward-preview-panel #preview-economic{margin:0!important}.reward-preview-panel .economy-preview{margin:0!important}
+.economy-preview-head{align-items:center}.economy-preview .effort-pill{display:none!important}
+.economy-loot{display:block!important}.economy-loot-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}.economy-loot-title small{color:var(--text-muted);font-size:.7rem;text-align:right}
+.economy-loot-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.economy-loot-place{display:flex;align-items:center;gap:9px;min-width:0;padding:9px 10px;border:1px solid rgba(255,255,255,.075);border-radius:11px;background:rgba(255,255,255,.025)}.economy-loot-place>span{font-size:1.2rem}.economy-loot-place small,.economy-loot-place b{display:block}.economy-loot-place small{color:var(--text-muted);font-size:.68rem}.economy-loot-place b{font-size:.78rem;line-height:1.2}
+
+/* Dirty-card form alignment. */
+.creation-input-row{display:flex!important;align-items:stretch!important;gap:10px!important}.creation-input-row>.input-group{margin-bottom:0!important;display:flex!important}.creation-input-row .input{height:100%!important;min-height:56px!important}.creation-input-row #add-card-btn{align-self:stretch!important;min-height:56px!important;height:auto!important;padding-top:.75rem!important;padding-bottom:.75rem!important}
+.dirty-card-zero-line{display:inline-block;margin-top:2px;color:var(--text-secondary)}
+
+/* Audio settings. */
+.audio-settings-overlay{position:fixed;inset:0;z-index:20050;display:grid;place-items:center;padding:20px;background:rgba(3,3,8,.7);backdrop-filter:blur(14px)}
+.audio-settings-shell{width:min(620px,100%);max-height:min(760px,calc(100dvh - 40px));overflow:auto;border:1px solid rgba(255,255,255,.12);border-radius:22px;background:linear-gradient(155deg,#171723,#0d0d15);box-shadow:0 24px 80px rgba(0,0,0,.65),0 0 35px rgba(139,92,246,.08)}
+.audio-settings-shell>header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:22px 22px 17px;border-bottom:1px solid rgba(255,255,255,.075)}.audio-settings-shell header small{color:#c084fc;font-weight:900;letter-spacing:.13em}.audio-settings-shell h2{margin:3px 0}.audio-settings-shell header p{font-size:.86rem;margin:0}.audio-settings-close{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.035);color:#fff;cursor:pointer;font-size:1.05rem}.audio-settings-body{display:grid;gap:2px;padding:12px 22px}.audio-setting-slider,.audio-setting-toggle{display:block;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.06)}.audio-setting-slider>span,.audio-setting-toggle{display:flex;align-items:center;justify-content:space-between;gap:16px}.audio-setting-slider b,.audio-setting-toggle b{font-family:var(--font-display);color:#fff}.audio-setting-slider em{font-style:normal;color:#d8b4fe;font-weight:800}.audio-setting-slider small,.audio-setting-toggle small{display:block;margin-top:3px;color:var(--text-muted);font-size:.76rem;line-height:1.4}.audio-setting-slider input[type=range]{width:100%;margin-top:13px;accent-color:#a855f7}.audio-setting-toggle>div{min-width:0}.switch{position:relative;flex:0 0 48px;width:48px;height:27px}.switch input{position:absolute;opacity:0;pointer-events:none}.switch span{position:absolute;inset:0;border-radius:999px;background:#303043;border:1px solid rgba(255,255,255,.09);cursor:pointer;transition:.18s}.switch span::after{content:'';position:absolute;width:21px;height:21px;left:2px;top:2px;border-radius:50%;background:#aaa;transition:.18s}.switch input:checked+span{background:rgba(139,92,246,.55);border-color:#a855f7}.switch input:checked+span::after{transform:translateX(21px);background:#fff}.audio-settings-shell>footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 22px 21px}.audio-settings-shell footer>span{color:var(--text-muted);font-size:.75rem}.audio-settings-home-card .home-action-icon{font-size:1.15rem}
+
+@media(max-width:800px){
+  .create-room-layout{grid-template-columns:1fr!important;grid-template-areas:'config' 'reward' 'rules'!important;gap:14px!important}
+  .reward-preview-panel{padding:12px}
+  .economy-loot-grid{grid-template-columns:1fr 1fr}
+  .clean-stack-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .back-button{top:calc(env(safe-area-inset-top,0px) + 7px);min-height:44px;padding:9px 14px;margin-bottom:14px}
+  .clean-stack-grid{grid-template-columns:1fr}.clean-stack-resource{min-height:88px}.clean-stack-resource.compact{flex-basis:100%}
+  .creation-input-row{flex-direction:column!important}.creation-input-row #add-card-btn{width:100%!important;min-height:52px!important}.creation-input-row .input{min-height:52px!important}
+  .economy-loot-grid{grid-template-columns:1fr}.economy-loot-title{align-items:flex-start;flex-direction:column}.economy-loot-title small{text-align:left}
+  .audio-settings-overlay{padding:10px;padding-top:calc(10px + env(safe-area-inset-top,0px));padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}.audio-settings-shell{max-height:100%}.audio-settings-shell>header,.audio-settings-body,.audio-settings-shell>footer{padding-left:16px;padding-right:16px}.audio-settings-shell>footer{align-items:stretch;flex-direction:column-reverse}.audio-settings-shell>footer .btn{width:100%}
+}
+@media(prefers-reduced-motion:reduce){.avatar-frame.frame-bronze::before,.avatar-frame.frame-silver::before,.avatar-frame.frame-gold::before,.avatar-frame.frame-platinum::before{animation:none}.clean-stack-resource.just-consumed .clean-stack-sheet:last-child{animation:none}}
