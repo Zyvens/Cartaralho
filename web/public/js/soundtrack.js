@@ -89,24 +89,19 @@
   }
   function persistMuted(){try{localStorage.setItem(STORAGE_KEY,muted?'1':'0');}catch(_){} }
   function persistVolume(){try{localStorage.setItem(VOLUME_KEY,String(volume));}catch(_){} }
-  function iconSvg(isMuted){return isMuted?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="m17 9 4 4m0-4-4 4"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>';}
-  function updateButton(button){button.innerHTML=iconSvg(muted);button.classList.toggle('is-muted',muted);button.setAttribute('aria-label',muted?'Ativar trilha sonora':'Mutar trilha sonora');button.setAttribute('title',muted?'Ativar trilha sonora':'Mutar trilha sonora');button.setAttribute('aria-pressed',muted?'true':'false');}
-  async function setMuted(value,button){
-    muted=!!value;persistMuted();updateButton(button);const ctx=ensureAudio();if(!ctx||!master)return;if(muted){master.gain.cancelScheduledValues(ctx.currentTime);master.gain.setTargetAtTime(.0001,ctx.currentTime,.035);return;}await unlockAndPlay();
+  async function setMuted(value){
+    muted=!!value;persistMuted();const ctx=ensureAudio();if(!ctx||!master)return;if(muted){master.gain.cancelScheduledValues(ctx.currentTime);master.gain.setTargetAtTime(.0001,ctx.currentTime,.035);return;}await unlockAndPlay();
   }
   function setVolume(value){
     volume=Math.max(0,Math.min(1,Number(value)||0));persistVolume();if(context&&master){master.gain.cancelScheduledValues(context.currentTime);master.gain.setTargetAtTime(targetLevel(),context.currentTime,.035);}return volume;
   }
-  function installButton(){
-    if(document.getElementById('game-audio-toggle'))return document.getElementById('game-audio-toggle');const button=document.createElement('button');button.id='game-audio-toggle';button.className='game-audio-toggle';button.type='button';updateButton(button);button.addEventListener('click',()=>setMuted(!muted,button));document.body.appendChild(button);return button;
-  }
-  function installAutoplayUnlock(){const attempt=event=>{if(event.target?.closest?.('#game-audio-toggle')||muted)return;unlockAndPlay();};document.addEventListener('pointerdown',attempt,{once:true,capture:true});document.addEventListener('keydown',attempt,{once:true,capture:true});}
+  function installAutoplayUnlock(){const attempt=()=>{if(muted)return;unlockAndPlay();};document.addEventListener('pointerdown',attempt,{once:true,capture:true});document.addEventListener('keydown',attempt,{once:true,capture:true});}
   document.addEventListener('visibilitychange',async()=>{if(!context)return;try{if(document.hidden&&context.state==='running')await context.suspend();else if(!document.hidden&&!muted&&unlocked){await context.resume();ensureScheduler();master.gain.setTargetAtTime(targetLevel(),context.currentTime,.04);}}catch(_){} });
-  function init(){const button=installButton();if(!AudioCtx){muted=true;updateButton(button);button.disabled=true;button.setAttribute('title','Áudio não suportado neste navegador');return;}installAutoplayUnlock();}
+  function init(){if(!AudioCtx){muted=true;return;}installAutoplayUnlock();}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 
   window.CartSoundtrack={
     get muted(){return muted;},get volume(){return volume;},
-    mute(){return setMuted(true,installButton());},unmute(){return setMuted(false,installButton());},setVolume
+    mute(){return setMuted(true);},unmute(){return setMuted(false);},setVolume
   };
 })();
