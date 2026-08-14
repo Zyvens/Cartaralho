@@ -1,12 +1,21 @@
 'use strict';
-const { withErrors, ok, fail, requireMethod, getBody } = require('../../lib/http');
-const gameManager = require('../../lib/gameManager');
-const matchSubmitP6 = require('../../lib/matchSubmitP6');
-const roomStore = require('../../lib/roomStore');
-const { broadcast } = require('../../lib/pusherServer');
-const { applyPresenceSweep } = require('../../lib/roomEvents');
-const { validateCards } = require('../../lib/validators');
-const { GAME_STATES } = require('../../lib/constants');
-const canonicalSubmission = require('../../lib/canonicalSubmission');
-async function inferCreated(player,type,texts){if(!player?.userId)return [];const created=[];for(const raw of texts||[]){const text=String(raw||'').trim();if(!text)continue;const inferred=await canonicalSubmission.inferSubmittedCard({type,text,userId:player.userId});if(inferred.isCreation)created.push(text);}return created;}
-module.exports=withErrors(async(req,res)=>{if(!requireMethod(req,res,'POST'))return;const{playerId,code,blackCards=[],whiteCards=[]}=getBody(req);if(!playerId||!code)return fail(res,400,'playerId e code são obrigatórios.');const room=await roomStore.loadRoom(code);if(!room)return fail(res,404,'Sala não encontrada.');const swept=await applyPresenceSweep(room);if(swept.deleted)return fail(res,404,'Sala não encontrada.');const player=room.players.get(String(playerId));if(!player||player.active===false)return fail(res,400,'Você não está nesta sala.');if(player.cardsReady)return fail(res,400,'Você já concluiu suas Cartas de Jogador.');if(![GAME_STATES.CADASTRO_CARTAS,GAME_STATES.AGUARDANDO_JOGADORES].includes(room.state))return fail(res,400,'Não é possível enviar cartas neste momento.');const validation=validateCards(blackCards,whiteCards);if(!validation.valid)return fail(res,400,validation.error);let allReady;if(process.env.MATCH_LOOT_ENABLED!=='false'){({allReady}=await matchSubmitP6.submitCards(room,playerId,blackCards,whiteCards));}else{const createdBlackCards=await inferCreated(player,'blackCards',blackCards),createdWhiteCards=await inferCreated(player,'whiteCards',whiteCards);({allReady}=await gameManager.submitCards(room,playerId,blackCards,whiteCards,{createdBlackCards,createdWhiteCards}));}await roomStore.saveRoom(room);const statuses=gameManager.getPlayerList(room).map(p=>({nickname:p.nickname,cardsReady:p.cardsReady}));await broadcast(room.code,'cards_submitted',{playerStatuses:statuses});if(allReady)await broadcast(room.code,'all_cards_ready',{message:'Todos os jogadores estão prontos! O jogo pode ser iniciado.'});ok(res);});
+const{withErrors,ok,fail,getBody}=require('../../lib/http');
+const{requireUser}=require('../../lib/auth');
+const roomStore=require('../../lib/roomStore');
+const cardSelection=require('../../lib/cardSelection');
+const gameManager=require('../../lib/gameManager');
+const{broadcast}=require('../../lib/pusherServer');
+const{applyPresenceSweep}=require('../../lib/roomEvents');
+module.exports=withErrors(async(req,res)=>{
+ const user=await requireUser(req,res);if(!user)return;
+ const code=String(req.method==='GET'?req.query?.code:getBody(req).code||'').trim().toUpperCase();if(!code)return fail(res,400,'code é obrigatório.');
+ const room=await roomStore.loadRoom(code);if(!room)return fail(res,404,'Sala não encontrada.');
+ const swept=await applyPresenceSweep(room);if(swept.deleted)return fail(res,404,'Sala não encontrada.');
+ if(req.method==='GET')return ok(res,{selection:cardSelection.get(room,String(user.id))});
+ if(req.method!=='POST')return fail(res,405,'Método não permitido. Use GET ou POST.');
+ const{blackCards=[],whiteCards=[]}=getBody(req),result=await cardSelection.save(room,String(user.id),blackCards,whiteCards);
+ await roomStore.saveRoom(room);
+ const players=gameManager.getPlayerList(room),statuses=players.map(p=>({nickname:p.nickname,cardsReady:p.cardsReady}));
+ await broadcast(room.code,'cards_submitted',{playerStatuses:statuses,changed:result.changed,message:result.changed?'Seleção de Cartas de Jogador atualizada.':'Seleção de Cartas de Jogador salva.'});
+ ok(res,{selection:{blackCards:result.blackCards,whiteCards:result.whiteCards,cardsReady:result.cardsReady},changed:result.changed,state:room.state});
+});
