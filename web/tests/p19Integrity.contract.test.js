@@ -6,9 +6,9 @@ const cardIdentity=require('../lib/cardIdentity');
 const{GAME_STATES}=require('../lib/constants');
 const defs=require('../lib/achievementDefinitions');
 
-const rewardUI=read('public/js/rewardPreviewUI.js'),previewApi=read('api/rooms/preview.js'),lobby=read('public/js/screens/lobby.js'),cardCreation=read('public/js/screens/cardCreation.js'),host=read('public/js/screens/host.js'),round=read('public/js/screens/round.js'),playApi=read('api/game/play.js'),handApi=read('api/game/hand.js'),profileAppearance=read('public/js/profileAppearanceP19.js'),p19css=read('public/css/p19.css'),index=read('public/index.html'),backfill=read('lib/achievementBackfillP19.js'),metagameApi=read('api/profile/metagame.js'),statsApi=read('api/profile/stats.js'),pickWinner=read('api/game/pick-winner.js'),progression=read('lib/cardProgressionService.js');
+const rewardUI=read('public/js/rewardPreviewUI.js'),previewApi=read('api/rooms/preview.js'),lobby=read('public/js/screens/lobby.js'),cardCreation=read('public/js/screens/cardCreation.js'),stackLegacy=read('public/js/cleanCardStacksFix.js'),host=read('public/js/screens/host.js'),round=read('public/js/screens/round.js'),result=read('public/js/screens/result.js'),gameplay=read('public/js/gameplayP19.js'),narrator=read('public/js/narrator.js'),playApi=read('api/game/play.js'),handApi=read('api/game/hand.js'),profileAppearance=read('public/js/profileAppearanceP19.js'),p19css=read('public/css/p19.css'),index=read('public/index.html'),backfill=read('lib/achievementBackfillP19.js'),metagameApi=read('api/profile/metagame.js'),statsApi=read('api/profile/stats.js'),pickWinner=read('api/game/pick-winner.js'),progression=read('lib/cardProgressionService.js');
 
-for(const[name,src]of[['rewardPreviewUI',rewardUI],['lobby',lobby],['cardCreation',cardCreation],['host',host],['round',round],['profileAppearanceP19',profileAppearance]])test(`${name} compila`,()=>assert.doesNotThrow(()=>new Function(src)));
+for(const[name,src]of[['rewardPreviewUI',rewardUI],['lobby',lobby],['cardCreation',cardCreation],['host',host],['round',round],['result',result],['gameplayP19',gameplay],['narrator',narrator],['profileAppearanceP19',profileAppearance]])test(`${name} compila`,()=>assert.doesNotThrow(()=>new Function(src)));
 
 test('estimativa dinâmica nunca depende de resposta 304 sem corpo',()=>{
  assert.match(rewardUI,/cache:'no-store'/);assert.match(rewardUI,/r\.status===304/);assert.match(rewardUI,/_fresh/);
@@ -25,9 +25,10 @@ test('Mão de Vaca confirma em modal e não se aplica quando criação está des
  assert.match(lobby,/Ficar Pronto sem Espólio/);assert.match(lobby,/Voltar e contribuir/);
 });
 
-test('pilhas de Cartas Limpas são geradas diretamente pela tela real',()=>{
+test('pilhas de Cartas Limpas são geradas diretamente pela tela real e patch legado sai do caminho',()=>{
  assert.match(cardCreation,/cleanStack\(type,count\)/);assert.match(cardCreation,/clean-stack-sheet/);assert.match(cardCreation,/clean-stack-empty/);assert.match(cardCreation,/this\.cleanStacks\(\)/);
  assert.match(p19css,/card-creation-screen \.clean-stack-visual/);assert.match(p19css,/width:70px!important/);assert.match(p19css,/clean-stack-white \.clean-stack-sheet/);assert.match(p19css,/clean-stack-black \.clean-stack-sheet/);
+ assert.match(stackLegacy,/typeof CardCreationScreen\.cleanStack==='function'/);assert.match(stackLegacy,/__cleanStacksSourceAuthoritative=true/);
 });
 
 test('Carta Preta aceita uma ou duas lacunas e rejeita a terceira',()=>{
@@ -54,9 +55,11 @@ test('round engine exige duas brancas e revela cada dupla como uma resposta',()=
  const winner=advanced.pickWinner(room,'1',answers[0].answerId);assert.equal(winner.winnerCards.length,2);assert.equal(players.get(String(winner.winnerId)).score,1);
 });
 
-test('UI e API tratam resposta dupla como grupo único para o Mestre',()=>{
+test('UI, Narrador e resultado tratam resposta dupla como um conjunto',()=>{
  assert.match(host,/submission-answer-group/);assert.match(host,/submission-answer-cards/);assert.match(host,/submission\.answerId/);assert.match(playApi,/advanced\.revealAnswers/);assert.match(handApi,/advanced\.revealAnswers/);assert.match(handApi,/cardsPerAnswer/);assert.match(round,/Esta Carta Preta tem 2 lacunas/);assert.match(p19css,/submission-answer-cards\.count-2/);
  assert.match(pickWinner,/winnerCards/);assert.match(progression,/winnerTexts=Array\.isArray\(r\.winnerCards\)/);
+ assert.match(narrator,/Array\.isArray\(submission\?\.cards\)/);assert.match(narrator,/E depois:/);assert.match(narrator,/winnerCards/);
+ assert.match(result,/result-winner-cards/);assert.match(result,/currentWinnerCards/);assert.match(gameplay,/round_result/);assert.match(gameplay,/currentWinnerCards/);assert.match(index,/js\/gameplayP19\.js/);assert.match(p19css,/result-winner-cards\.count-2/);
 });
 
 test('Perfil usa rascunho e só persiste título/moldura no botão Salvar',()=>{
