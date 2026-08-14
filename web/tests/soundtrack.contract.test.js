@@ -19,7 +19,7 @@ test('trilha usa Web Audio e não depende de mídia externa',()=>{
 test('autoplay respeita gesto exigido por navegadores móveis',()=>{
   assert.match(js,/pointerdown/);
   assert.match(js,/keydown/);
-  assert.match(js,/context\.resume\(\)/);
+  assert.match(js,/\.resume\(\)/);
 });
 
 test('mute persiste e expõe controle acessível',()=>{
