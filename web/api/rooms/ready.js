@@ -1,0 +1,21 @@
+'use strict';
+const{withErrors,ok,fail,requireMethod,getBody}=require('../../lib/http');
+const{requireUser}=require('../../lib/auth');
+const roomStore=require('../../lib/roomStore');
+const readiness=require('../../lib/roomReadiness');
+const gameManager=require('../../lib/gameManager');
+const{broadcast}=require('../../lib/pusherServer');
+const{applyPresenceSweep}=require('../../lib/roomEvents');
+module.exports=withErrors(async(req,res)=>{
+ if(!requireMethod(req,res,'POST'))return;
+ const user=await requireUser(req,res);if(!user)return;
+ const{code,ready}=getBody(req);if(!code)return fail(res,400,'code é obrigatório.');
+ const room=await roomStore.loadRoom(code);if(!room)return fail(res,404,'Sala não encontrada.');
+ const swept=await applyPresenceSweep(room);if(swept.deleted)return fail(res,404,'Sala não encontrada.');
+ const result=readiness.setReady(room,String(user.id),ready===true);
+ await roomStore.saveRoom(room);
+ const players=gameManager.getPlayerList(room);
+ await broadcast(room.code,'player_list_update',{players,state:room.state,playerCount:result.activeCount,maxPlayers:room.maxPlayers});
+ if(result.allReady)await broadcast(room.code,'all_cards_ready',{message:'Todos os jogadores estão prontos! O Host pode iniciar a partida.'});
+ ok(res,{ready:result.ready,allReady:result.allReady,state:room.state,players});
+});
