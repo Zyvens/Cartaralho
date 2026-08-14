@@ -2,6 +2,12 @@
 
 (function cleanCardStacksFix(){
   if(!window.CardCreationScreen||CardCreationScreen.__cleanStacksFixed)return;
+  // P19 renderiza a pilha diretamente na fonte da tela. Não envolva renderTabContent novamente.
+  if(typeof CardCreationScreen.cleanStack==='function'){
+    CardCreationScreen.__cleanStacksFixed=true;
+    CardCreationScreen.__cleanStacksSourceAuthoritative=true;
+    return;
+  }
   CardCreationScreen.__cleanStacksFixed=true;
 
   const previous={white:null,black:null};
@@ -53,6 +59,5 @@
     return result;
   };
 
-  // Covers the unlikely case where this patch loads while the screen is already open.
   if(App?.state?.currentScreen==='cardCreation')replaceLegacyCounters(document.getElementById('tab-content'));
 })();
