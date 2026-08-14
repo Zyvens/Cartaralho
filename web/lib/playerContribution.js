@@ -1,0 +1,10 @@
+'use strict';
+function cleanCount(list){return(list||[]).reduce((n,v)=>n+(String(v||'').trim()?1:0),0);}
+function count(player){return cleanCount(player?.blackCards)+cleanCount(player?.whiteCards);}
+function requirementEnabled(room){return room?.cardCreationEnabled!==false||room?.playerCardsEnabled!==false;}
+function currentEligibility(room,player){return !requirementEnabled(room)||count(player)>0;}
+function status(room,player){const contributionCount=count(player),contributionRequired=requirementEnabled(room),lootEligible=!contributionRequired||contributionCount>0;return{contributionCount,contributionRequired,lootEligible,requiresConfirmation:contributionRequired&&!lootEligible};}
+function freeze(room,player){const s=status(room,player);player.contributionCount=s.contributionCount;player.lootEligible=s.lootEligible;return s;}
+function clearFreeze(player){if(!player)return;delete player.contributionCount;delete player.lootEligible;}
+function finalEligibility(room,player){return typeof player?.lootEligible==='boolean'?player.lootEligible:currentEligibility(room,player);}
+module.exports={cleanCount,count,requirementEnabled,currentEligibility,status,freeze,clearFreeze,finalEligibility};
