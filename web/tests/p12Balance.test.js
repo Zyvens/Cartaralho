@@ -1,0 +1,11 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict');
+const{CONFIG,buildConfig}=require('../lib/balanceConfig');
+const rules=require('../lib/rewardEngineRules');
+const preview=require('../lib/rewardPreview');
+const loot=require('../lib/matchLootRules');
+test('P12 preserva defaults v1.4 e os torna centralizados',()=>{assert.equal(CONFIG.reward.pointsExponent,1.35);assert.equal(CONFIG.reward.playersExponent,.80);assert.equal(CONFIG.reward.multiplierExponent,1.35);assert.equal(CONFIG.reward.survivalCoefficient,50);assert.equal(CONFIG.reward.minimumParticipation,.70);assert.deepEqual(CONFIG.loot.placementBase,[10,7,5]);assert.equal(CONFIG.loot.otherBase,3);});
+test('classes de duração respeitam a especificação',()=>{for(const[e,key]of[[.49,'relampago'],[.5,'casual'],[.9,'padrao'],[1.25,'longa'],[2,'maratona'],[3,'insana']])assert.equal(preview.matchClass(e).key,key);});
+test('curva v1 continua compatível com exemplos',()=>{const a=preview.preview({pointsToWin:3,participants:3});assert.equal(a.payouts.first.total,8);assert.equal(a.payouts.second.total,4);assert.equal(a.payouts.third.total,2);const b=preview.preview({pointsToWin:20,participants:10});assert.equal(b.payouts.first.total,1178);assert.equal(b.payouts.second.total,718);assert.equal(b.payouts.third.total,503);assert.equal(b.payouts.last.total,258);});
+test('override é reversível sem migration',()=>{const c=buildConfig(JSON.stringify({reward:{survivalCoefficient:60,minimumParticipation:.75},unknown:{x:1}}));assert.equal(c.reward.survivalCoefficient,60);assert.equal(c.reward.minimumParticipation,.75);assert.equal(c.reward.pointsExponent,1.35);assert.equal(c.unknown,undefined);});
+test('Reward Engine e Espólio usam config central',()=>{assert.equal(rules.MINIMUM_PARTICIPATION,CONFIG.reward.minimumParticipation);assert.equal(loot.baseLootQuota(1),CONFIG.loot.placementBase[0]);assert.equal(loot.baseLootQuota(4),CONFIG.loot.otherBase);});
