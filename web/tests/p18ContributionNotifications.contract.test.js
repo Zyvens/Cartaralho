@@ -4,11 +4,10 @@ const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'
 const contribution=require('../lib/playerContribution');
 const cardIdentity=require('../lib/cardIdentity');
 const defs=require('../lib/prestigeDefinitions');
-const notifications=require('../lib/appNotifications');
 const{GAME_STATES}=require('../lib/constants');
 const readiness=require('../lib/roomReadiness');
 
-const lobby=read('public/js/screens/lobby.js'),cards=read('public/js/screens/cardCreation.js'),rules=read('public/js/roomRulesUI.js'),readyApi=read('api/rooms/ready.js'),loot=read('lib/matchLoot.js'),shop=read('public/js/marketplaceShop.js'),auth=read('public/js/auth.js'),notifyUI=read('public/js/notificationsUI.js'),notifyApi=read('api/notifications.js'),audio=read('public/js/audioIntegrationP13.js'),css=read('public/css/p18.css'),index=read('public/index.html'),migration=read('db/p18_creator_entitlements.sql'),prestige=read('lib/prestigeService.js'),createApi=read('api/cards/create.js'),cardComponent=read('public/js/components/card.js');
+const lobby=read('public/js/screens/lobby.js'),cards=read('public/js/screens/cardCreation.js'),rules=read('public/js/roomRulesUI.js'),readyApi=read('api/rooms/ready.js'),loot=read('lib/matchLoot.js'),shop=read('public/js/marketplaceShop.js'),auth=read('public/js/auth.js'),notifyLib=read('lib/appNotifications.js'),notifyUI=read('public/js/notificationsUI.js'),notifyApi=read('api/notifications.js'),audio=read('public/js/audioIntegrationP13.js'),css=read('public/css/p18.css'),index=read('public/index.html'),migration=read('db/p18_creator_entitlements.sql'),prestige=read('lib/prestigeService.js'),createApi=read('api/cards/create.js'),cleanCards=read('lib/cleanCards.js'),cardComponent=read('public/js/components/card.js');
 
 for(const[name,src]of[['lobby',lobby],['cardCreation',cards],['roomRules',rules],['marketplaceShop',shop],['notificationsUI',notifyUI],['audioIntegration',audio],['cardComponent',cardComponent]])test(`${name} compila`,()=>assert.doesNotThrow(()=>new Function(src)));
 
@@ -41,7 +40,7 @@ test('configuração exibe valores numéricos e não mostra Editável',()=>{
 });
 
 test('seleção de cartas usa game-card real para biblioteca e seleção',()=>{
- assert.match(cards,/CardComponent\.createBlackCard/);assert.match(cards,/CardComponent\.createWhiteCard/);assert.match(cards,/player-card-library-card/);assert.doesNotMatch(cards,/b\.className=`profile-card/);assert.match(css,/player-card-library-grid/);
+ assert.match(cards,/CardComponent\.createBlackCard/);assert.match(cards,/CardComponent\.createWhiteCard/);assert.match(cards,/player-card-library-card/);assert.doesNotMatch(cards,/profile-card tier-/);assert.match(css,/player-card-library-grid/);
 });
 
 test('Carta Preta nova exige lacuna e qualquer run de underscore vira seis underscores',()=>{
@@ -49,12 +48,13 @@ test('Carta Preta nova exige lacuna e qualquer run de underscore vira seis under
  assert.equal(cardIdentity.normalizeBlackCardDisplay('Qual é _?'),'Qual é ______?');
  assert.equal(cardIdentity.normalizeBlackCardDisplay('A __________ B'),'A ______ B');
  assert.equal(cardIdentity.normalizeBlackCardDisplay('___ ou ____________________'),'______ ou ______');
- assert.match(createApi,/Toda Carta Preta precisa ter pelo menos uma lacuna/);
+ assert.match(cleanCards,/normalizeBlackCardDisplay\(text,\{requireGap:true\}\)/);
+ assert.match(createApi,/\/lacuna\/i/);
  assert.match(cardComponent,/replace\(\/_\+\/g/);
 });
 
-test('Central de Notificações publica versão, updates e recompensas',()=>{
- assert.equal(notifications.APP_VERSION,'v1.4.18');assert.ok(notifications.RELEASES.length>=3);assert.match(notifyApi,/notifications\.center/);assert.match(notifyUI,/Central de Notificações/);assert.match(notifyUI,/VERSÃO ATUAL/);assert.match(notifyUI,/Prêmios recebidos/);assert.match(index,/js\/notificationsUI\.js/);assert.match(css,/notifications-overlay/);
+test('Central de Notificações publica versão, updates e recompensas sem depender de DB no contrato',()=>{
+ assert.match(notifyLib,/const APP_VERSION='v1\.4\.18'/);assert.ok((notifyLib.match(/type:'update'/g)||[]).length>=3);assert.match(notifyLib,/Prêmio de boas-vindas/);assert.match(notifyLib,/Kit de boas-vindas/);assert.match(notifyApi,/notifications\.center/);assert.match(notifyUI,/Central de Notificações/);assert.match(notifyUI,/VERSÃO ATUAL/);assert.match(notifyUI,/Prêmios recebidos/);assert.match(index,/js\/notificationsUI\.js/);assert.match(css,/notifications-overlay/);
 });
 
 test('música é migrada para ligada e retoma no primeiro gesto permitido',()=>{
