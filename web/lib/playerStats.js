@@ -3,12 +3,8 @@ const cardOrigins=require('./cardOrigins');
 const canonicalCards=require('./canonicalCards');
 const{normalizeCardText}=require('./cardIdentity');
 const{ensureMonthlySeason}=require('./metaGame');
-
-const REWARD_ENGINE_VERSION='dirty-coins-v1';
-const clamp=(min,max,value)=>Math.max(min,Math.min(max,Number(value)||0));
-function effortIndex(pointsToWin,effectivePlayers){const p=clamp(3,20,pointsToWin),n=clamp(3,10,effectivePlayers);return Math.pow(p/10,1.35)*Math.pow(n/6,0.80);}
-function rewardCurve(pointsToWin,effectivePlayers){const effort=effortIndex(pointsToWin,effectivePlayers),multiplier=Math.pow(effort,1.35),survival=Math.max(0,Math.round(50*(multiplier-1)));return{engineVersion:REWARD_ENGINE_VERSION,effort,multiplier,survival,placement:[Math.round(150*multiplier),Math.round(75*multiplier),Math.round(40*multiplier)]};}
-function payoutForPosition(position,totalPlayers,curve,survivalEligible){const placement=position>=1&&position<=3?curve.placement[position-1]:0,survival=survivalEligible?curve.survival:0,consolation=totalPlayers>3&&position===totalPlayers?1:0;return{placement,survival,consolation,total:placement+survival+consolation};}
+const rewardRules=require('./rewardEngineRules');
+const{REWARD_ENGINE_VERSION,clamp,effortIndex,rewardCurve,payoutForPosition}=rewardRules;
 
 async function ensureWallet(userId){if(!userId)return null;await sql`INSERT INTO dirty_coin_wallets(user_id,balance) VALUES(${userId},0) ON CONFLICT(user_id) DO NOTHING`;return Number((await sql`SELECT balance FROM dirty_coin_wallets WHERE user_id=${userId}`)[0]?.balance||0);}
 async function creditDirtyCoins(userId,amount,transactionType,idempotencyKey,{referenceType=null,referenceId=null,metadata={}}={}){const value=Math.max(0,Math.trunc(Number(amount)||0));if(!userId||!value)return{balance:await ensureWallet(userId),amount:0};await ensureWallet(userId);const rows=await sql`WITH ins AS (INSERT INTO dirty_coin_ledger(user_id,amount,transaction_type,idempotency_key,reference_type,reference_id,metadata) VALUES(${userId},${value},${transactionType},${idempotencyKey},${referenceType},${referenceId},${JSON.stringify(metadata)}::jsonb) ON CONFLICT(idempotency_key) DO NOTHING RETURNING amount) UPDATE dirty_coin_wallets SET balance=balance+COALESCE((SELECT SUM(amount) FROM ins),0),updated_at=now() WHERE user_id=${userId} RETURNING balance`;return{balance:Number(rows[0]?.balance||0),amount:value};}
