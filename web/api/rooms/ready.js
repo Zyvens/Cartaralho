@@ -19,8 +19,8 @@ module.exports=withErrors(async(req,res)=>{
  }
  const result=readiness.setReady(room,String(user.id),ready);
  await roomStore.saveRoom(room);
- const players=gameManager.getPlayerList(room),statuses=players.map(p=>({nickname:p.nickname,cardsReady:p.cardsReady}));
- // Prontidão não precisa retransmitir avatarData/title/frame: esse payload podia ultrapassar o limite do Pusher e causar 413.
+ const statuses=gameManager.getPlayerList(room).map(p=>({nickname:p.nickname,cardsReady:p.cardsReady}));
+ // Prontidão usa somente status textual: avatarData em base64 fazia o evento ultrapassar o limite do Pusher e podia retornar 413 para o Host.
  await broadcast(room.code,'cards_submitted',{playerStatuses:statuses,changed:false,readyChanged:true,message:result.ready?'Prontidão atualizada.':'Prontidão cancelada.'});
- ok(res,{ready:result.ready,allReady:result.allReady,state:room.state,players,contributionCount:result.contributionCount,lootEligible:result.lootEligible});
+ ok(res,{ready:result.ready,allReady:result.allReady,state:room.state,playerStatuses:statuses,contributionCount:result.contributionCount,lootEligible:result.lootEligible});
 });
