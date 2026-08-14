@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS special_entitlements(
 CREATE INDEX IF NOT EXISTS idx_special_entitlements_user ON special_entitlements(user_id,entitlement_type,granted_at DESC);
 
 -- Congela o conjunto real de participantes Beta somente na PRIMEIRA aplicação.
-WITH freeze AS (
+WITH snapshot_insert AS (
  INSERT INTO prestige_snapshots(snapshot_key,snapshot_type,metadata)
  VALUES('beta-v1-2026-08-14','beta_participants',jsonb_build_object('rule','participou de ao menos uma partida com valid_for_rewards=true','version','p11-v1'))
  ON CONFLICT(snapshot_key) DO NOTHING
@@ -60,7 +60,7 @@ FROM (
  WHERE mp.user_id IS NOT NULL
  ORDER BY mp.user_id,mp.finished_at,mp.room_code
 ) x
-WHERE EXISTS(SELECT 1 FROM freeze)
+WHERE EXISTS(SELECT 1 FROM snapshot_insert)
 ON CONFLICT(snapshot_key,user_id) DO NOTHING;
 
 INSERT INTO special_entitlements(user_id,entitlement_key,entitlement_type,source_type,snapshot_key,metadata)
