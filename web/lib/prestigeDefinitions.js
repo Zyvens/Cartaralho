@@ -14,6 +14,10 @@ const SPECIAL_TITLES={
  'betinha':{key:'betinha',name:'Betinha',icon:'🧪',rarity:'epic',description:'Estava aqui quando isso ainda quebrava com personalidade.',source:'beta_snapshot'}
 };
 
+const SPECIAL_FRAMES={
+ 'genese-celestial':{key:'genese-celestial',name:'Gênese',icon:'✦',rarity:'celestial',description:'A moldura que existia antes do catálogo. Exclusiva de quem fez o Cartaralho existir.',source:'entitlement'}
+};
+
 const COSMETIC_EQUIP_KEYS={
  'cosmetic-lisa':{type:'frame',productKey:'cosmetic_frame_lisa'},
  'cosmetic-dupla':{type:'frame',productKey:'cosmetic_frame_dupla'},
@@ -45,4 +49,4 @@ const MIN_COSMETIC_XP=(MIN_COSMETIC_LEVEL-1)*1000;
 function levelFromXp(xp){return Math.floor(Math.max(0,Number(xp||0))/1000)+1;}
 function rarityInfo(key){return RARITIES[key]||RARITIES.common;}
 
-module.exports={RARITIES,SPECIAL_TITLES,COSMETIC_EQUIP_KEYS,MIN_COSMETIC_LEVEL,MIN_COSMETIC_XP,levelFromXp,rarityInfo};
+module.exports={RARITIES,SPECIAL_TITLES,SPECIAL_FRAMES,COSMETIC_EQUIP_KEYS,MIN_COSMETIC_LEVEL,MIN_COSMETIC_XP,levelFromXp,rarityInfo};

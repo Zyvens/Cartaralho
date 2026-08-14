@@ -1,0 +1,46 @@
+/* Cartaralho P18 — Contribuição, Mão de Vaca, BUFF rarity, notificações e entitlement do Criador. */
+
+/* Sala: números dos ranges sempre visíveis e sem pill Editável. */
+.room-rules-card .config-value{display:grid!important;place-items:center!important;visibility:visible!important;opacity:1!important;min-width:38px!important;height:27px!important;padding:0 8px!important;color:#f2eaff!important;background:rgba(139,92,246,.16)!important;border:1px solid rgba(167,139,250,.34)!important;border-radius:8px!important;font:900 .78rem/1 var(--font-display)!important;font-variant-numeric:tabular-nums}
+.room-rules-edit-pill{display:none!important}
+
+/* Lobby: contribuição é uma regra econômica visível, sem poluir o botão de cartas. */
+.lobby-contribution-note{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start;margin:14px 0 4px;padding:13px 14px;border:1px solid rgba(250,204,21,.16);border-radius:15px;background:linear-gradient(135deg,rgba(250,204,21,.055),rgba(255,255,255,.025))}
+.lobby-contribution-icon{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.14);font-size:1.08rem}
+.lobby-contribution-note small{display:block;color:#d9b63f;font-size:.62rem;font-weight:900;letter-spacing:.11em}.lobby-contribution-note b{display:block;margin:3px 0 4px;color:#f5f1df;font-size:.82rem;line-height:1.35}.lobby-contribution-note p{margin:0;color:var(--text-muted);font-size:.7rem;line-height:1.45}
+.lobby-contribution-note.is-miser{border-color:rgba(245,158,11,.34);background:linear-gradient(135deg,rgba(245,158,11,.11),rgba(120,53,15,.045))}.lobby-card-menu .is-locked{opacity:.58!important;cursor:not-allowed!important;border-style:dashed!important}.miser-modal-copy{color:var(--text-muted);line-height:1.55}
+
+/* Seleção de Cartas de Jogador usa a própria linguagem visual das cartas da partida. */
+.player-card-library-grid,.created-cards-grid{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))!important;gap:12px!important;align-items:stretch}
+.player-card-library-card{width:100%!important;min-width:0!important;min-height:132px!important;height:100%;cursor:pointer;outline:none}
+.player-card-library-card .card-text{font-size:.82rem!important;line-height:1.38!important;padding-right:2px}
+.player-card-library-card .card-watermark{font-size:.5rem!important;letter-spacing:.08em!important;margin-top:10px!important}
+.player-card-library-card:focus-visible{box-shadow:0 0 0 3px rgba(139,92,246,.42),var(--shadow-lg)!important}
+.player-card-library-card.selected{transform:none!important;box-shadow:0 0 0 2px rgba(139,92,246,.42),var(--shadow-md)!important}
+.player-card-library-card.selected::before{top:7px!important;right:7px!important}
+.created-cards-grid .game-card.card-mini{min-height:132px!important}
+
+/* BUFF: raridade usa a mesma linguagem tipográfica dos cosméticos, sem pill. */
+.market-buff-header .cosmetic-rarity{min-height:0!important;padding:0!important;border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;line-height:1.1!important}
+
+/* Central de Notificações. */
+.notifications-home-card{position:relative}.notification-home-badge{position:absolute;right:31px;top:50%;transform:translateY(-50%);display:grid;place-items:center;min-width:23px;height:23px;padding:0 6px;border-radius:999px;background:#ef4444;color:#fff;font:900 .67rem/1 var(--font-display);box-shadow:0 0 0 3px rgba(239,68,68,.12)}.notification-home-badge[hidden]{display:none!important}
+.notifications-overlay{position:fixed;inset:0;z-index:19000;display:grid;place-items:center;padding:24px;background:rgba(5,5,11,.76);backdrop-filter:blur(14px)}
+.notifications-shell{width:min(900px,96vw);max-height:min(820px,90vh);overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.1);border-radius:22px;background:linear-gradient(155deg,#171624,#0d0d16 60%,#090a11);box-shadow:0 32px 90px rgba(0,0,0,.58)}
+.notifications-head{display:flex;justify-content:space-between;gap:20px;padding:20px 22px 16px;border-bottom:1px solid rgba(255,255,255,.07)}.notifications-head small{color:#a78bfa;font-size:.63rem;font-weight:900;letter-spacing:.13em}.notifications-head h2{margin:4px 0 3px;font-size:1.35rem}.notifications-head p{margin:0;color:var(--text-muted);font-size:.76rem}.notifications-close{width:38px;height:38px;border-radius:11px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);color:#fff;cursor:pointer;font-size:1rem}
+.notifications-version{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:16px 22px 0;padding:13px 15px;border:1px solid rgba(103,232,249,.16);border-radius:15px;background:linear-gradient(135deg,rgba(103,232,249,.07),rgba(167,139,250,.06))}.notifications-version small,.notifications-version b{display:block}.notifications-version small{color:#9bdcf0;font-size:.6rem;font-weight:900;letter-spacing:.1em}.notifications-version b{margin-top:2px;font-size:1.05rem}.notifications-version>span{color:var(--text-muted);font-size:.7rem;text-align:right}
+.notifications-body{overflow:auto;padding:16px 22px 22px;display:grid;gap:20px}.notifications-section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.notifications-section-title h3{font-size:.96rem}.notifications-section-title small{color:var(--text-muted);font-size:.64rem}.notifications-list{display:grid;gap:8px}.notification-item{display:grid;grid-template-columns:auto minmax(0,1fr);gap:11px;padding:12px 13px;border:1px solid rgba(255,255,255,.07);border-radius:13px;background:rgba(255,255,255,.027)}.notification-item.update{border-color:rgba(139,92,246,.12)}.notification-item.reward{border-color:rgba(250,204,21,.11)}.notification-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.045);font-size:1rem}.notification-title{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.notification-title b{font-size:.78rem}.notification-title span{color:#c4b5fd;font:800 .58rem/1 var(--font-display);letter-spacing:.04em}.notification-copy p{margin:3px 0;color:#b0a9bd;font-size:.69rem;line-height:1.42}.notification-copy>small{color:#625d70;font-size:.59rem}.notification-empty{padding:18px;text-align:center;color:var(--text-muted);font-size:.72rem;border:1px dashed rgba(255,255,255,.08);border-radius:12px}
+
+/* Entitlement exclusivo do user 1: Gênese. Não existe produto correspondente no Mercado. */
+.avatar-frame.frame-genese-celestial{position:relative;isolation:isolate;overflow:visible!important;padding:7px!important;background:#070914!important;filter:none!important;box-shadow:0 0 0 1px rgba(255,255,255,.92),0 0 16px rgba(125,211,252,.78),0 0 34px rgba(167,139,250,.54),0 0 58px rgba(103,232,249,.28)!important;animation:p18GenesisPulse 3s ease-in-out infinite!important}
+.avatar-frame.frame-genese-celestial>img,.avatar-frame.frame-genese-celestial>.profile-modal-avatar-fallback,.avatar-frame.frame-genese-celestial>.cosmetic-avatar-fallback{position:relative;z-index:2;filter:none!important}
+.avatar-frame.frame-genese-celestial::before{content:'';position:absolute;inset:-3px;border-radius:inherit;z-index:0;background:conic-gradient(from 0deg,#fff 0 7%,#67e8f9 14%,#818cf8 28%,#e9d5ff 42%,#fff 50%,#a5f3fc 62%,#c4b5fd 76%,#7dd3fc 90%,#fff 100%);box-shadow:inset 0 0 12px rgba(255,255,255,.46);animation:p18GenesisOrbit 3.6s linear infinite;pointer-events:none}
+.avatar-frame.frame-genese-celestial::after{content:'✦';position:absolute;z-index:4;top:-11px;right:-3px;color:#fff;font-size:1em;line-height:1;pointer-events:none;text-shadow:-18px 20px 0 rgba(165,243,252,.66),0 0 6px #fff,0 0 13px #67e8f9,0 0 24px #a78bfa;animation:p18GenesisStar 1.45s ease-in-out infinite}
+@keyframes p18GenesisOrbit{to{transform:rotate(360deg)}}
+@keyframes p18GenesisPulse{0%,100%{box-shadow:0 0 0 1px rgba(255,255,255,.9),0 0 15px rgba(125,211,252,.64),0 0 31px rgba(167,139,250,.4),0 0 52px rgba(103,232,249,.2)}50%{box-shadow:0 0 0 2px #fff,0 0 24px rgba(103,232,249,.94),0 0 46px rgba(196,181,253,.7),0 0 76px rgba(129,140,248,.34)}}
+@keyframes p18GenesisStar{0%,100%{opacity:.32;transform:scale(.65) rotate(0deg)}45%{opacity:1;transform:scale(1.38) rotate(48deg)}72%{opacity:.62;transform:scale(.9) rotate(84deg)}}
+
+@media(max-width:620px){.notifications-overlay{padding:12px}.notifications-shell{max-height:94vh}.notifications-head{padding:17px}.notifications-version{margin:13px 17px 0;align-items:flex-start;flex-direction:column}.notifications-version>span{text-align:left}.notifications-body{padding:14px 17px 18px}.player-card-library-grid,.created-cards-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:520px){.lobby-contribution-note{padding:12px;gap:10px}.lobby-contribution-icon{width:34px;height:34px}}
+@media(max-width:370px){.player-card-library-grid,.created-cards-grid{grid-template-columns:1fr!important}}
+@media(prefers-reduced-motion:reduce){.avatar-frame.frame-genese-celestial,.avatar-frame.frame-genese-celestial::before,.avatar-frame.frame-genese-celestial::after{animation:none!important}}

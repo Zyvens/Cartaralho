@@ -9,6 +9,7 @@ async function save(room,playerId,blackCards=[],whiteCards=[]){
  if(!readiness.PRE_START.has(room?.state))throw new Error('Não é possível editar Cartas de Jogador depois que a partida começou.');
  const player=room.players?.get(String(playerId));
  if(!player||player.active===false)throw new Error('Você não está nesta sala.');
+ if(player.cardsReady===true)throw new Error('Desmarque Pronto no Lobby antes de editar suas Cartas de Jogador.');
  const black=clean(blackCards),white=clean(whiteCards),validation=validateCards(black,white);if(!validation.valid)throw new Error(validation.error);
  if(player.userId){await matchSubmit.assertAllowed(room,player.userId,'blackCards',black);await matchSubmit.assertAllowed(room,player.userId,'whiteCards',white);}
  const changed=!same(player.blackCards||[],black)||!same(player.whiteCards||[],white);
