@@ -1,5 +1,18 @@
 const RewardPreviewUI={
- async request(params){const q=new URLSearchParams(params);const r=await fetch(`/api/rooms/preview?${q}`,{headers:AuthClient.headers()}),d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw new Error(d.error||'Falha ao calcular recompensa.');return d;},
+ async request(params){
+  const q=new URLSearchParams(params);
+  const url=`/api/rooms/preview?${q}`;
+  const fetchPreview=()=>fetch(url,{headers:AuthClient.headers(),cache:'no-store'});
+  let r=await fetchPreview();
+  // Alguns navegadores podem reutilizar uma resposta condicional antiga durante o rollout.
+  // Se isso acontecer, uma única repetição com cache-buster recupera o JSON sem exigir ação do usuário.
+  if(r.status===304){q.set('_fresh',Date.now().toString());r=await fetch(`/api/rooms/preview?${q}`,{headers:AuthClient.headers(),cache:'no-store'});}
+  const text=await r.text();
+  let d={};
+  if(text){try{d=JSON.parse(text);}catch{throw new Error('A estimativa recebeu uma resposta inválida. Tente novamente.');}}
+  if(!r.ok||!d.success)throw new Error(d.error||'Falha ao calcular recompensa.');
+  return d;
+ },
  money(n){return Number(n||0).toLocaleString('pt-BR');},
  placementCard(icon,label,coins,loot,{survival=false}={}){const cardCount=Number(loot||0),coinLabel=survival?'Sobrevivência':'Prêmio';return`<article class="economy-placement-card ${survival?'is-survival':''}"><header><span class="economy-placement-medal">${icon}</span><div><small>Colocação</small><b>${label}</b></div></header><div class="economy-placement-rewards"><div class="economy-reward-chip economy-reward-coins"><small>${coinLabel}</small><b>${this.money(coins)} 🪙</b></div><div class="economy-reward-chip economy-reward-loot"><small>Espólio</small><b>${cardCount} carta${cardCount===1?'':'s'}</b></div></div></article>`;},
  card(p,title='Estimativa econômica'){if(!p)return'<div class="economy-preview loading">Calculando...</div>';const c=p.class||{},loot=p.loot||{},payout=p.payouts||{};return`<section class="economy-preview class-${c.key||'padrao'}"><div class="economy-preview-head"><div><small>${title}</small><h3>${c.icon||'🎯'} Partida ${c.label||'Padrão'}</h3></div></div><div class="economy-context"><b>${p.participants} jogadores · ${p.pointsToWin} pontos</b><span>Duração relativa: ${c.duration||'moderada'}</span></div><div class="economy-prizes-heading"><div><b>🏆 Prêmios estimados</b><small>Moedas e Espólio por colocação</small></div></div><div class="economy-placement-grid">${this.placementCard('🥇','1º lugar',payout.first?.total,loot.first)}${this.placementCard('🥈','2º lugar',payout.second?.total,loot.second)}${this.placementCard('🥉','3º lugar',payout.third?.total,loot.third)}${this.placementCard('🃏','Demais',payout.survivalBonus,loot.other,{survival:true})}</div><small class="economy-note">A mão (${p.handSize} cartas) muda variedade, não recompensa. Valores finais usam participação efetiva.</small></section>`;},

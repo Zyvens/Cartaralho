@@ -6,7 +6,11 @@ const ResultScreen = {
 
   render(container, data = {}) {
     const blackCard = data.blackCard || '';
-    const winnerCard = data.winnerCard || '';
+    const winnerCards = Array.isArray(data.winnerCards) && data.winnerCards.length
+      ? data.winnerCards
+      : (Array.isArray(App.state.currentWinnerCards) && App.state.currentWinnerCards.length
+        ? App.state.currentWinnerCards
+        : [data.winnerCard || '']);
     const winnerNickname = data.winnerNickname || '???';
     const scores = data.scores || App.state.scores || [];
     const roundNumber = data.roundNumber || App.state.roundNumber || 1;
@@ -18,9 +22,9 @@ const ResultScreen = {
           <div class="round-number">Resultado — Rodada ${roundNumber}</div>
         </div>
 
-        <div class="result-cards">
+        <div class="result-cards ${winnerCards.length > 1 ? 'has-double-answer' : ''}">
           <div id="result-black-card"></div>
-          <div id="result-winner-card"></div>
+          <div id="result-winner-card" class="result-winner-cards count-${winnerCards.length}"></div>
         </div>
 
         <div class="result-winner-text">
@@ -36,18 +40,18 @@ const ResultScreen = {
       </div>
     `;
 
-    // Render cards
     const blackCardArea = document.getElementById('result-black-card');
-    if (blackCardArea) {
-      blackCardArea.appendChild(CardComponent.createBlackCard(blackCard, { large: true }));
-    }
+    if (blackCardArea) blackCardArea.appendChild(CardComponent.createBlackCard(blackCard, { large: true }));
 
     const winnerCardArea = document.getElementById('result-winner-card');
     if (winnerCardArea) {
-      winnerCardArea.appendChild(CardComponent.createWhiteCard(winnerCard, { large: true, winner: true }));
+      winnerCards.filter(Boolean).forEach((card,index) => {
+        const el=CardComponent.createWhiteCard(card, { large: winnerCards.length===1, winner: true });
+        if(winnerCards.length>1){el.classList.add('result-combo-card');el.setAttribute('aria-label',`Carta vencedora ${index+1} de ${winnerCards.length}`);}
+        winnerCardArea.appendChild(el);
+      });
     }
 
-    // Update scoreboard
     if (scores.length > 0) {
       App.state.scores = scores;
       Scoreboard.update(scores);
@@ -64,7 +68,6 @@ const ResultScreen = {
     const barEl = document.getElementById('timer-bar-fill');
 
     if (barEl) {
-      // Animate timer bar
       setTimeout(() => { barEl.style.width = '0%'; }, 50);
       barEl.style.transition = 'width 5s linear';
     }
@@ -96,7 +99,7 @@ const ResultScreen = {
           confirmText: 'Sim, Sair',
           cancelText: 'Cancelar',
           onConfirm: () => {
-            SocketClient.emit('leave_room', null, (res) => {
+            SocketClient.emit('leave_room', null, () => {
               App.resetState();
               App.showScreen('home');
             });

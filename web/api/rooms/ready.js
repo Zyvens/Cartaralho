@@ -15,12 +15,13 @@ module.exports=withErrors(async(req,res)=>{
  const swept=await applyPresenceSweep(room);if(swept.deleted)return fail(res,404,'Sala não encontrada.');
  if(ready){
   const gate=readiness.contributionStatus(room,String(user.id));
-  if(gate.requiresConfirmation&&body.acceptNoContribution!==true)return fail(res,409,'Você está prestes a ficar Pronto sem contribuir com Cartas de Jogador.',{code:'CONTRIBUTION_CONFIRMATION_REQUIRED',retryable:false,contributionCount:gate.contributionCount,lootEligible:false});
+  // Mão de Vaca é uma decisão válida do jogador, não um erro HTTP. O primeiro clique apenas pede confirmação.
+  if(gate.requiresConfirmation&&body.acceptNoContribution!==true)return ok(res,{confirmationRequired:true,confirmationCode:'NO_CONTRIBUTION_LOOT_WARNING',ready:false,state:room.state,contributionCount:gate.contributionCount,lootEligible:false});
  }
  const result=readiness.setReady(room,String(user.id),ready);
  await roomStore.saveRoom(room);
  const statuses=gameManager.getPlayerList(room).map(p=>({nickname:p.nickname,cardsReady:p.cardsReady}));
  // Prontidão usa somente status textual: avatarData em base64 fazia o evento ultrapassar o limite do Pusher e podia retornar 413 para o Host.
  await broadcast(room.code,'cards_submitted',{playerStatuses:statuses,changed:false,readyChanged:true,message:result.ready?'Prontidão atualizada.':'Prontidão cancelada.'});
- ok(res,{ready:result.ready,allReady:result.allReady,state:room.state,playerStatuses:statuses,contributionCount:result.contributionCount,lootEligible:result.lootEligible});
+ ok(res,{confirmationRequired:false,ready:result.ready,allReady:result.allReady,state:room.state,playerStatuses:statuses,contributionCount:result.contributionCount,lootEligible:result.lootEligible});
 });
