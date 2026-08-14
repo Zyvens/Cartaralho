@@ -1,6 +1,22 @@
 'use strict';
 
 (function profileAppearanceP19(){
+  const TITLE_META={
+    'catador-de-ideias':['Catador de Ideias','common'],
+    'cliente-suspeito':['Cliente Suspeito','common'],
+    'frequentador-do-beco':['Frequentador do Beco','rare'],
+    'malabarista-de-lacunas':['Malabarista de Lacunas','superrare'],
+    'usina-de-ideias':['Usina de Ideias','epic'],
+    'magnata-do-mercado-paralelo':['Magnata do Mercado Paralelo','legendary'],
+    'o-criador':['O Criador','celestial']
+  };
+  window.MetaTitleNames={...(window.MetaTitleNames||{}),...Object.fromEntries(Object.entries(TITLE_META).map(([k,v])=>[k,v[0]]))};
+  if(window.MetaUI&&!MetaUI.__p19TitleColors){
+    MetaUI.__p19TitleColors=true;
+    const old=MetaUI.titleColor.bind(MetaUI),colors={common:'#f4f4f5',rare:'#22c55e',superrare:'#3b82f6',epic:'#a855f7',legendary:'#facc15',celestial:'#67e8f9'};
+    MetaUI.titleColor=k=>TITLE_META[k]?colors[TITLE_META[k][1]]:old(k);
+  }
+
   const P=window.ProfileModal;
   if(!P||P.__p19Appearance)return;
   P.__p19Appearance=true;
@@ -28,22 +44,22 @@
     return baseClose();
   };
 
-  P.render=function(){
-    this._ensureAppearanceDraft();
-    return baseRender();
+  P.render=function(){this._ensureAppearanceDraft();return baseRender();};
+
+  P._refreshCurrentTab=function(tab){
+    this.activeTab=tab;
+    this.render();
+    const shell=this.overlay?.querySelector('.profile-modal-shell');
+    shell?.querySelectorAll('[data-profile-tab]').forEach(x=>x.classList.toggle('active',x.dataset.profileTab===tab));
+    this.renderTab();
   };
 
   P._setAppearanceDraft=function(kind,key){
     this._ensureAppearanceDraft();
     if(!this.data?.equipped)return;
-    if(kind==='title')this.data.equipped.titleKey=key||null;
-    else this.data.equipped.frameKey=key||null;
+    if(kind==='title')this.data.equipped.titleKey=key||null;else this.data.equipped.frameKey=key||null;
     this._appearanceDirty=this.data.equipped.titleKey!==this._appearanceSaved.titleKey||this.data.equipped.frameKey!==this._appearanceSaved.frameKey;
-    this.render();
-    this.activeTab=kind==='title'?'titles':'frames';
-    const shell=this.overlay?.querySelector('.profile-modal-shell');
-    shell?.querySelectorAll('[data-profile-tab]').forEach(x=>x.classList.toggle('active',x.dataset.profileTab===this.activeTab));
-    this.renderTab();
+    this._refreshCurrentTab(kind==='title'?'titles':'frames');
   };
 
   P.equipTitle=function(key){this._setAppearanceDraft('title',key||null);};
@@ -56,16 +72,12 @@
     try{
       const titleKey=this.data.equipped?.titleKey||null,frameKey=this.data.equipped?.frameKey||null;
       await MetaClient.equip(titleKey,frameKey);
-      this._appearanceSaved={titleKey,frameKey};
-      this._appearanceDirty=false;
+      this._appearanceSaved={titleKey,frameKey};this._appearanceDirty=false;
       if(AuthClient.user){AuthClient.user.equipped_title_key=titleKey;AuthClient.user.equipped_frame_key=frameKey;}
-      if(App?.state){App.state.matchTitleKey=titleKey;App.state.matchFrameKey=frameKey;}
+      if(window.App?.state){App.state.matchTitleKey=titleKey;App.state.matchFrameKey=frameKey;}
       Toast.success('Título e moldura salvos.');
       HomeScreen.renderAccount?.();
-      this.render();
-      const shell=this.overlay?.querySelector('.profile-modal-shell');
-      shell?.querySelectorAll('[data-profile-tab]').forEach(x=>x.classList.toggle('active',x.dataset.profileTab===this.activeTab));
-      this.renderTab();
+      this._refreshCurrentTab(this.activeTab||'profile');
     }catch(e){Toast.error(e.message||'Não foi possível salvar a aparência.');}
   };
 
@@ -81,15 +93,14 @@
 
   P.renderTab=function(){
     const out=baseRenderTab();
-    const body=this.overlay?.querySelector('#profile-modal-body');
-    if(!body)return out;
+    const body=this.overlay?.querySelector('#profile-modal-body');if(!body)return out;
     if(this.activeTab==='profile'){
       const layout=body.querySelector('.profile-tab-layout-profile');
       if(layout&&!layout.querySelector('.profile-appearance-selector-card'))layout.insertAdjacentHTML('beforeend',this._profileAppearanceCard());
     }
     if((this.activeTab==='titles'||this.activeTab==='frames')&&!body.querySelector('.profile-appearance-savebar'))body.insertAdjacentHTML('beforeend',this._appearanceSavebar());
-    body.querySelector('[data-profile-draft-title]')?.addEventListener('change',e=>{this.data.equipped.titleKey=e.target.value||null;this._appearanceDirty=this.data.equipped.titleKey!==this._appearanceSaved.titleKey||this.data.equipped.frameKey!==this._appearanceSaved.frameKey;this.renderTab();});
-    body.querySelector('[data-profile-draft-frame]')?.addEventListener('change',e=>{this.data.equipped.frameKey=e.target.value||null;this._appearanceDirty=this.data.equipped.titleKey!==this._appearanceSaved.titleKey||this.data.equipped.frameKey!==this._appearanceSaved.frameKey;this.render();this.activeTab='profile';this.overlay?.querySelectorAll('[data-profile-tab]').forEach(x=>x.classList.toggle('active',x.dataset.profileTab==='profile'));this.renderTab();});
+    body.querySelector('[data-profile-draft-title]')?.addEventListener('change',e=>{this.data.equipped.titleKey=e.target.value||null;this._appearanceDirty=this.data.equipped.titleKey!==this._appearanceSaved.titleKey||this.data.equipped.frameKey!==this._appearanceSaved.frameKey;this._refreshCurrentTab('profile');});
+    body.querySelector('[data-profile-draft-frame]')?.addEventListener('change',e=>{this.data.equipped.frameKey=e.target.value||null;this._appearanceDirty=this.data.equipped.titleKey!==this._appearanceSaved.titleKey||this.data.equipped.frameKey!==this._appearanceSaved.frameKey;this._refreshCurrentTab('profile');});
     body.querySelector('[data-save-appearance]')?.addEventListener('click',()=>this.saveAppearance());
     return out;
   };
