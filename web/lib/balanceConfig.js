@@ -1,7 +1,7 @@
 'use strict';
 
 const DEFAULTS={
-  version:'metagame-v1.4-p12',
+  version:'metagame-v1.4-p16',
   reward:{
     engineVersion:'dirty-coins-v1',
     pointsMin:3,pointsMax:20,playersMin:3,playersMax:10,
@@ -19,6 +19,7 @@ const DEFAULTS={
     {key:'insana',min:3,label:'Insana',icon:'☠️',duration:'muito longa'}
   ],
   loot:{placementBase:[10,7,5],otherBase:3},
+  recycling:{batchSize:10,rewardPerBatch:250},
   bestWorld:{winsLog:2,winRate:3,minWinRateUses:5,presenceLog:1.3,adoptionsLog:1.5,reachLog:1.1,ageLog:.5,ageSeconds:2592000}
 };
 
