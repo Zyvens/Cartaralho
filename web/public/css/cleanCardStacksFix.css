@@ -1,0 +1,17 @@
+/* Fix: the clean-card balance must be represented as actual stacked cards. */
+.clean-stack-grid-live{align-items:stretch}
+.clean-stack-live{min-height:118px!important;padding:16px 18px!important;gap:18px!important}
+.clean-stack-live .clean-stack-visual{flex:0 0 104px!important;width:104px!important;height:82px!important;overflow:visible}
+.clean-stack-live .clean-stack-sheet{left:8px!important;top:8px!important;width:49px!important;height:68px!important;border-radius:8px!important;transform:translate(calc(var(--stack-i)*3.6px),calc(var(--stack-i)*-1.1px)) rotate(calc((var(--stack-i) - (var(--stack-count)/2))*1.1deg))!important;transform-origin:center bottom;transition:transform .18s ease,opacity .18s ease}
+.clean-stack-live .clean-stack-sheet:last-of-type{box-shadow:0 10px 22px rgba(0,0,0,.38),0 0 0 1px rgba(255,255,255,.05)}
+.clean-stack-live.clean-stack-white .clean-stack-sheet:last-of-type{box-shadow:0 10px 22px rgba(0,0,0,.30),0 0 13px rgba(255,255,255,.15)}
+.clean-stack-live.clean-stack-black .clean-stack-sheet:last-of-type{box-shadow:0 11px 24px rgba(0,0,0,.55),0 0 12px rgba(112,86,255,.11)}
+.clean-stack-live .clean-stack-empty{left:17px!important;top:7px!important;width:49px!important;height:68px!important;border:2px dashed rgba(151,151,180,.55)!important;border-radius:8px!important;background:transparent!important;box-shadow:none!important}
+.clean-stack-depth{position:absolute;right:2px;bottom:4px;display:grid;place-items:center;min-width:31px;height:24px;padding:0 7px;border:1px solid rgba(255,255,255,.13);border-radius:999px;background:rgba(8,8,15,.86);color:var(--text-secondary);font:800 .66rem var(--font-display);box-shadow:0 5px 13px rgba(0,0,0,.3)}
+.clean-stack-live .clean-stack-copy{display:flex;min-width:0;flex-direction:column;justify-content:center}
+.clean-stack-live .clean-stack-copy small{color:#f5f5fb;font-size:.8rem;font-weight:800}
+.clean-stack-live .clean-stack-copy b{margin-top:6px;font-size:1.7rem}
+.clean-stack-live .clean-stack-copy span{margin-top:5px;color:var(--text-muted);font-size:.72rem}
+.clean-stack-live.just-consumed .clean-stack-sheet:last-of-type{animation:cleanCardSpent .34s cubic-bezier(.2,.75,.3,1)}
+@keyframes cleanCardSpent{0%{opacity:1;filter:brightness(1);transform:translate(calc(var(--stack-i)*3.6px),calc(var(--stack-i)*-1.1px)) rotate(0) scale(1)}55%{opacity:.05;filter:brightness(1.35);transform:translate(calc(var(--stack-i)*3.6px + 28px),calc(var(--stack-i)*-1.1px - 20px)) rotate(10deg) scale(1.07)}56%{opacity:0}100%{opacity:1}}
+@media(max-width:600px){.clean-stack-grid-live{grid-template-columns:1fr!important}.clean-stack-live{min-height:104px!important}.clean-stack-live .clean-stack-visual{flex-basis:94px!important;width:94px!important}}
