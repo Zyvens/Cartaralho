@@ -10,7 +10,7 @@ Consolidar correções solicitadas em revisões anteriores que ficaram parciais 
 - Nova configuração de sala: `Narrador` ligado/desligado.
 - A configuração pertence à sala e pode ser alterada pelo criador enquanto a partida ainda não começou.
 - O narrador usa `SpeechSynthesis`/Web Speech API no navegador.
-- Apenas o dispositivo do criador/host vocaliza, evitando múltiplos dispositivos falando ao mesmo tempo.
+- Apenas o dispositivo do criador vocaliza, evitando múltiplos dispositivos falando ao mesmo tempo quando o Mestre da rodada muda.
 - Narra somente informação pública: início da partida, número da rodada, Carta Preta, momento de revelação das respostas, carta vencedora/vencedor e fim da partida.
 - Nunca lê mão privada, autoria oculta antes da revelação ou dados de espectador privados.
 - Preferência respeita suporte do navegador e falha silenciosamente quando síntese de voz não existe.
@@ -23,7 +23,7 @@ Consolidar correções solicitadas em revisões anteriores que ficaram parciais 
 - Título, descrição, preço e CTA preservam alinhamento consistente entre cards.
 
 ### 3. Novas molduras cosméticas
-Adicionar molduras compráveis sem interferir na progressão Copper → Silver → Gold → Platinum.
+Adicionar molduras compráveis sem interferir na progressão Copper → Silver → Gold → Platinum. As raridades de entrada são deliberadamente baratas; Épicas e Lendárias preservam um salto de prestígio em relação ao catálogo existente.
 
 #### Comum
 - Moldura Lisa — 4.000
@@ -36,12 +36,12 @@ Adicionar molduras compráveis sem interferir na progressão Copper → Silver �
 - Ornamental — 10.000
 
 #### Épica
-- Cintilante — 18.000
+- Cintilante — 65.000
 
 #### Lendárias
-- Arco-íris — 28.000
-- Asas — 30.000
-- Folhas — 27.000
+- Arco-íris — 110.000
+- Folhas — 125.000
+- Asas — 135.000
 
 Todas são ownership permanente, usam o fluxo cosmético existente e têm render visual próprio.
 
@@ -81,7 +81,7 @@ Todas são ownership permanente, usam o fluxo cosmético existente e têm render
 3. Como Jogar mantém dimensões naturais e o preview está abaixo dele em card independente.
 4. Criador consegue editar regras no Lobby antes do início; outro jogador não consegue.
 5. Alterações de regras aparecem para todos via evento de sala.
-6. Narrador pode ser ligado/desligado na criação e no Lobby e só vocaliza conteúdo público pelo host.
+6. Narrador pode ser ligado/desligado na criação e no Lobby e só vocaliza conteúdo público pelo dispositivo do criador.
 7. Cards de BUFF exibem pills alinhados e ícones sem repetição visual.
 8. As 10 novas molduras aparecem no catálogo após migração, com raridade/preço corretos e render próprio.
 9. Progressão Copper/Silver/Gold/Platinum permanece separada dos cosméticos.
