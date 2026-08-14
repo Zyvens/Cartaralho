@@ -4,7 +4,7 @@ SELECT points_to_win,participants_at_start,class_key,COUNT(*) matches,ROUND((AVG
 -- 2) Rejoin, disconnect e abandono.
 SELECT COUNT(*) matches,SUM(disconnect_count) disconnects,SUM(rejoin_count) rejoins,SUM(abandon_count) abandons,ROUND(AVG(disconnect_count)::numeric,2) disconnects_per_match FROM match_telemetry WHERE started_at>=now()-interval '30 days';
 -- 3) Moedas geradas/gastas por dia.
-SELECT date_trunc('day',created_at) day,SUM(amount) FILTER(WHERE amount>0) generated,-SUM(amount) FILTER(WHERE amount<0) spent,SUM(amount) net FROM dirty_coin_ledger GROUP BY 1 ORDER BY 1 DESC;
+SELECT date_trunc('day',created_at) AS bucket_day,SUM(amount) FILTER(WHERE amount>0) generated,-SUM(amount) FILTER(WHERE amount<0) spent,SUM(amount) net FROM dirty_coin_ledger GROUP BY 1 ORDER BY 1 DESC;
 -- 4) Moedas de recompensa por hora real de jogo.
 WITH per_match AS(SELECT mt.room_code,mt.duration_seconds,COALESCE(SUM(l.amount) FILTER(WHERE l.amount>0),0) generated FROM match_telemetry mt LEFT JOIN dirty_coin_ledger l ON l.reference_type='match' AND l.reference_id=mt.room_code WHERE mt.finished_at IS NOT NULL AND mt.duration_seconds>0 AND mt.valid_for_rewards=true GROUP BY mt.room_code,mt.duration_seconds) SELECT COUNT(*) matches,ROUND((SUM(generated)*3600.0/NULLIF(SUM(duration_seconds),0))::numeric,2) coins_per_hour FROM per_match;
 -- 5) Distribuição atual de saldo.
