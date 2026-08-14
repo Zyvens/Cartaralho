@@ -4,6 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const source=fs.readFileSync(path.join(__dirname,'../lib/buffEngine.js'),'utf8');
+const manager=fs.readFileSync(path.join(__dirname,'../lib/gameManager.js'),'utf8');
 
 test('consumo acontece dentro da mesma transação que persiste ativação e efeito',()=>{
  const effect=source.indexOf('UPDATE rooms SET current_round');
@@ -26,8 +27,14 @@ test('Foi sem querer querendo reverte estatística da resposta recolhida',()=>{
  assert.match(source,/used_count=GREATEST\(0,used_count-1\)/);
 });
 
-test('Mão de Vaca persiste escolha pendente e bloqueia resposta\/resultado',()=>{
+test('Mão de Vaca persiste escolha pendente e bloqueia resposta/resultado',()=>{
  assert.match(source,/pendingTrim/);
  assert.match(source,/Devolva duas cartas da Mão de Vaca antes de responder/);
  assert.match(source,/assertCanResolveRound/);
+});
+
+test('remoção de jogador normaliza Mão de Vaca antes de permitir rejoin futuro',()=>{
+ assert.match(source,/function handlePlayerRemoved/);
+ assert.match(source,/delete s\.pendingTrim\[id\]/);
+ assert.match(manager,/buffEngine\.handlePlayerRemoved\(room,key\)/);
 });
