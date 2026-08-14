@@ -15,7 +15,8 @@ function normalizeBlackCardDisplay(text,{requireGap=true}={}){
 }
 function prepareDisplayText(type,text,{requireBlackGap=false}={}){const cardType=canonicalCardType(type);return cardType==='black'?normalizeBlackCardDisplay(text,{requireGap:requireBlackGap}):cleanDisplayText(text);}
 function normalizeCardText(text){return cleanDisplayText(text).toLowerCase();}
-function canonicalIdentity(type,text){const cardType=canonicalCardType(type),displayText=prepareDisplayText(cardType,text),normalizedText=normalizeCardText(displayText);if(!normalizedText)throw new Error('O texto da carta não pode ficar vazio.');return{cardType,normalizedText,displayText};}
+// Identidade canônica preserva cartas históricas; a normalização de lacuna é aplicada apenas no fluxo de nova criação.
+function canonicalIdentity(type,text){const cardType=canonicalCardType(type),displayText=cleanDisplayText(text),normalizedText=normalizeCardText(displayText);if(!normalizedText)throw new Error('O texto da carta não pode ficar vazio.');return{cardType,normalizedText,displayText};}
 function sameCanonicalCard(aType,aText,bType,bText){const a=canonicalIdentity(aType,aText),b=canonicalIdentity(bType,bText);return a.cardType===b.cardType&&a.normalizedText===b.normalizedText;}
 function creationKind(canonicalCard,matchId){if(!canonicalCard||!matchId||canonicalCard.origin_uncertain)return'independent';return String(canonicalCard.origin_match_id||'')===String(matchId)?'original':'independent';}
 function submissionIsCreation(userId,alreadyOwned){return Boolean(userId&&!alreadyOwned);}
