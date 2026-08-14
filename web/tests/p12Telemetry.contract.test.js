@@ -1,0 +1,8 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
+const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const migration=read('db/metagame_v1_4_package12.sql'),queries=read('db/telemetry_p12_queries.sql'),ops=read('docs/P12_OPERATIONS.md'),matrix=read('docs/P12_SCENARIO_MATRIX.md'),env=read('.env.example');
+test('P12 instrumenta ciclo de vida sem dados pessoais desnecessários',()=>{for(const k of['duration_seconds','disconnect_count','rejoin_count','abandon_count','effective_players','valid_for_rewards'])assert.ok(migration.includes(k),k);assert.match(migration,/operational_events/);assert.doesNotMatch(migration,/email|password|nickname|avatar/i);});
+test('queries cobrem duração, moedas, cartas, buffs, saldo e ledger',()=>{for(const k of['coins_per_hour','cards_per_hour','dirty_coin_wallets','buff_activations','match_loot_entitlements','delta'])assert.ok(queries.includes(k),k);});
+test('flags e rollback estão documentados',()=>{for(const k of['MARKETPLACE_ENABLED','MATCH_LOOT_ENABLED','CARD_PROGRESSION_V2_ENABLED','BUFFS_FEATURE_ENABLED','ADVANCED_ROUND_ENGINE','ECONOMY_SETTLEMENTS_ENABLED','ACHIEVEMENTS_V2_ENABLED','COSMETICS_FEATURE_ENABLED','TELEMETRY_ENABLED']){assert.ok(env.includes(k),k);assert.ok(ops.includes(k),k);}assert.match(ops,/Não existe bônus por duração real na v1/);});
+test('matriz cobre cenários críticos',()=>{for(const k of['Duas abas','Retry HTTP','Rejoin','Disconnect','Pusher duplicado','Saqueador','Surrupiada','Espólio','Autoria','Replay','Spectator','Mobile'])assert.ok(matrix.includes(k),k);});
