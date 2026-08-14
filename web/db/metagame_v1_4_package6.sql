@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS match_loot_snapshots(
 );
 
 CREATE TABLE IF NOT EXISTS match_loot_candidates(
+  id BIGSERIAL PRIMARY KEY,
   match_id TEXT NOT NULL REFERENCES match_loot_snapshots(match_id) ON DELETE CASCADE,
   canonical_card_id BIGINT NOT NULL REFERENCES canonical_cards(id) ON DELETE CASCADE,
   source_user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
@@ -19,7 +20,7 @@ CREATE TABLE IF NOT EXISTS match_loot_candidates(
   source_reason TEXT NOT NULL CHECK(source_reason IN('created','white_revealed','black_used')),
   first_round_number INT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  PRIMARY KEY(match_id,canonical_card_id,source_user_id,source_reason)
+  UNIQUE(match_id,canonical_card_id,source_user_id,source_reason)
 );
 CREATE INDEX IF NOT EXISTS idx_match_loot_candidates_match_card ON match_loot_candidates(match_id,canonical_card_id);
 
