@@ -2,6 +2,7 @@ const { withErrors, ok, fail, requireMethod, getBody } = require('../../lib/http
 const { requireUser } = require('../../lib/auth');
 const roomStore = require('../../lib/roomStore');
 const roomConfig = require('../../lib/roomConfigP7');
+const { broadcast } = require('../../lib/pusherServer');
 
 module.exports = withErrors(async (req, res) => {
   if (!requireMethod(req, res, 'POST')) return;
@@ -13,5 +14,8 @@ module.exports = withErrors(async (req, res) => {
   try { roomConfig.apply(room, String(user.id), partialConfig || {}); }
   catch (e) { return fail(res, 409, e.message); }
   await roomStore.saveRoom(room);
-  ok(res,{config:roomConfig.publicConfig(room)});
+  const config=roomConfig.publicConfig(room);
+  try{await broadcast(room.code,'room_config_updated',{config});}
+  catch(e){console.error('Falha ao transmitir room_config_updated:',e.message);}
+  ok(res,{config});
 });
