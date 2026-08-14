@@ -2,6 +2,7 @@
 const{sql}=require('./db');
 const playerStats=require('./playerStats');
 const cardProgression=require('./cardProgressionService');
+const contribution=require('./playerContribution');
 const rules=require('./matchLootRules');
 const enabled=()=>process.env.MATCH_LOOT_ENABLED!=='false';
 
@@ -16,11 +17,19 @@ async function resolveEconomy(room,economy,validForRewards=true){
  return{engineVersion:playerStats.REWARD_ENGINE_VERSION,effectivePlayers,effort,valid:validForRewards!==false&&rounds>0&&players>=3};
 }
 
+async function enforceContributionEligibility(room){
+ if(!contribution.requirementEnabled(room))return[];
+ const excluded=Array.from(room.players.values()).filter(p=>p?.userId&&!contribution.finalEligibility(room,p)).map(p=>Number(p.userId));
+ for(const userId of excluded)await sql`UPDATE match_loot_entitlements SET eligible_count=0,quota=0,status='empty' WHERE match_id=${room.code} AND user_id=${userId} AND status<>'claimed'`;
+ return excluded;
+}
+
 async function finalizeMatch(room,{economy=null,validForRewards=true}={}){
  if(!enabled())return{status:'disabled'};
  const e=await resolveEconomy(room,economy,validForRewards);
- const rows=await sql`SELECT settle_match_loot(${room.code},${e.valid},${e.engineVersion},${e.effectivePlayers},${e.effort}) result`;
- return rows[0]?.result||{status:'unavailable'};
+ const rows=await sql`SELECT settle_match_loot(${room.code},${e.valid},${e.engineVersion},${e.effectivePlayers},${e.effort}) result`,result=rows[0]?.result||{status:'unavailable'};
+ const noLootUserIds=e.valid?await enforceContributionEligibility(room):[];
+ return{...result,noLootUserIds};
 }
 
 async function expireEmpty(userId){
@@ -54,4 +63,4 @@ async function claim(userId,{matchId,claimId,cardIds=[]}={}){
  if(result.status==='ok'&&!result.replayed){for(const cardId of result.granted||[])await cardProgression.refreshCanonicalStats(Number(cardId));}
  return result;
 }
-module.exports={...rules,enabled,finalizeMatch,getPending,claim};
+module.exports={...rules,enabled,finalizeMatch,enforceContributionEligibility,getPending,claim};
