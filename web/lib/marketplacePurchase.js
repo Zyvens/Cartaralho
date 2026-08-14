@@ -8,6 +8,7 @@ async function purchase(userId,productKey,purchaseId){
  if(!id)return{status:'invalid_user'};if(p.length<8)return{status:'invalid_idempotency_key'};
  await c.balances(id);let old=await c.getPurchase(id,p);if(old)return c.shapePurchase(old,await c.balances(id),true);
  const product=await c.getProduct(key);if(!product||!product.enabled)return{status:'invalid_product'};
+ if(product.category==='buff'&&process.env.BUFFS_FEATURE_ENABLED==='false')return{status:'buff_feature_disabled'};
  for(let attempt=0;attempt<3;attempt++)try{
   const out=product.category==='clean_cards'?await clean.run(id,product,p):product.category==='buff'?await buff.run(id,product,p):await runPack(id,product,p),final=out[out.length-1]?.[0];
   if(final)return c.shapePurchase(final,{dirtyBalance:Number(final.dirty_balance||0),whiteBalance:Number(final.white_balance||0),blackBalance:Number(final.black_balance||0)},false);
