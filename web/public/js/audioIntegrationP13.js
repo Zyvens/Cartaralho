@@ -2,12 +2,17 @@
 (function audioIntegrationP13(){
   const SETTINGS_KEY='cartaralho:audio-settings:v1';
   const LEGACY_MUTE_KEY='cartaralho:music-muted:v1';
+  const AUTOSTART_FIX_KEY='cartaralho:music-autostart-p18:v1';
   try{
-    if(!localStorage.getItem(SETTINGS_KEY))window.CartSFX?.setSettings({music:localStorage.getItem(LEGACY_MUTE_KEY)!=='1'});
+    if(!localStorage.getItem(AUTOSTART_FIX_KEY)){
+      window.CartSFX?.setSettings({music:true});
+      localStorage.setItem(LEGACY_MUTE_KEY,'0');
+      localStorage.setItem(AUTOSTART_FIX_KEY,'1');
+    }else if(!localStorage.getItem(SETTINGS_KEY))window.CartSFX?.setSettings({music:localStorage.getItem(LEGACY_MUTE_KEY)!=='1'});
     else window.CartSFX?.applyMusic?.();
   }catch(_){window.CartSFX?.applyMusic?.();}
 
-  // A música fica habilitada por padrão. Como Safari/Chrome podem bloquear áudio antes de interação,
+  // A música fica habilitada por padrão. Safari/Chrome podem bloquear áudio antes de interação;
   // o primeiro gesto válido força o resume da trilha sem exigir abrir Configurações e alternar o toggle.
   const resumeMusic=()=>{const s=window.CartSFX?.getSettings?.();if(s?.music!==false)window.CartSoundtrack?.unmute?.();};
   document.addEventListener('pointerdown',resumeMusic,{once:true,capture:true});
