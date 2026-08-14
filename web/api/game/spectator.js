@@ -1,0 +1,3 @@
+'use strict';
+const{withErrors,ok,fail,requireMethod}=require('../../lib/http');const roomStore=require('../../lib/roomStore'),advanced=require('../../lib/advancedRoundEngine');
+module.exports=withErrors(async(req,res)=>{if(!requireMethod(req,res,'GET'))return;const code=String(req.query?.code||'').trim().toUpperCase();if(!code)return fail(res,400,'code é obrigatório.');const room=await roomStore.loadRoom(code);if(!room)return fail(res,404,'Sala não encontrada.');const view=advanced.spectatorView(room);if(!view)return fail(res,409,'A partida ainda não possui rodada ativa.');ok(res,{spectator:view});});
