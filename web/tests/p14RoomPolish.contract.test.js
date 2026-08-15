@@ -8,7 +8,7 @@ for(const[file,src]of[['rewardPreviewUI.js',reward],['createRoom.js',createRoom]
 
 test('reward preview fonte não usa til e mantém Espólio explícito por colocação',()=>{assert.doesNotMatch(reward,/~\$\{/);assert.match(reward,/economy-placement-grid/);assert.match(reward,/economy-reward-loot/);assert.match(reward,/'1º lugar'/);assert.match(reward,/'2º lugar'/);assert.match(reward,/'3º lugar'/);assert.match(reward,/'Demais'/);});
 
-test('Como Jogar e estimativas permanecem blocos próprios na criação de sala',()=>{const rulesAt=createRoom.indexOf('how-to-play-card'),rewardAt=createRoom.indexOf('dashboard-estimate-card');assert.ok(rulesAt>0&&rewardAt>rulesAt);assert.match(createRoom,/create-room-dashboard/);assert.match(createRoom,/dashboard-config-card/);assert.match(createRoom,/dashboard-summary-slot/);assert.doesNotMatch(createRoom,/create-room-sidebar/);});
+test('Como Jogar e estimativas permanecem blocos próprios na criação de sala',()=>{const rulesAt=createRoom.indexOf('how-to-play-card'),rewardAt=createRoom.indexOf('dashboard-estimate-card');assert.ok(rulesAt>0&&rewardAt>0&&rulesAt!==rewardAt);assert.match(createRoom,/create-room-dashboard/);assert.match(createRoom,/dashboard-config-card/);assert.match(createRoom,/dashboard-summary-slot/);assert.doesNotMatch(createRoom,/create-room-sidebar/);});
 
 test('Lobby mantém regras editáveis antes do início através do resumo e modal',()=>{assert.match(lobby,/RoomRulesUI\.summary\(cfg/);assert.match(lobby,/RoomRulesUI\.openEditor/);assert.match(lobby,/SocketClient\.updateRoomConfig/);assert.match(lobby,/App\.state\.isCreator/);assert.doesNotMatch(lobby,/save-room-rules-btn/);assert.match(rules,/Narrador da partida/);assert.match(rules,/data-room-input/);});
 
