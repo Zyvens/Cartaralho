@@ -1,8 +1,9 @@
 'use strict';
 const{sql}=require('./db');
 
-const APP_VERSION='v1.4.23';
+const APP_VERSION='v1.4.24';
 const RELEASES=[
+ {id:'release:p24',type:'update',icon:'🧭',title:'P24 — Achievements e atalhos da Home',description:'Títulos ligados a achievements agora mostram diretamente o requisito real de desbloqueio, e os atalhos da Home passam a seguir uma ordem fixa e consistente.',version:'v1.4.24',publishedAt:'2026-08-15T09:05:00.000Z'},
  {id:'release:p23',type:'update',icon:'🪞',title:'P23 — Perfil e Gênese',description:'Corrige a moldura Gênese no seletor e na prévia, elimina o salto ao topo ao trocar cosméticos e consolida todo o salvamento do Perfil no botão Salvar alterações.',version:'v1.4.23',publishedAt:'2026-08-15T08:55:00.000Z'},
  {id:'release:p22',type:'update',icon:'🧩',title:'P22 — Estimativas, Gênese e refinamentos mobile',description:'Unifica o visual de Resumo e Estimativa, preserva a classificação da partida, corrige a hidratação da moldura Gênese e simplifica pilhas/ícones de cartas no mobile.',version:'v1.4.22',publishedAt:'2026-08-15T07:50:00.000Z'},
  {id:'release:p21',type:'update',icon:'🩹',title:'P21 — Hotfix de configuração e Cartas Limpas',description:'Corrige início da música no primeiro gesto permitido, números das regras, organização dos quatro cards de configuração, contraste das abas de cartas e consumo visual das pilhas de Cartas Limpas.',version:'v1.4.21',publishedAt:'2026-08-15T07:20:00.000Z'},

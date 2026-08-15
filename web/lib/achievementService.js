@@ -83,5 +83,5 @@ async function syncProgress(userId){
 }
 
 async function syncAchievements(userId){if(!enabled())return{enabled:false,achievements:[],newUnlocks:[],royalties:[]};const royalties=await processLegacyMilestones(userId);await syncCanonicalEvents(userId);const state=await syncProgress(userId);return{enabled:true,...state,royalties};}
-function titleDefinitions(){return defs.ACHIEVEMENTS.filter(x=>x.title).map(x=>({key:x.title.key,name:x.title.name,icon:x.icon,rarity:x.rarity,description:`Título por achievement: ${x.name}.`,achievementKey:x.key,target:x.target}));}
+function titleDefinitions(){return defs.ACHIEVEMENTS.filter(x=>x.title).map(x=>({key:x.title.key,name:x.title.name,icon:x.icon,rarity:x.rarity,description:x.description,achievementKey:x.key,target:x.target}));}
 module.exports={enabled,syncCanonicalEvents,processLegacyMilestones,syncProgress,syncAchievements,titleDefinitions,milestoneEventKey};
