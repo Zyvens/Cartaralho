@@ -20,12 +20,13 @@ function normalizeProfileData(pm){
   if(!pm?.data)return;
   pm.data.titles?.forEach(t=>{t.rarityInfo=t.rarityInfo||{};t.rarityInfo.label=rarityLabels[t.rarity]||t.rarityInfo.label||'Comum';});
   if(Array.isArray(pm.data.frames)){
-    pm.data.frames=pm.data.frames.filter(f=>baseFrameKeys.includes(f.key));
+    // Molduras de progressão recebem os nomes históricos, mas cosméticos e entitlements
+    // permanecem na coleção. O filtro antigo removia Gênese e qualquer moldura comprada.
     pm.data.frames.forEach(f=>{
+      if(!baseFrameKeys.includes(f.key))return;
       f.name=frameNames[f.key]||f.name;
       f.description=frameDescriptions[f.key]||f.description;
     });
-    if(pm.data.equipped?.frameKey&&!baseFrameKeys.includes(pm.data.equipped.frameKey))pm.data.equipped.frameKey=null;
   }
 }
 
@@ -56,10 +57,13 @@ async function saveProfileAll(pm){
   btn.disabled=true;btn.classList.add('is-saving');btn.textContent='Salvando...';
   try{
     const d=pm.__profileDraft||{displayName:AuthClient.user.display_name,email:AuthClient.user.email||'',bio:AuthClient.user.bio||''};
-    await AuthClient.saveProfile({displayName:d.displayName,email:d.email,bio:d.bio,avatarData:pm.draftAvatar});
-    await MetaClient.equip(pm.data?.equipped?.titleKey||null,pm.data?.equipped?.frameKey||null);
-    AuthClient.user.equipped_title_key=pm.data?.equipped?.titleKey||null;
-    AuthClient.user.equipped_frame_key=pm.data?.equipped?.frameKey||null;
+    const titleKey=pm.data?.equipped?.titleKey||null,frameKey=pm.data?.equipped?.frameKey||null;
+    // P23: um único endpoint persiste identidade e cosméticos. Não existe mais um
+    // segundo salvar de aparência nem duas gravações concorrentes no cliente.
+    await AuthClient.saveProfile({displayName:d.displayName,email:d.email,bio:d.bio,avatarData:pm.draftAvatar,titleKey,frameKey});
+    pm.data.equipped={titleKey:AuthClient.user?.equipped_title_key||null,frameKey:AuthClient.user?.equipped_frame_key||null};
+    pm._appearanceSaved={...pm.data.equipped};pm._appearanceDirty=false;pm.__appearanceDirty=false;
+    if(window.App?.state){App.state.matchTitleKey=pm.data.equipped.titleKey;App.state.matchFrameKey=pm.data.equipped.frameKey;}
     pm.__profileDraft={displayName:AuthClient.user.display_name,email:AuthClient.user.email||'',bio:AuthClient.user.bio||''};
     HomeScreen.renderAccount();Toast.success('Alterações salvas.');pm.render();
   }catch(e){Toast.error(e.message||'Não foi possível salvar.');}
@@ -85,6 +89,8 @@ if(window.ProfileModal){
       const legend=this.overlay?.querySelector('.profile-modal-legend');
       if(legend)legend.outerHTML='<div class="frame-progression-legend"><span>● Bronze</span><span>● Prata</span><span>● Ouro</span><span>● Platina</span></div>';
     }
+    // P23: o rodapé global é o único ponto de persistência visível do Perfil.
+    this.overlay?.querySelectorAll('.profile-modal-savebar,.profile-appearance-savebar').forEach(x=>x.remove());
     bindProfileDraft(this);ensureProfileFooter(this);return r;
   };
 
@@ -98,10 +104,14 @@ if(window.ProfileModal){
   };
 
   ProfileModal.equipTitle=function(key){
-    if(!this.data)return;this.data.equipped.titleKey=key||null;this.__appearanceDirty=true;this.activeTab='titles';this.render();
+    if(!this.data)return;
+    if(typeof this._setAppearanceDraft==='function')return this._setAppearanceDraft('title',key||null);
+    this.data.equipped.titleKey=key||null;this.__appearanceDirty=true;
   };
   ProfileModal.equipFrame=function(key){
-    if(!this.data)return;this.data.equipped.frameKey=key||null;this.__appearanceDirty=true;this.activeTab='frames';this.render();
+    if(!this.data)return;
+    if(typeof this._setAppearanceDraft==='function')return this._setAppearanceDraft('frame',key||null);
+    this.data.equipped.frameKey=key||null;this.__appearanceDirty=true;
   };
   ProfileModal.rarityLegend=()=>'<span class="rarity-common">● Comum</span><span class="rarity-rare">● Incomum</span><span class="rarity-superrare">● Raro</span><span class="rarity-epic">● Épico</span><span class="rarity-legendary">● Lendário</span>';
 }
