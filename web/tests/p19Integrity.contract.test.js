@@ -73,9 +73,11 @@ test('UI, Narrador e resultado tratam resposta dupla como um conjunto',()=>{
  assert.match(result,/result-winner-cards/);assert.match(result,/currentWinnerCards/);assert.match(gameplay,/round_result/);assert.match(gameplay,/currentWinnerCards/);assert.match(index,/js\/gameplayP19\.js/);assert.match(p19css,/result-winner-cards\.count-2/);
 });
 
-test('Perfil usa rascunho e só persiste título/moldura no botão Salvar',()=>{
+test('Perfil usa rascunho e só persiste aparência pelo salvamento global',()=>{
  assert.match(profileAppearance,/equipTitle=function\(key\)\{this\._setAppearanceDraft/);assert.match(profileAppearance,/equipFrame=function\(key\)\{this\._setAppearanceDraft/);
- assert.match(profileAppearance,/saveAppearance=async function/);assert.match(profileAppearance,/await MetaClient\.equip\(titleKey,frameKey\)/);assert.match(profileAppearance,/Salvar título e moldura/);assert.match(profileAppearance,/Alterações não salvas/);
+ assert.match(profileAppearance,/_setAppearanceDraft=function/);assert.match(profileAppearance,/this\._syncAppearanceDom\(\)/);
+ assert.match(profileAppearance,/saveAppearance=async function\(\)\{this\.overlay\?\.querySelector\('\.profile-global-save'\)\?\.click\(\);\}/);
+ assert.doesNotMatch(profileAppearance,/MetaClient\.equip\(/);
  assert.match(index,/js\/profileAppearanceP19\.js/);assert.ok(index.indexOf('js/profileAppearanceP19.js')>index.indexOf('js/profileModal.js'));
 });
 
