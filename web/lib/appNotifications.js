@@ -1,8 +1,9 @@
 'use strict';
 const{sql}=require('./db');
 
-const APP_VERSION='v1.4.19';
+const APP_VERSION='v1.4.20';
 const RELEASES=[
+ {id:'release:p20',type:'update',icon:'🎭',title:'P20 — Cosméticos públicos e apresentação pré-jogo',description:'Título e moldura passam a acompanhar a identidade do jogador no Perfil, Home, Lobby e partida. Gênese fica disponível ao Criador e o início da partida ganha uma apresentação curta dos jogadores e suas cartas de ostentação.',version:'v1.4.20',publishedAt:'2026-08-15T07:00:00.000Z'},
  {id:'release:p19',type:'update',icon:'🛠️',title:'P19 — Correções de sala, cartas e progressão',description:'Corrige estimativas com cache, confirma Mão de Vaca sem bloquear Pronto, restaura pilhas de Cartas Limpas, suporta Cartas Pretas de duas lacunas, Perfil com salvar aparência e novas badges/títulos.',version:'v1.4.19',publishedAt:'2026-08-14T23:45:00.000Z'},
  {id:'release:p18',type:'update',icon:'🆕',title:'P18 — Contribuição e Central de Notificações',description:'Pronto passa a considerar contribuição para Espólio, seleção de cartas é bloqueada após Pronto, melhorias de sala e nova Central de Notificações.',version:'v1.4.18',publishedAt:'2026-08-14T21:00:00.000Z'},
  {id:'release:p17',type:'update',icon:'✨',title:'P17 — Molduras e raridades',description:'Molduras reorganizadas por raridade, novos preços e efeitos animados para progressão e Celestial.',version:'v1.4.17',publishedAt:'2026-08-14T19:30:00.000Z'},
