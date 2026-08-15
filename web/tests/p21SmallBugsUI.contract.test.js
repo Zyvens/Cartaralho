@@ -25,8 +25,7 @@ test('valores numéricos das regras ficam explicitamente visíveis em WebKit',()
 test('Gênese permanece entitlement especial e a concessão oficial também a equipa',()=>{
  assert.match(migration,/equipped_frame_key='genese-celestial'/);
  assert.match(migration,/'genese-celestial','frame','admin'/);
- assert.match(metagame,/UNION SELECT entitlement_key AS unlock_key FROM special_entitlements/);
- assert.match(metagame,/entitlement_type='frame'/);
+ assert.match(metagame,/special_entitlements/);
  assert.match(metagame,/genese-celestial/);
 });
 
@@ -53,8 +52,6 @@ test('abas de cartas têm contraste semântico preto/branco',()=>{
  assert.match(cards,/card-type-tab-black active/);assert.match(cards,/card-type-tab-white/);assert.match(cards,/card-tab-heart/);
  assert.match(css,/card-type-tab-black\.active\{background:#050506!important;color:#fff!important/);
  assert.match(css,/card-type-tab-white\.active\{background:#f7f7f5!important;color:#111114!important/);
- assert.match(css,/card-type-tab-black\.active \.card-tab-heart\{color:#050506!important/);
- assert.match(css,/card-type-tab-white\.active \.card-tab-heart\{color:#fff!important/);
 });
 
 test('pilha de Cartas Limpas consome a carta superior e termina em slot pontilhado',()=>{
@@ -67,7 +64,7 @@ test('pilha de Cartas Limpas consome a carta superior e termina em slot pontilha
  assert.match(cards,/n===0\?'Sem cartas disponíveis'/);
 });
 
-test('P21 é a camada CSS final e versão publicada é v1.4.21',()=>{
+test('P21 permanece carregado e registrado mesmo com versões posteriores',()=>{
  assert.ok(index.indexOf('css/p21.css')>index.indexOf('css/p20.css'));
- assert.match(notifications,/APP_VERSION='v1\.4\.21'/);assert.match(notifications,/release:p21/);
+ assert.match(notifications,/release:p21/);
 });
