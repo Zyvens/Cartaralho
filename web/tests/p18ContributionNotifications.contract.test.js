@@ -58,7 +58,7 @@ test('Carta Preta nova exige de 1 a 2 lacunas e normaliza qualquer run de unders
 });
 
 test('Central de Notificações publica versão atual, updates e recompensas',()=>{
- assert.match(notifyLib,/const APP_VERSION='v1\.4\.19'/);assert.ok((notifyLib.match(/type:'update'/g)||[]).length>=4);assert.match(notifyLib,/Prêmio de boas-vindas/);assert.match(notifyLib,/Kit de boas-vindas/);assert.match(notifyApi,/notifications\.center/);assert.match(notifyUI,/Central de Notificações/);assert.match(notifyUI,/VERSÃO ATUAL/);assert.match(notifyUI,/Prêmios recebidos/);assert.match(index,/js\/notificationsUI\.js/);assert.match(css,/notifications-overlay/);
+ const version=notifyLib.match(/const APP_VERSION='v(\d+)\.(\d+)\.(\d+)'/);assert.ok(version,'APP_VERSION deve permanecer semver');const[,major,minor,patch]=version.map(Number);assert.ok(major>1||(major===1&&(minor>4||(minor===4&&patch>=18))),'a Central não pode regredir abaixo do P18');assert.ok((notifyLib.match(/type:'update'/g)||[]).length>=4);assert.match(notifyLib,/Prêmio de boas-vindas/);assert.match(notifyLib,/Kit de boas-vindas/);assert.match(notifyApi,/notifications\.center/);assert.match(notifyUI,/Central de Notificações/);assert.match(notifyUI,/VERSÃO ATUAL/);assert.match(notifyUI,/Prêmios recebidos/);assert.match(index,/js\/notificationsUI\.js/);assert.match(css,/notifications-overlay/);
 });
 
 test('música é migrada para ligada e retoma no primeiro gesto permitido',()=>{
