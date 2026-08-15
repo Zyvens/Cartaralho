@@ -12,12 +12,19 @@
     else window.CartSFX?.applyMusic?.();
   }catch(_){window.CartSFX?.applyMusic?.();}
 
-  // A música fica habilitada por padrão. Safari/Chrome podem bloquear áudio antes de interação;
-  // o primeiro gesto válido força o resume da trilha sem exigir abrir Configurações e alternar o toggle.
-  const resumeMusic=()=>{const s=window.CartSFX?.getSettings?.();if(s?.music!==false)window.CartSoundtrack?.unmute?.();};
-  document.addEventListener('pointerdown',resumeMusic,{once:true,capture:true});
-  document.addEventListener('keydown',resumeMusic,{once:true,capture:true});
-  window.addEventListener('load',()=>{window.CartSFX?.applyMusic?.();});
+  // Web Audio não pode garantir som audível antes de interação no iOS. A trilha fica
+  // armada ao carregar e é retomada no primeiro gesto aceito pelo navegador, sem exigir
+  // que o usuário abra Configurações ou alterne Música manualmente.
+  const resumeMusic=()=>{
+    const s=window.CartSFX?.getSettings?.();
+    if(s?.music===false)return;
+    window.CartSoundtrack?.unmute?.();
+  };
+  const gestureEvents=['touchstart','pointerdown','click','keydown'];
+  gestureEvents.forEach(type=>document.addEventListener(type,resumeMusic,{once:true,capture:true,passive:type!=='keydown'}));
+  window.addEventListener('pageshow',resumeMusic);
+  window.addEventListener('load',()=>{window.CartSFX?.applyMusic?.();resumeMusic();});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)resumeMusic();});
 
   if(window.Modal&&!Modal.__p13Audio){
     Modal.__p13Audio=true;
