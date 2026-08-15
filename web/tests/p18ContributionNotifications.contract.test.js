@@ -53,7 +53,7 @@ test('Carta Preta nova exige de 1 a 2 lacunas e normaliza qualquer run de unders
  assert.throws(()=>cardIdentity.normalizeBlackCardDisplay('_ + _ + _'),/no máximo 2 lacunas/i);
  assert.equal(cardIdentity.whiteCardsRequiredForBlack('A ______ ou ______'),2);
  assert.match(cleanCards,/normalizeBlackCardDisplay\(text,\{requireGap:true\}\)/);
- assert.match(createApi,/\/lacuna\/i/);
+ assert.match(createApi,/pendingCardDrafts\.preview/);
  assert.match(cardComponent,/replace\(\/_\+\/g/);
 });
 
