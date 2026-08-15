@@ -1,7 +1,6 @@
 'use strict';
 const{validateCards}=require('./validators');
 const matchSubmit=require('./matchSubmitP6');
-const playerStats=require('./playerStats');
 const readiness=require('./roomReadiness');
 function clean(list){return(list||[]).map(x=>String(x||'').trim()).filter(Boolean);}
 function same(a,b){return a.length===b.length&&a.every((x,i)=>x===b[i]);}
@@ -15,7 +14,6 @@ async function save(room,playerId,blackCards=[],whiteCards=[]){
  const changed=!same(player.blackCards||[],black)||!same(player.whiteCards||[],white);
  player.blackCards=black;player.whiteCards=white;
  if(changed)player.cardsReady=false;
- if(player.userId){await playerStats.registerSubmittedCards(room,player,'blackCards',black,[]);await playerStats.registerSubmittedCards(room,player,'whiteCards',white,[]);}
  const state=readiness.sync(room);
  return{changed,cardsReady:player.cardsReady,blackCards:black,whiteCards:white,...state};
 }
