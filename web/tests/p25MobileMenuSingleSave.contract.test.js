@@ -42,8 +42,9 @@ test('decisão de produto preserva criação imediata de cartas como no modelo a
  assert.doesNotMatch(createApi,/draft|reservation|reserve/i);
 });
 
-test('Central registra P25 sem apagar P24',()=>{
- assert.match(notifications,/APP_VERSION='v1\.4\.25'/);
+test('Central preserva P25 e P24 mesmo quando a versão continua avançando',()=>{
+ const version=notifications.match(/APP_VERSION='v1\.4\.(\d+)'/);
+ assert.ok(version&&Number(version[1])>=25,'versão não pode regredir abaixo do P25');
  assert.match(notifications,/release:p25/);
  assert.match(notifications,/release:p24/);
 });

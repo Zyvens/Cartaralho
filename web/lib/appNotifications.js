@@ -1,8 +1,9 @@
 'use strict';
 const{sql}=require('./db');
 
-const APP_VERSION='v1.4.25';
+const APP_VERSION='v1.4.26';
 const RELEASES=[
+ {id:'release:p26',type:'update',icon:'✦',title:'P26 — Gênese refinada',description:'A moldura Celestial Gênese recebe espessura média, anel celestial giratório e um novo brilho orbital independente ao redor do avatar, sem alterar a cor da foto.',version:'v1.4.26',publishedAt:'2026-08-15T20:20:00.000Z'},
  {id:'release:p25',type:'update',icon:'📱',title:'P25 — Ordem mobile e editor de cartas',description:'A Home passa a impor a mesma ordem dos atalhos também no iPhone/PWA, e o editor de Cartas de Jogador mantém apenas um botão de salvar e voltar ao Lobby.',version:'v1.4.25',publishedAt:'2026-08-15T09:30:00.000Z'},
  {id:'release:p24',type:'update',icon:'🧭',title:'P24 — Achievements e atalhos da Home',description:'Títulos ligados a achievements agora mostram diretamente o requisito real de desbloqueio, e os atalhos da Home passam a seguir uma ordem fixa e consistente.',version:'v1.4.24',publishedAt:'2026-08-15T09:05:00.000Z'},
  {id:'release:p23',type:'update',icon:'🪞',title:'P23 — Perfil e Gênese',description:'Corrige a moldura Gênese no seletor e na prévia, elimina o salto ao topo ao trocar cosméticos e consolida todo o salvamento do Perfil no botão Salvar alterações.',version:'v1.4.23',publishedAt:'2026-08-15T08:55:00.000Z'},
