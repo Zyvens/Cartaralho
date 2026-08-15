@@ -39,7 +39,7 @@ async function classifyForUser(room,userId,type,texts,{checkInventory=true}={}){
  if(checkInventory&&drafts.length){
   inventory=await cleanCards.getInventory(userId);
   const balance=cardType==='black'?Number(inventory.blackBalance||0):Number(inventory.whiteBalance||0);
-  if(drafts.length>balance)throw new Error(`Você preparou ${drafts.length} Carta${drafts.length===1?'':'s'} ${cardType==='black'?'Preta':'Branca'}${drafts.length===1?'':'s'}, mas possui apenas ${balance} Carta${balance===1?'':'s'} Limpa${balance===1?'':'s'} disponível${balance===1?'':'is'}.`);
+  if(drafts.length>balance)throw new Error(`Você preparou ${drafts.length} Carta${drafts.length===1?'':'s'} ${cardType==='black'?'Preta':'Branca'}${drafts.length===1?'':'s'}, mas possui apenas ${balance} Carta${balance===1?'':'s'} Limpa${balance===1?'':'s'} ${balance===1?'disponível':'disponíveis'}.`);
  }
  return{cardType,owned,drafts,inventory};
 }
