@@ -52,8 +52,8 @@ test('seleção de cartas usa coração preto e branco, sem coração rosa',()=>
  assert.doesNotMatch(css,/💗|💖|💕|pink/i);
 });
 
-test('P22 é camada final e Central de Notificações avança para v1.4.22',()=>{
+test('P22 permanece carregado e registrado mesmo com versões posteriores',()=>{
  assert.ok(index.indexOf('css/p22.css')>index.indexOf('css/p21.css'));
- assert.match(notifications,/APP_VERSION='v1\.4\.22'/);
  assert.match(notifications,/release:p22/);
+ assert.match(notifications,/version:'v1\.4\.22'/);
 });
