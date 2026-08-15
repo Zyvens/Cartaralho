@@ -1,8 +1,9 @@
 'use strict';
 const{sql}=require('./db');
 
-const APP_VERSION='v1.4.20';
+const APP_VERSION='v1.4.21';
 const RELEASES=[
+ {id:'release:p21',type:'update',icon:'🩹',title:'P21 — Hotfix de configuração e Cartas Limpas',description:'Corrige início da música no primeiro gesto permitido, números das regras, organização dos quatro cards de configuração, contraste das abas de cartas e consumo visual das pilhas de Cartas Limpas.',version:'v1.4.21',publishedAt:'2026-08-15T07:20:00.000Z'},
  {id:'release:p20',type:'update',icon:'🎭',title:'P20 — Cosméticos públicos e apresentação pré-jogo',description:'Título e moldura passam a acompanhar a identidade do jogador no Perfil, Home, Lobby e partida. Gênese fica disponível ao Criador e o início da partida ganha uma apresentação curta dos jogadores e suas cartas de ostentação.',version:'v1.4.20',publishedAt:'2026-08-15T07:00:00.000Z'},
  {id:'release:p19',type:'update',icon:'🛠️',title:'P19 — Correções de sala, cartas e progressão',description:'Corrige estimativas com cache, confirma Mão de Vaca sem bloquear Pronto, restaura pilhas de Cartas Limpas, suporta Cartas Pretas de duas lacunas, Perfil com salvar aparência e novas badges/títulos.',version:'v1.4.19',publishedAt:'2026-08-14T23:45:00.000Z'},
  {id:'release:p18',type:'update',icon:'🆕',title:'P18 — Contribuição e Central de Notificações',description:'Pronto passa a considerar contribuição para Espólio, seleção de cartas é bloqueada após Pronto, melhorias de sala e nova Central de Notificações.',version:'v1.4.18',publishedAt:'2026-08-14T21:00:00.000Z'},

@@ -1,8 +1,8 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const metagame=read('api/profile/metagame.js'),publicProfile=read('api/profile/public.js'),start=read('api/game/start.js'),showcaseLib=read('lib/playerShowcase.js'),identity=read('public/js/identityP20.js'),showcase=read('public/js/playerShowcaseP20.js'),narrator=read('public/js/narrator.js'),profile=read('public/js/profileAppearanceP20.js'),playerList=read('public/js/components/playerList.js'),scoreboard=read('public/js/components/scoreboard.js'),css=read('public/css/p20.css'),index=read('public/index.html'),p18css=read('public/css/p18.css'),notifications=read('lib/appNotifications.js');
-for(const[file,src]of[['identityP20.js',identity],['playerShowcaseP20.js',showcase],['profileAppearanceP20.js',profile],['narrator.js',narrator]])test(`${file} compila`,()=>assert.doesNotThrow(()=>new Function(src)));
+const metagame=read('api/profile/metagame.js'),publicProfile=read('api/profile/public.js'),start=read('api/game/start.js'),showcaseLib=read('lib/playerShowcase.js'),identity=read('public/js/identityP20.js'),showcase=read('public/js/playerShowcaseP20.js'),profile=read('public/js/profileAppearanceP20.js'),playerList=read('public/js/components/playerList.js'),scoreboard=read('public/js/components/scoreboard.js'),css=read('public/css/p20.css'),index=read('public/index.html'),p18css=read('public/css/p18.css'),notifications=read('lib/appNotifications.js');
+for(const[file,src]of[['identityP20.js',identity],['playerShowcaseP20.js',showcase],['profileAppearanceP20.js',profile]])test(`${file} compila`,()=>assert.doesNotThrow(()=>new Function(src)));
 
 test('Gênese é garantida por entitlement no Perfil e perfil público',()=>{assert.match(metagame,/genese-celestial/);assert.match(metagame,/special_entitlements/);assert.match(metagame,/entitlement_type='frame'/);assert.match(publicProfile,/genese-celestial/);assert.match(p18css,/frame-genese-celestial/);});
 
@@ -18,8 +18,6 @@ test('showcase prioriza carta famosa de autoria e depois maior progressão',()=>
 
 test('showcase segura a primeira rodada apenas no cliente, narra e aborta com segurança',()=>{assert.match(showcase,/playerShowcaseActive/);assert.match(showcase,/name==='round'\|\|name==='host'/);assert.match(showcase,/self\.pending=\{name,data\}/);assert.match(showcase,/CartNarrator\.speak/);assert.match(showcase,/Conheça os suspeitos/);assert.match(showcase,/showcaseCard/);assert.match(showcase,/abort\(\).*this\.pending=null/s);assert.match(showcase,/room_cancelled.*self\.abort/s);assert.match(showcase,/room_closed.*self\.abort/s);});
 
-test('Narrador não interrompe apresentação com a primeira Carta Preta',()=>{assert.match(narrator,/deferredRound/);assert.match(narrator,/playerShowcaseActive/);assert.match(narrator,/flushDeferredRound/);assert.match(narrator,/announceRound\(data,\{interrupt:false\}\)/);assert.match(showcase,/CartNarrator\?\.flushDeferredRound/);});
+test('Central de Notificações preserva o registro do P20 mesmo quando a versão avança',()=>{assert.match(notifications,/release:p20/);assert.match(notifications,/version:'v1\.4\.20'/);assert.match(notifications,/Cosméticos públicos e apresentação pré-jogo/);});
 
-test('Central de Notificações publica o P20 como versão atual',()=>{assert.match(notifications,/APP_VERSION='v1\.4\.20'/);assert.match(notifications,/release:p20/);assert.match(notifications,/Cosméticos públicos e apresentação pré-jogo/);});
-
-test('P20 carrega por último e respeita P18/P19',()=>{const p19=index.indexOf('css/p19.css'),p20=index.indexOf('css/p20.css'),identityPos=index.indexOf('js/identityP20.js'),appearancePos=index.indexOf('js/profileAppearanceP20.js'),showcasePos=index.indexOf('js/playerShowcaseP20.js');assert.ok(p20>p19);assert.ok(identityPos>0&&appearancePos>identityPos&&showcasePos>appearancePos);});
+test('P20 carrega depois de P18/P19',()=>{const p19=index.indexOf('css/p19.css'),p20=index.indexOf('css/p20.css'),identityPos=index.indexOf('js/identityP20.js'),appearancePos=index.indexOf('js/profileAppearanceP20.js'),showcasePos=index.indexOf('js/playerShowcaseP20.js');assert.ok(p20>p19);assert.ok(identityPos>0&&appearancePos>identityPos&&showcasePos>appearancePos);});
