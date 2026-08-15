@@ -29,7 +29,7 @@ test('Mão de Vaca confirma em modal e não se aplica quando criação está des
 });
 
 test('pilhas de Cartas Limpas são geradas diretamente pela tela real e patch legado sai do caminho',()=>{
- assert.match(cardCreation,/cleanStack\(type,count\)/);assert.match(cardCreation,/clean-stack-sheet/);assert.match(cardCreation,/clean-stack-empty/);assert.match(cardCreation,/this\.cleanStacks\(\)/);
+ assert.match(cardCreation,/cleanStack\(type,count(?:,reserved=0)?\)/);assert.match(cardCreation,/clean-stack-sheet/);assert.match(cardCreation,/clean-stack-empty/);assert.match(cardCreation,/this\.cleanStacks\(\)/);
  assert.match(p19css,/card-creation-screen \.clean-stack-visual/);assert.match(p19css,/width:70px!important/);assert.match(p19css,/clean-stack-white \.clean-stack-sheet/);assert.match(p19css,/clean-stack-black \.clean-stack-sheet/);
  assert.match(stackLegacy,/typeof CardCreationScreen\.cleanStack==='function'/);assert.match(stackLegacy,/__cleanStacksSourceAuthoritative=true/);
 });
