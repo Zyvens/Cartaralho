@@ -15,7 +15,7 @@
    if(existing){this.updateBadge();return;}
    const b=document.createElement('button');b.id='notifications-menu-btn';b.type='button';b.className='btn btn-secondary home-action-card notifications-home-card';b.innerHTML='<span class="home-action-icon">🔔</span><span class="home-action-copy"><b>Central de Notificações</b><small>Atualizações, versão e prêmios recebidos</small></span><span class="notification-home-badge" hidden>0</span><span class="home-action-arrow">›</span>';b.onclick=()=>this.open();const settings=actions.querySelector('#audio-settings-menu-btn'),credits=actions.querySelector('[data-panel="credits"]');if(settings)actions.insertBefore(b,settings);else if(credits)actions.insertBefore(b,credits);else actions.appendChild(b);this.refresh();
   },
-  updateBadge(){const b=document.querySelector('#notifications-menu-btn .notification-home-badge');if(!b)return;const n=this.unread();b.hidden=n<1;b.textContent=n>99?'99+':String(n);},
+  updateBadge(){const b=document.querySelector('#notifications-menu-btn .notification-home-badge');if(!b)return;const n=this.unread(),hidden=n<1,label=n>99?'99+':String(n);if(b.hidden!==hidden)b.hidden=hidden;if(b.textContent!==label)b.textContent=label;},
   row(item,kind){const date=item.receivedAt||item.publishedAt,when=date?new Date(date).toLocaleDateString('pt-BR'):'',version=item.version?`<span>${this.esc(item.version)}</span>`:'';return `<article class="notification-item ${kind}"><div class="notification-icon">${item.icon||'🔔'}</div><div class="notification-copy"><div class="notification-title"><b>${this.esc(item.title)}</b>${version}</div><p>${this.esc(item.description)}</p>${when?`<small>${when}</small>`:''}</div></article>`;},
   async open(){
    if(!AuthClient.user)return Toast.warning('Entre na sua conta para abrir as notificações.');
@@ -26,5 +26,8 @@
   close(){if(!this.overlay)return;this.overlay.remove();this.overlay=null;document.body.classList.remove('app-panel-open');window.CartSFX?.play('modal_close');}
  };
  window.NotificationsUI=N;
- const observer=new MutationObserver(()=>N.ensureButton());observer.observe(document.body,{childList:true,subtree:true});window.addEventListener('load',()=>N.ensureButton());setTimeout(()=>N.ensureButton(),0);
+ const baseRenderAccount=HomeScreen.renderAccount.bind(HomeScreen);
+ HomeScreen.renderAccount=function(...args){const out=baseRenderAccount(...args);queueMicrotask(()=>N.ensureButton());return out;};
+ window.addEventListener('load',()=>N.ensureButton(),{once:true});
+ setTimeout(()=>N.ensureButton(),0);
 })();
