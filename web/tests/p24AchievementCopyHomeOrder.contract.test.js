@@ -11,9 +11,9 @@ test('títulos derivados de achievements usam exatamente a descrição do requis
  for(const title of titles)assert.equal(title.description,expected.get(title.key),`descrição divergente em ${title.key}`);
 });
 
-test('nenhuma fonte do jogo mantém o texto genérico título por achievement',()=>{
- const stack=[root],hits=[];
- while(stack.length){const dir=stack.pop();for(const entry of fs.readdirSync(dir,{withFileTypes:true})){if(['node_modules','.git'].includes(entry.name))continue;const p=path.join(dir,entry.name);if(entry.isDirectory())stack.push(p);else if(/\.(js|html|css|md|json)$/i.test(entry.name)){const src=fs.readFileSync(p,'utf8');if(/t[ií]tulo por achievement/i.test(src))hits.push(path.relative(root,p));}}}
+test('nenhuma fonte do jogo mantém a copy genérica antiga dos títulos',()=>{
+ const forbidden=['título','por','achievement'].join(' '),stack=[root],hits=[];
+ while(stack.length){const dir=stack.pop();for(const entry of fs.readdirSync(dir,{withFileTypes:true})){if(['node_modules','.git'].includes(entry.name))continue;const p=path.join(dir,entry.name);if(entry.isDirectory())stack.push(p);else if(/\.(js|html|css|md|json)$/i.test(entry.name)){const src=fs.readFileSync(p,'utf8').toLocaleLowerCase('pt-BR');if(src.includes(forbidden))hits.push(path.relative(root,p));}}}
  assert.deepEqual(hits,[]);
 });
 
