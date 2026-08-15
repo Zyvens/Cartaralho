@@ -48,10 +48,69 @@
 
   P._refreshCurrentTab=function(tab){
     this.activeTab=tab;
-    this.render();
-    const shell=this.overlay?.querySelector('.profile-modal-shell');
-    shell?.querySelectorAll('[data-profile-tab]').forEach(x=>x.classList.toggle('active',x.dataset.profileTab===tab));
+    const body=this.overlay?.querySelector('#profile-modal-body'),scroll=body?.scrollTop||0;
     this.renderTab();
+    if(body)body.scrollTop=scroll;
+  };
+
+  P._setAvatarFrameClass=function(node,key){
+    if(!node)return;
+    [...node.classList].filter(c=>c.startsWith('frame-')).forEach(c=>node.classList.remove(c));
+    if(key)node.classList.add(`frame-${key}`);
+  };
+
+  P._syncAppearanceDom=function(){
+    const d=this.data||{},titleKey=d.equipped?.titleKey||null,frameKey=d.equipped?.frameKey||null;
+    const title=(d.titles||[]).find(x=>x.key===titleKey)||null,frame=(d.frames||[]).find(x=>x.key===frameKey)||null;
+    const root=this.overlay;if(!root)return;
+
+    const titleSelect=root.querySelector('[data-profile-draft-title]'),frameSelect=root.querySelector('[data-profile-draft-frame]');
+    if(titleSelect)titleSelect.value=titleKey||'';
+    if(frameSelect)frameSelect.value=frameKey||'';
+
+    [
+      root.querySelector('.profile-modal-identity .avatar-frame'),
+      root.querySelector('#profile-modal-avatar-preview .avatar-frame'),
+      root.querySelector('.profile-appearance-live-preview .avatar-frame'),
+      root.querySelector('.profile-modal-frame-hero .avatar-frame')
+    ].filter(Boolean).forEach(node=>this._setAvatarFrameClass(node,frameKey));
+
+    const live=root.querySelector('.profile-appearance-live-preview>div');
+    if(live){
+      let titleNode=live.querySelector('.equipped-title,.profile-appearance-no-title');
+      if(!titleNode){titleNode=document.createElement('span');live.appendChild(titleNode);}
+      if(title){titleNode.className='equipped-title';titleNode.dataset.titleKey=title.key;titleNode.textContent=`${title.icon||'🏷️'} ${title.name}`;}
+      else{titleNode.className='profile-appearance-no-title';titleNode.removeAttribute('data-title-key');titleNode.textContent='Sem título';}
+      let frameNode=live.querySelector('em');if(!frameNode){frameNode=document.createElement('em');live.appendChild(frameNode);}
+      frameNode.textContent=frame?`◉ ${frame.name}`:'◌ Sem moldura';
+    }
+
+    const handle=root.querySelector('.profile-modal-handle');
+    if(handle){
+      let current=handle.querySelector('.profile-modal-title');
+      if(title){if(!current){current=document.createElement('span');current.className='profile-modal-title';handle.append(' ',current);}current.className=`profile-modal-title rarity-${title.rarity||'common'}`;current.textContent=`${title.icon||'🏷️'} ${title.name}`;}
+      else current?.remove();
+    }
+
+    const frameHero=root.querySelector('.profile-modal-frame-hero');
+    if(frameHero){const h=frameHero.querySelector('h3');if(h)h.textContent=frame?.name||'Sem moldura';}
+    root.querySelectorAll('[data-equip-frame]').forEach(btn=>{
+      const active=btn.dataset.equipFrame===frameKey,card=btn.closest('.profile-modal-frame-item'),top=card?.querySelector('.profile-modal-unlock-top');
+      card?.classList.toggle('equipped',active);btn.textContent=active?'Usando':'Equipar';
+      const pill=top?.querySelector('.profile-modal-equipped-pill');
+      if(active&&!pill){const el=document.createElement('span');el.className='profile-modal-equipped-pill';el.textContent='EQUIPADO';top?.appendChild(el);}else if(!active)pill?.remove();
+    });
+    const titleFeature=root.querySelector('.profile-modal-feature-card');
+    if(this.activeTab==='titles'&&titleFeature){const h=titleFeature.querySelector('h3');if(h)h.textContent=title?.name||'Nenhum título equipado';}
+    root.querySelectorAll('[data-equip-title]').forEach(btn=>{
+      const active=btn.dataset.equipTitle===titleKey,card=btn.closest('.profile-modal-unlock'),top=card?.querySelector('.profile-modal-unlock-top');
+      card?.classList.toggle('equipped',active);btn.textContent=active?'Usando':'Equipar';
+      const pill=top?.querySelector('.profile-modal-equipped-pill');
+      if(active&&!pill){const el=document.createElement('span');el.className='profile-modal-equipped-pill';el.textContent='EQUIPADO';top?.appendChild(el);}else if(!active)pill?.remove();
+    });
+
+    const footer=root.querySelector('.profile-global-footer');
+    if(footer){footer.classList.toggle('is-dirty',this._appearanceDirty);const copy=footer.querySelector('small');if(copy)copy.textContent=this._appearanceDirty?'Há alterações de aparência aguardando o Salvar alterações.':'Perfil, título e moldura são confirmados juntos.';}
   };
 
   P._setAppearanceDraft=function(kind,key){
@@ -59,36 +118,20 @@
     if(!this.data?.equipped)return;
     if(kind==='title')this.data.equipped.titleKey=key||null;else this.data.equipped.frameKey=key||null;
     this._appearanceDirty=this.data.equipped.titleKey!==this._appearanceSaved.titleKey||this.data.equipped.frameKey!==this._appearanceSaved.frameKey;
-    this._refreshCurrentTab(kind==='title'?'titles':'frames');
+    this.__appearanceDirty=this._appearanceDirty;
+    this._syncAppearanceDom();
   };
 
   P.equipTitle=function(key){this._setAppearanceDraft('title',key||null);};
   P.equipFrame=function(key){this._setAppearanceDraft('frame',key||null);};
 
-  P.saveAppearance=async function(){
-    this._ensureAppearanceDraft();
-    const button=this.overlay?.querySelector('[data-save-appearance]');
-    if(button){button.disabled=true;button.textContent='Salvando...';}
-    try{
-      const titleKey=this.data.equipped?.titleKey||null,frameKey=this.data.equipped?.frameKey||null;
-      await MetaClient.equip(titleKey,frameKey);
-      this._appearanceSaved={titleKey,frameKey};this._appearanceDirty=false;
-      if(AuthClient.user){AuthClient.user.equipped_title_key=titleKey;AuthClient.user.equipped_frame_key=frameKey;}
-      if(window.App?.state){App.state.matchTitleKey=titleKey;App.state.matchFrameKey=frameKey;}
-      Toast.success('Título e moldura salvos.');
-      HomeScreen.renderAccount?.();
-      this._refreshCurrentTab(this.activeTab||'profile');
-    }catch(e){Toast.error(e.message||'Não foi possível salvar a aparência.');}
-  };
-
-  P._appearanceSavebar=function(){
-    const dirty=this._appearanceDirty;
-    return `<div class="profile-appearance-savebar ${dirty?'is-dirty':'is-saved'}"><div><b>${dirty?'Alterações não salvas':'Aparência salva'}</b><small>${dirty?'Título e moldura só serão mantidos depois de salvar.':'Esta combinação será usada nas próximas partidas.'}</small></div><button type="button" class="btn btn-primary" data-save-appearance ${dirty?'':'disabled'}>${dirty?'Salvar título e moldura':'✓ Salvo'}</button></div>`;
-  };
+  // Compatibilidade: qualquer chamada antiga de salvar aparência usa o único botão global.
+  P.saveAppearance=async function(){this.overlay?.querySelector('.profile-global-save')?.click();};
+  P._appearanceSavebar=function(){return'';};
 
   P._profileAppearanceCard=function(){
     const d=this.data||{},titles=(d.titles||[]).filter(x=>x.unlocked),frames=(d.frames||[]).filter(x=>x.unlocked),t=d.equipped?.titleKey||'',f=d.equipped?.frameKey||'';
-    return `<section class="profile-modal-card profile-appearance-selector-card"><div class="profile-modal-section-heading"><div><span>APARÊNCIA DA PARTIDA</span><h3>Título e moldura</h3></div></div><p class="profile-appearance-help">Escolha como seu perfil aparece no Lobby e durante a partida. Você pode testar a combinação antes de salvar.</p><div class="profile-appearance-selectors"><label><span>Título</span><select class="input" data-profile-draft-title><option value="">Sem título</option>${titles.map(x=>`<option value="${attr(x.key)}" ${t===x.key?'selected':''}>${esc(x.icon||'🏷️')} ${esc(x.name)} · ${esc(x.rarityInfo?.label||x.rarity)}</option>`).join('')}</select></label><label><span>Moldura</span><select class="input" data-profile-draft-frame><option value="">Sem moldura</option>${frames.map(x=>`<option value="${attr(x.key)}" ${f===x.key?'selected':''}>${esc(x.icon||'◉')} ${esc(x.name)} · ${esc(x.rarityInfo?.label||x.rarity)}</option>`).join('')}</select></label></div>${this._appearanceSavebar()}</section>`;
+    return `<section class="profile-modal-card profile-appearance-selector-card"><div class="profile-modal-section-heading"><div><span>APARÊNCIA DA PARTIDA</span><h3>Título e moldura</h3></div></div><p class="profile-appearance-help">Escolha como seu perfil aparece no Lobby e durante a partida. Você pode testar a combinação antes de salvar.</p><div class="profile-appearance-selectors"><label><span>Título</span><select class="input" data-profile-draft-title><option value="">Sem título</option>${titles.map(x=>`<option value="${attr(x.key)}" ${t===x.key?'selected':''}>${esc(x.icon||'🏷️')} ${esc(x.name)} · ${esc(x.rarityInfo?.label||x.rarity)}</option>`).join('')}</select></label><label><span>Moldura</span><select class="input" data-profile-draft-frame><option value="">Sem moldura</option>${frames.map(x=>`<option value="${attr(x.key)}" ${f===x.key?'selected':''}>${esc(x.icon||'◉')} ${esc(x.name)} · ${esc(x.rarityInfo?.label||x.rarity)}</option>`).join('')}</select></label></div></section>`;
   };
 
   P.renderTab=function(){
@@ -98,10 +141,9 @@
       const layout=body.querySelector('.profile-tab-layout-profile');
       if(layout&&!layout.querySelector('.profile-appearance-selector-card'))layout.insertAdjacentHTML('beforeend',this._profileAppearanceCard());
     }
-    if((this.activeTab==='titles'||this.activeTab==='frames')&&!body.querySelector('.profile-appearance-savebar'))body.insertAdjacentHTML('beforeend',this._appearanceSavebar());
-    body.querySelector('[data-profile-draft-title]')?.addEventListener('change',e=>{this.data.equipped.titleKey=e.target.value||null;this._appearanceDirty=this.data.equipped.titleKey!==this._appearanceSaved.titleKey||this.data.equipped.frameKey!==this._appearanceSaved.frameKey;this._refreshCurrentTab('profile');});
-    body.querySelector('[data-profile-draft-frame]')?.addEventListener('change',e=>{this.data.equipped.frameKey=e.target.value||null;this._appearanceDirty=this.data.equipped.titleKey!==this._appearanceSaved.titleKey||this.data.equipped.frameKey!==this._appearanceSaved.frameKey;this._refreshCurrentTab('profile');});
-    body.querySelector('[data-save-appearance]')?.addEventListener('click',()=>this.saveAppearance());
+    body.querySelector('[data-profile-draft-title]')?.addEventListener('change',e=>this._setAppearanceDraft('title',e.target.value||null));
+    body.querySelector('[data-profile-draft-frame]')?.addEventListener('change',e=>this._setAppearanceDraft('frame',e.target.value||null));
+    this._syncAppearanceDom();
     return out;
   };
 })();
