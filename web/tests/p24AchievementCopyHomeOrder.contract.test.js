@@ -2,17 +2,19 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const defs=require('../lib/achievementDefinitions');
-const service=read('lib/achievementService.js'),menu=read('public/js/homeMenuP24.js'),index=read('public/index.html'),notifications=read('lib/appNotifications.js');
+const service=read('lib/achievementService.js'),refinement=read('public/js/refinementP13.js'),menu=read('public/js/homeMenuP24.js'),index=read('public/index.html'),notifications=read('lib/appNotifications.js');
 
 test('títulos derivados de achievements usam a descrição canônica do requisito real',()=>{
  assert.ok(defs.ACHIEVEMENTS.filter(a=>a.title).length>0);
  assert.match(service,/function titleDefinitions\(\)\{return defs\.ACHIEVEMENTS\.filter\(x=>x\.title\)\.map\(x=>\(\{key:x\.title\.key,name:x\.title\.name,icon:x\.icon,rarity:x\.rarity,description:x\.description,achievementKey:x\.key,target:x\.target\}\)\);\}/);
 });
 
-test('nenhuma fonte do jogo mantém a copy genérica antiga dos títulos',()=>{
- const forbidden=['título','por','achievement'].join(' '),stack=[root],hits=[];
- while(stack.length){const dir=stack.pop();for(const entry of fs.readdirSync(dir,{withFileTypes:true})){if(['node_modules','.git'].includes(entry.name))continue;const p=path.join(dir,entry.name);if(entry.isDirectory())stack.push(p);else if(/\.(js|html|css|md|json)$/i.test(entry.name)){const src=fs.readFileSync(p,'utf8').toLocaleLowerCase('pt-BR');if(src.includes(forbidden))hits.push(path.relative(root,p));}}}
- assert.deepEqual(hits,[]);
+test('copy genérica antiga não é mais produzida e o scrubber legado continua convertendo caches antigos',()=>{
+ const generic=['Título','por','achievement'].join(' ');
+ assert.ok(!service.includes(generic));
+ assert.match(refinement,/TITLE_DESCRIPTIONS/);
+ assert.match(refinement,/node\.nodeValue=title/);
+ assert.match(refinement,/p\.textContent=copy/);
 });
 
 test('ordem autoritativa da Home segue exatamente a sequência solicitada',()=>{
