@@ -43,8 +43,8 @@ test('Salvar alterações persiste dados, título e moldura em uma única chamad
  assert.match(settings,/equipped_title_key=\$\{titleKey\},equipped_frame_key=\$\{frameKey\}/);
 });
 
-test('P23 é a camada final e versão publicada é v1.4.23',()=>{
+test('P23 permanece carregado e registrado mesmo com versões posteriores',()=>{
  assert.ok(index.indexOf('css/p23.css')>index.indexOf('css/p22.css'));
- assert.match(notifications,/APP_VERSION='v1\.4\.23'/);
  assert.match(notifications,/release:p23/);
+ assert.match(notifications,/version:'v1\.4\.23'/);
 });
