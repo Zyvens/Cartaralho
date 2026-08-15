@@ -32,8 +32,8 @@ test('ordenação reage somente dentro da grade de atalhos e não observa o body
  assert.match(menu,/if\(!already\)nodes\.forEach\(node=>actions\.appendChild\(node\)\)/);
 });
 
-test('P24 carrega por último e é publicado como v1.4.24',()=>{
+test('P24 permanece carregado e registrado mesmo com versões posteriores',()=>{
  assert.ok(index.indexOf('js/homeMenuP24.js')>index.indexOf('js/playerShowcaseP20.js'));
- assert.match(notifications,/APP_VERSION='v1\.4\.24'/);
  assert.match(notifications,/release:p24/);
+ assert.match(notifications,/version:'v1\.4\.24'/);
 });
