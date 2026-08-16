@@ -51,8 +51,8 @@ test('Reciclagem não retrai o modal enquanto busca os dados',()=>{
   assert.match(css,/recycling-skeleton-grid>span/);
 });
 
-test('Central registra P28',()=>{
-  assert.match(notifications,/APP_VERSION='v1\.4\.28'/);
+test('P28 permanece registrado na Central após versões futuras',()=>{
   assert.match(notifications,/release:p28/);
+  assert.match(notifications,/version:'v1\.4\.28'/);
   assert.match(notifications,/Música persistente e Gênese atômica/);
 });
