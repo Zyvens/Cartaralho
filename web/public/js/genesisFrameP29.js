@@ -1,14 +1,22 @@
 'use strict';
 (()=>{
   const SELECTOR='.avatar-frame.frame-genese-celestial';
+  const STAR='✦';
 
   function mount(frame){
-    if(!frame||frame.querySelector(':scope > .genese-atom-track'))return frame;
+    if(!frame)return frame;
+    const existing=frame.querySelector(':scope > .genese-atom-track');
+    if(existing){
+      const particle=existing.querySelector(':scope > .genese-atom-particle');
+      if(particle&&particle.textContent!==STAR)particle.textContent=STAR;
+      return frame;
+    }
     const track=document.createElement('span');
     track.className='genese-atom-track';
     track.setAttribute('aria-hidden','true');
     const particle=document.createElement('i');
-    particle.className='genese-atom-particle';
+    particle.className='genese-atom-particle genese-atom-star';
+    particle.textContent=STAR;
     track.appendChild(particle);
     frame.appendChild(track);
     return frame;
@@ -32,5 +40,5 @@
   });
   if(document.body)observer.observe(document.body,{childList:true,subtree:true});
 
-  window.GenesisFrameP29={decorate,mount};
+  window.GenesisFrameP29={decorate,mount,STAR};
 })();
