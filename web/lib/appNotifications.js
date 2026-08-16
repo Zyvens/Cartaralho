@@ -1,8 +1,9 @@
 'use strict';
 const{sql}=require('./db');
 
-const APP_VERSION='v1.4.30';
+const APP_VERSION='v1.4.31';
 const RELEASES=[
+ {id:'release:p31',type:'update',icon:'✦',title:'P31 — Seis estrelas orbitais da Gênese',description:'A Gênese passa a usar seis estrelas ✦ equidistantes orbitando sobre uma elipse invisível. A trajetória continua girando como guia geométrico, enquanto o avatar mantém apenas um contorno Celestial visível.',version:'v1.4.31',publishedAt:'2026-08-16T00:28:00.000Z'},
  {id:'release:p30',type:'update',icon:'✦',title:'P30 — Estrela orbital da Gênese',description:'A partícula da órbita da Gênese passa a usar a mesma estrela/faísca visual da moldura Platina. A estrela percorre a elipse, pulsa de tamanho e gira enquanto a própria órbita continua rodando ao redor do arco Celestial.',version:'v1.4.30',publishedAt:'2026-08-15T22:25:00.000Z'},
  {id:'release:p29',type:'update',icon:'⚛️',title:'P29 — Gênese com órbita atômica real',description:'A moldura Gênese separa de verdade o arco Celestial, a órbita elíptica e a partícula luminosa. A elipse gira ao redor do avatar enquanto a partícula percorre a própria linha, criando um efeito visual de átomo.',version:'v1.4.29',publishedAt:'2026-08-15T21:55:00.000Z'},
  {id:'release:p28',type:'update',icon:'🎵',title:'P28 — Música persistente e Gênese atômica',description:'A trilha volta a tentar iniciar e retomar no iPhone/PWA até o Web Audio realmente ficar disponível. A Gênese ganha um arco Celestial giratório com uma órbita elíptica também giratória e uma partícula luminosa percorrendo a própria elipse.',version:'v1.4.28',publishedAt:'2026-08-15T21:20:00.000Z'},
