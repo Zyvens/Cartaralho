@@ -33,7 +33,7 @@ test('ordenador observa o contêiner estável da Home, sobrevivendo à troca da 
   assert.match(js,/HomeScreen\.render=async function/);
 });
 
-test('Gênese tem órbita elíptica simétrica com um único glint pulsante',()=>{
+test('Gênese P27 preserva órbita elíptica simétrica e glint pulsante como fallback',()=>{
   assert.match(css,/frame-genese-celestial::after[\s\S]*inset-block:-7px[\s\S]*inset-inline:-12px/);
   assert.match(css,/background-image:radial-gradient\(circle/);
   assert.match(css,/animation:p27GenesisOrbitalGlint 5\.2s linear infinite!important/);
@@ -44,8 +44,8 @@ test('Gênese tem órbita elíptica simétrica com um único glint pulsante',()=
   assert.doesNotMatch(css,/radial-gradient\([^\n]*,.*radial-gradient\(/);
 });
 
-test('Central registra P27 sem apagar releases anteriores',()=>{
-  assert.match(notifications,/APP_VERSION='v1\.4\.27'/);
+test('Central preserva o release P27 e permite versões posteriores',()=>{
+  assert.match(notifications,/const APP_VERSION='v1\.4\.\d+'/);
   assert.match(notifications,/release:p27/);
   assert.match(notifications,/release:p26/);
   assert.match(notifications,/release:p25/);
