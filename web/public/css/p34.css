@@ -1,0 +1,39 @@
+/* P34 — correções definitivas de navegação, Asas e identidade no Rank. */
+
+/* Criação de mesa: o botão Voltar pertence ao canto superior esquerdo do viewport. */
+.create-room-screen>.back-button{
+  position:fixed!important;
+  top:calc(env(safe-area-inset-top,0px) + 12px)!important;
+  left:12px!important;
+  right:auto!important;
+  bottom:auto!important;
+  margin:0!important;
+  z-index:1000!important;
+}
+
+/* Asas: restaura a produção inicial do P14 — laterais e centro vertical — com 45° horário e par refletido. */
+.avatar-frame.frame-cosmetic-asas::before,
+.avatar-frame.frame-cosmetic-asas::after{
+  top:50%!important;
+  bottom:auto!important;
+  z-index:-1!important;
+  font-size:1.65em!important;
+  transform-origin:center!important;
+}
+.avatar-frame.frame-cosmetic-asas::before{
+  right:72%!important;
+  left:auto!important;
+  transform:translateY(-50%) rotate(45deg)!important;
+}
+.avatar-frame.frame-cosmetic-asas::after{
+  left:72%!important;
+  right:auto!important;
+  transform:translateY(-50%) scaleX(-1) rotate(45deg)!important;
+}
+
+@media(max-width:520px){
+  .create-room-screen>.back-button{
+    top:calc(env(safe-area-inset-top,0px) + 9px)!important;
+    left:10px!important;
+  }
+}
