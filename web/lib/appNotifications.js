@@ -1,8 +1,9 @@
 'use strict';
 const{sql}=require('./db');
 
-const APP_VERSION='v1.4.27';
+const APP_VERSION='v1.4.28';
 const RELEASES=[
+ {id:'release:p28',type:'update',icon:'🎵',title:'P28 — Música persistente e Gênese atômica',description:'A trilha volta a tentar iniciar e retomar no iPhone/PWA até o Web Audio realmente ficar disponível. A Gênese ganha um arco Celestial giratório com uma órbita elíptica também giratória e uma partícula luminosa percorrendo a própria elipse.',version:'v1.4.28',publishedAt:'2026-08-15T21:20:00.000Z'},
  {id:'release:p27',type:'update',icon:'🧭',title:'P27 — Ordem estável da Home e órbita Gênese',description:'A Home passa a manter a ordem acordada dos atalhos sem oscilar entre renders no iPhone/PWA. A Gênese recebe órbita simétrica com um único glint que pulsa ao percorrer a elipse.',version:'v1.4.27',publishedAt:'2026-08-15T20:58:00.000Z'},
  {id:'release:p26',type:'update',icon:'✦',title:'P26 — Gênese refinada',description:'A moldura Celestial Gênese recebe espessura média, anel celestial giratório e um novo brilho orbital independente ao redor do avatar, sem alterar a cor da foto.',version:'v1.4.26',publishedAt:'2026-08-15T20:20:00.000Z'},
  {id:'release:p25',type:'update',icon:'📱',title:'P25 — Ordem mobile e editor de cartas',description:'A Home passa a impor a mesma ordem dos atalhos também no iPhone/PWA, e o editor de Cartas de Jogador mantém apenas um botão de salvar e voltar ao Lobby.',version:'v1.4.25',publishedAt:'2026-08-15T09:30:00.000Z'},
