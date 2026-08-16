@@ -1,4 +1,4 @@
-/* P28 — Gênese atômica + ajustes de retomada de áudio. */
+/* P28 — Gênese atômica + retomada de áudio + Reciclagem sem layout shift. */
 
 /*
  * A foto permanece imóvel. O ::before do P26 continua sendo o arco Celestial
@@ -38,11 +38,22 @@
   100%{transform:rotate(336deg);background-position:100% 50%;background-size:9px 9px;opacity:.82}
 }
 
+/* Reciclagem: mantém a geometria final desde o primeiro frame do fetch. */
+.market-body.recycling-loading{min-height:min(540px,62dvh)}
+.recycling-skeleton-hero,.recycling-skeleton-toolbar,.recycling-skeleton-line,.recycling-skeleton-grid>span{position:relative;overflow:hidden}
+.recycling-skeleton-hero::after,.recycling-skeleton-toolbar::after,.recycling-skeleton-line::after,.recycling-skeleton-grid>span::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 20%,rgba(255,255,255,.055) 45%,transparent 70%);
+  transform:translateX(-100%);animation:p28RecycleSkeleton 1.15s ease-in-out infinite;
+}
+.recycling-skeleton-grid>span{display:block;min-height:112px;border:1px solid rgba(255,255,255,.07);border-radius:14px;background:rgba(255,255,255,.025)}
+.recycling-skeleton-rate b{color:rgba(255,255,255,.62)}
+.recycling-load-error{min-height:260px;display:grid;place-items:center}
+@keyframes p28RecycleSkeleton{to{transform:translateX(100%)}}
+
 @media(max-width:520px){
-  .avatar-frame.frame-genese-celestial::after{
-    inset-block:-7px;
-    inset-inline:-12px;
-  }
+  .avatar-frame.frame-genese-celestial::after{inset-block:-7px;inset-inline:-12px}
+  .market-body.recycling-loading{min-height:min(520px,64dvh)}
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -52,4 +63,5 @@
     background-position:100% 50%;
     background-size:10px 10px;
   }
+  .recycling-skeleton-hero::after,.recycling-skeleton-toolbar::after,.recycling-skeleton-line::after,.recycling-skeleton-grid>span::after{animation:none}
 }
