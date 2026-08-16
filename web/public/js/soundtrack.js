@@ -5,7 +5,6 @@
   const VOLUME_KEY='cartaralho:music-volume:v1';
   const AudioCtx=window.AudioContext||window.webkitAudioContext;
 
-  // V2 composition preserved: fast arcade-party energy with stable A-minor harmony.
   const BPM=166;
   const STEP_SECONDS=60/BPM/2;
   const LOOKAHEAD_SECONDS=.32;
@@ -21,7 +20,7 @@
   let muted=storedMuted();
   let volume=storedVolume();
 
-  const chords=[[57,60,64],[53,57,60],[48,52,55],[55,59,62]]; // Am F C G
+  const chords=[[57,60,64],[53,57,60],[48,52,55],[55,59,62]];
   const roots=[45,41,36,43];
   const barProgression=[0,1,2,3,0,1,2,3,1,3,0,0,1,2,3,3];
   const bassOffsets=[0,7,12,7,0,7,12,7];
@@ -40,7 +39,14 @@
   const targetLevel=()=>muted?0.0001:Math.max(.0001,MASTER_LEVEL*volume);
   const midiToHz=note=>440*Math.pow(2,(note-69)/12);
 
+  function resetAudio(){
+    if(scheduler){clearInterval(scheduler);scheduler=null;}
+    try{master?.disconnect?.();}catch(_){}
+    try{compressor?.disconnect?.();}catch(_){}
+    context=null;master=null;compressor=null;noiseBuffer=null;unlocked=false;nextStepTime=0;
+  }
   function ensureAudio(){
+    if(context?.state==='closed')resetAudio();
     if(context||!AudioCtx)return context;
     context=new AudioCtx();master=context.createGain();compressor=context.createDynamicsCompressor();
     compressor.threshold.value=-19;compressor.knee.value=14;compressor.ratio.value=6;compressor.attack.value=.006;compressor.release.value=.18;
@@ -84,24 +90,35 @@
     if(!context||context.state!=='running'||muted||volume<=0)return;if(nextStepTime<context.currentTime-.5)nextStepTime=context.currentTime+.05;while(nextStepTime<context.currentTime+LOOKAHEAD_SECONDS){scheduleStep(stepIndex,nextStepTime);nextStepTime+=STEP_SECONDS;stepIndex=(stepIndex+1)%LOOP_STEPS;}
   }
   function ensureScheduler(){if(scheduler)return;nextStepTime=(context?.currentTime||0)+.06;scheduler=setInterval(scheduleAhead,SCHEDULER_MS);scheduleAhead();}
-  async function unlockAndPlay(){
-    if(muted||!AudioCtx)return;const ctx=ensureAudio();if(!ctx)return;try{if(ctx.state==='suspended')await ctx.resume();unlocked=ctx.state==='running';if(unlocked){master.gain.cancelScheduledValues(ctx.currentTime);master.gain.setTargetAtTime(targetLevel(),ctx.currentTime,.06);ensureScheduler();}}catch(_){unlocked=false;}
+  async function unlockAndPlay(retry=true){
+    if(muted||!AudioCtx)return false;let ctx=ensureAudio();if(!ctx)return false;
+    try{
+      if(ctx.state!=='running')await ctx.resume();
+      if(ctx.state==='closed'&&retry){resetAudio();return unlockAndPlay(false);}
+      unlocked=ctx.state==='running';
+      if(unlocked){master.gain.cancelScheduledValues(ctx.currentTime);master.gain.setTargetAtTime(targetLevel(),ctx.currentTime,.06);ensureScheduler();scheduleAhead();}
+      return unlocked;
+    }catch(_){
+      if(ctx?.state==='closed'&&retry){resetAudio();return unlockAndPlay(false);}
+      unlocked=false;return false;
+    }
   }
   function persistMuted(){try{localStorage.setItem(STORAGE_KEY,muted?'1':'0');}catch(_){} }
   function persistVolume(){try{localStorage.setItem(VOLUME_KEY,String(volume));}catch(_){} }
   async function setMuted(value){
-    muted=!!value;persistMuted();const ctx=ensureAudio();if(!ctx||!master)return;if(muted){master.gain.cancelScheduledValues(ctx.currentTime);master.gain.setTargetAtTime(.0001,ctx.currentTime,.035);return;}await unlockAndPlay();
+    muted=!!value;persistMuted();const ctx=ensureAudio();if(!ctx||!master)return false;if(muted){master.gain.cancelScheduledValues(ctx.currentTime);master.gain.setTargetAtTime(.0001,ctx.currentTime,.035);return true;}return unlockAndPlay();
   }
   function setVolume(value){
-    volume=Math.max(0,Math.min(1,Number(value)||0));persistVolume();if(context&&master){master.gain.cancelScheduledValues(context.currentTime);master.gain.setTargetAtTime(targetLevel(),context.currentTime,.035);}return volume;
+    volume=Math.max(0,Math.min(1,Number(value)||0));persistVolume();if(context&&master&&context.state!=='closed'){master.gain.cancelScheduledValues(context.currentTime);master.gain.setTargetAtTime(targetLevel(),context.currentTime,.035);}return volume;
   }
-  function installAutoplayUnlock(){const attempt=()=>{if(muted)return;unlockAndPlay();};document.addEventListener('pointerdown',attempt,{once:true,capture:true});document.addEventListener('keydown',attempt,{once:true,capture:true});}
-  document.addEventListener('visibilitychange',async()=>{if(!context)return;try{if(document.hidden&&context.state==='running')await context.suspend();else if(!document.hidden&&!muted&&unlocked){await context.resume();ensureScheduler();master.gain.setTargetAtTime(targetLevel(),context.currentTime,.04);}}catch(_){} });
+  function installAutoplayUnlock(){const attempt=()=>{if(!muted)unlockAndPlay();};['touchstart','touchend','pointerdown','pointerup','click','keydown'].forEach(type=>document.addEventListener(type,attempt,{capture:true,passive:type!=='keydown'}));}
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!muted)unlockAndPlay();});
+  window.addEventListener('pageshow',()=>{if(!muted)unlockAndPlay();});
   function init(){if(!AudioCtx){muted=true;return;}installAutoplayUnlock();}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 
   window.CartSoundtrack={
-    get muted(){return muted;},get volume(){return volume;},
-    mute(){return setMuted(true);},unmute(){return setMuted(false);},setVolume
+    get muted(){return muted;},get volume(){return volume;},get state(){return context?.state||'none';},
+    mute(){return setMuted(true);},unmute(){return setMuted(false);},resume(){return unlockAndPlay();},setVolume
   };
 })();
