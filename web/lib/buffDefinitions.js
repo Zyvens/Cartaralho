@@ -4,7 +4,7 @@ const D=(key,name,icon,phases,target,input,description,role='any',extra={})=>({k
 const defs={
  buff_dedo_no_olho:D('buff_dedo_no_olho','Dedo no Olho','👁️',[PHASES.HAND,PHASES.SUBMISSIONS],'opponent',[],'Veja privadamente uma carta aleatória da mão de um adversário.'),
  buff_foi_sem_querer:D('buff_foi_sem_querer','Foi sem querer querendo','↩️',[PHASES.SUBMISSIONS],'self_submission',[],'Recolha sua resposta antes da revelação e envie outra carta.'),
- buff_amigo_de_merda:D('buff_amigo_de_merda','Amigo de Merda','🌀',[PHASES.HAND,PHASES.SUBMISSIONS],'opponent_unsubmitted',[],'Embaralhe a ordem da mão de um adversário antes da submissão dele.'),
+ buff_amigo_de_merda:D('buff_amigo_de_merda','Amigo de Merda','🌀',[PHASES.HAND,PHASES.SUBMISSIONS],'opponent_unsubmitted',[],'Antes da submissão do alvo, devolva toda a mão dele ao bolo e force uma nova mão do mesmo tamanho.'),
  buff_vou_fingir:D('buff_vou_fingir','Vou fingir que ninguém viu','🕵️',[PHASES.SUBMISSIONS,PHASES.MASTER_CHOICE],'self',[],'Mestre: revele somente para você a autoria das respostas desta rodada.','master'),
  buff_meu_jogo:D('buff_meu_jogo','Meu jogo, minhas regras','🃏',[PHASES.HAND,PHASES.SUBMISSIONS],'self',[],'Envie duas respostas independentes nesta rodada.'),
  buff_xo_ve_aqui:D('buff_xo_ve_aqui','Xô vê aqui','🔄',[PHASES.HAND],'opponent',['cardIndex'],'Troque uma carta da sua mão por uma carta aleatória da mão de um adversário.'),
