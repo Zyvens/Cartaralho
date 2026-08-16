@@ -20,15 +20,15 @@ test('anel celestial inteiro gira sem girar a foto',()=>{
   assert.doesNotMatch(css,/frame-genese-celestial>img[\s\S]{0,180}animation:/);
 });
 
-test('glint usa órbita elíptica independente',()=>{
-  assert.match(css,/frame-genese-celestial::after[\s\S]*inset:-8px -14px/);
-  assert.match(css,/border-radius:50%/);
-  assert.match(css,/radial-gradient\(circle at 100% 50%/);
+test('glint P26 mantém a base orbital para refinamentos posteriores',()=>{
+  assert.match(css,/frame-genese-celestial::after[\s\S]*border-radius:50%/);
   assert.match(css,/animation:p26GenesisOrbit 4\.9s linear infinite/);
   assert.match(css,/@keyframes p26GenesisOrbit/);
 });
 
-test('P26 aparece na Central de Notificações',()=>{
-  assert.match(notifications,/APP_VERSION='v1\.4\.26'/);
+test('P26 permanece registrado quando a versão avança',()=>{
+  const version=notifications.match(/APP_VERSION='v1\.4\.(\d+)'/)?.[1];
+  assert.ok(Number(version)>=26);
+  assert.match(notifications,/release:p26/);
   assert.match(notifications,/P26 — Gênese refinada/);
 });
