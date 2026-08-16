@@ -50,7 +50,7 @@ CREATE INDEX IF NOT EXISTS idx_buff_activations_room_round ON buff_activations(r
 INSERT INTO market_catalog(product_key,name,description,category,product_kind,price,config,catalog_version,enabled,sort_order) VALUES
  ('buff_dedo_no_olho','Dedo no Olho','Veja privadamente uma carta aleatória da mão de um adversário.','buff','buff_item',250,'{"buffKey":"buff_dedo_no_olho"}'::jsonb,'buff-v1',true,200),
  ('buff_foi_sem_querer','Foi sem querer querendo','Recolha sua própria resposta antes da revelação e envie outra uma única vez.','buff','buff_item',300,'{"buffKey":"buff_foi_sem_querer"}'::jsonb,'buff-v1',true,210),
- ('buff_amigo_de_merda','Amigo de Merda','Antes da submissão do alvo, embaralhe a ordem da mão dele.','buff','buff_item',350,'{"buffKey":"buff_amigo_de_merda"}'::jsonb,'buff-v1',true,220),
+ ('buff_amigo_de_merda','Amigo de Merda','Antes da submissão do alvo, devolva toda a mão dele ao bolo e force uma nova mão do mesmo tamanho.','buff','buff_item',350,'{"buffKey":"buff_amigo_de_merda"}'::jsonb,'buff-v1',true,220),
  ('buff_xo_ve_aqui','Xô vê aqui','Troque uma carta da sua mão por uma carta aleatória da mão de um adversário.','buff','buff_item',450,'{"buffKey":"buff_xo_ve_aqui"}'::jsonb,'buff-v1',true,230),
  ('buff_mao_de_vaca','Mão de Vaca','Compre duas cartas extras, escolha duas para devolver e termine com a mão normal.','buff','buff_item',500,'{"buffKey":"buff_mao_de_vaca"}'::jsonb,'buff-v1',true,240),
  ('buff_testemunha_protegida','Testemunha Protegida','Proteja sua submissão de apagar, trocar ou manipular nesta rodada.','buff','buff_item',500,'{"buffKey":"buff_testemunha_protegida"}'::jsonb,'buff-v1',true,250),
