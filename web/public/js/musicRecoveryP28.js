@@ -16,21 +16,16 @@
     if(!force&&now-lastAttempt<180)return false;
     lastAttempt=now;
     try{
-      // No Safari/iOS, muted=false não garante que o AudioContext esteja rodando.
-      // unmute() também cria/retoma o contexto e rearma o scheduler da trilha.
-      await window.CartSoundtrack?.unmute?.();
-      return true;
+      const ok=await (window.CartSoundtrack?.resume?.()||window.CartSoundtrack?.unmute?.());
+      return ok===true||window.CartSoundtrack?.state==='running';
     }catch(_){return false;}
   }
 
   function gestureAttempt(){attempt(true);}
   function armPersistentGestures(){
-    // Não usa once:true: se o primeiro gesto ocorrer antes de o Safari liberar
-    // Web Audio (PWA restaurada/aba retomada), o gesto seguinte tenta de novo.
-    document.addEventListener('touchstart',gestureAttempt,{capture:true,passive:true});
-    document.addEventListener('pointerdown',gestureAttempt,{capture:true,passive:true});
-    document.addEventListener('click',gestureAttempt,{capture:true,passive:true});
-    document.addEventListener('keydown',gestureAttempt,{capture:true});
+    ['touchstart','touchend','pointerdown','pointerup','click','keydown'].forEach(type=>
+      document.addEventListener(type,gestureAttempt,{capture:true,passive:type!=='keydown'})
+    );
   }
 
   armPersistentGestures();
