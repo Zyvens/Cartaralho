@@ -2,23 +2,37 @@
 (()=>{
   const SELECTOR='.avatar-frame.frame-genese-celestial';
   const STAR='✦';
+  const STAR_COUNT=6;
+
+  function syncStars(track){
+    const current=[...track.querySelectorAll(':scope > .genese-atom-particle')];
+    if(current.length!==STAR_COUNT)track.replaceChildren();
+
+    const stars=current.length===STAR_COUNT?current:[];
+    for(let index=0;index<STAR_COUNT;index+=1){
+      let particle=stars[index];
+      if(!particle){
+        particle=document.createElement('i');
+        track.appendChild(particle);
+      }
+      particle.className='genese-atom-particle genese-atom-star';
+      particle.textContent=STAR;
+      particle.setAttribute('aria-hidden','true');
+      particle.style.setProperty('--genese-star-index',String(index));
+    }
+    return track;
+  }
 
   function mount(frame){
     if(!frame)return frame;
-    const existing=frame.querySelector(':scope > .genese-atom-track');
-    if(existing){
-      const particle=existing.querySelector(':scope > .genese-atom-particle');
-      if(particle&&particle.textContent!==STAR)particle.textContent=STAR;
-      return frame;
+    let track=frame.querySelector(':scope > .genese-atom-track');
+    if(!track){
+      track=document.createElement('span');
+      track.className='genese-atom-track';
+      track.setAttribute('aria-hidden','true');
+      frame.appendChild(track);
     }
-    const track=document.createElement('span');
-    track.className='genese-atom-track';
-    track.setAttribute('aria-hidden','true');
-    const particle=document.createElement('i');
-    particle.className='genese-atom-particle genese-atom-star';
-    particle.textContent=STAR;
-    track.appendChild(particle);
-    frame.appendChild(track);
+    syncStars(track);
     return frame;
   }
 
@@ -40,5 +54,5 @@
   });
   if(document.body)observer.observe(document.body,{childList:true,subtree:true});
 
-  window.GenesisFrameP29={decorate,mount,STAR};
+  window.GenesisFrameP29={decorate,mount,syncStars,STAR,STAR_COUNT};
 })();
