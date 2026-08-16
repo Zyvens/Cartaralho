@@ -35,10 +35,10 @@ test('foto e arco Celestial continuam independentes da estrela orbital',()=>{
   assert.match(css,/genese-atom-track/);
 });
 
-test('cache-bust e Central publicam P30',()=>{
-  assert.match(index,/css\/p29\.css\?v=1\.4\.30/);
-  assert.match(index,/js\/genesisFrameP29\.js\?v=1\.4\.30/);
-  assert.match(notifications,/APP_VERSION='v1\.4\.30'/);
+test('P30 permanece registrado e o asset aceita cache-bust de versões futuras',()=>{
+  assert.match(index,/css\/p29\.css\?v=1\.4\.\d+/);
+  assert.match(index,/js\/genesisFrameP29\.js\?v=1\.4\.\d+/);
   assert.match(notifications,/release:p30/);
+  assert.match(notifications,/version:'v1\.4\.30'/);
   assert.match(notifications,/Estrela orbital da Gênese/);
 });
