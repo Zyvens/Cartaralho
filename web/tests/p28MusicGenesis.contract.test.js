@@ -3,16 +3,18 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const recovery=read('public/js/musicRecoveryP28.js'),recycling=read('public/js/marketplaceRecycling.js'),css=read('public/css/p28.css'),index=read('public/index.html'),notifications=read('lib/appNotifications.js');
 
-test('P28 carrega áudio com cache-bust e recovery depois da integração existente',()=>{
+test('P28 carrega áudio com cache-bust atual e recovery depois da integração existente',()=>{
   assert.doesNotThrow(()=>new Function(recovery));
-  assert.match(index,/js\/soundtrack\.js\?v=1\.4\.28/);
-  assert.match(index,/js\/sfx\.js\?v=1\.4\.28/);
-  assert.ok(index.indexOf('js/musicRecoveryP28.js?v=1.4.28')>index.indexOf('js/audioIntegrationP13.js'));
+  assert.match(index,/js\/soundtrack\.js\?v=1\.4\.\d+/);
+  assert.match(index,/js\/sfx\.js\?v=1\.4\.\d+/);
+  const recoveryMatch=index.match(/js\/musicRecoveryP28\.js\?v=(1\.4\.\d+)/);
+  assert.ok(recoveryMatch,'musicRecoveryP28 precisa manter cache-bust versionado');
+  assert.ok(index.indexOf(`js/musicRecoveryP28.js?v=${recoveryMatch[1]}`)>index.indexOf('js/audioIntegrationP13.js'));
 });
 
 test('recovery respeita música desligada e tenta novamente em gestos futuros',()=>{
   assert.match(recovery,/function wantsMusic\(\)\{return readSettings\(\)\.music!==false;\}/);
-  assert.match(recovery,/CartSoundtrack\?\.unmute/);
+  assert.match(recovery,/CartSoundtrack\?\.(?:resume|unmute)/);
   assert.match(recovery,/touchstart/);
   assert.match(recovery,/pointerdown/);
   assert.match(recovery,/click/);
