@@ -19,8 +19,8 @@
   left:50%;
   top:50%;
   z-index:5;
-  width:calc(100% + 38px);
-  height:calc(100% + 12px);
+  width:145%;
+  height:112%;
   box-sizing:border-box;
   border:1.5px solid rgba(186,230,253,.52);
   border-radius:50%;
@@ -87,8 +87,8 @@
 
 @media(max-width:520px){
   .avatar-frame.frame-genese-celestial>.genese-atom-track{
-    width:calc(100% + 28px);
-    height:calc(100% + 9px);
+    width:142%;
+    height:110%;
     border-width:1.25px;
   }
   .avatar-frame.frame-genese-celestial>.genese-atom-track>.genese-atom-particle{
