@@ -41,10 +41,12 @@ test('Gênese não desenha segunda borda estrutural sobre o arco Celestial',()=>
   assert.match(css,/@keyframes p31GenesisBreath/);
 });
 
-test('P31 usa cache-bust novo e fica registrado na Central',()=>{
-  assert.match(index,/css\/p29\.css\?v=1\.4\.31/);
-  assert.match(index,/js\/genesisFrameP29\.js\?v=1\.4\.31/);
-  assert.match(notifications,/APP_VERSION='v1\.4\.31'/);
+test('P31 usa cache-bust novo e permanece registrado quando a versão avança',()=>{
+  assert.match(index,/css\/p29\.css\?v=1\.4\.\d+/);
+  assert.match(index,/js\/genesisFrameP29\.js\?v=1\.4\.\d+/);
+  const current=notifications.match(/APP_VERSION='v1\.4\.(\d+)'/);
+  assert.ok(current&&Number(current[1])>=31,'versão atual não pode regredir abaixo de P31');
   assert.match(notifications,/release:p31/);
+  assert.match(notifications,/version:'v1\.4\.31'/);
   assert.match(notifications,/Seis estrelas orbitais da Gênese/);
 });
