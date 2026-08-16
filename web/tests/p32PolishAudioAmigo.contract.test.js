@@ -34,7 +34,7 @@ test('Cintilante aplica RGB somente à foto',()=>{
 test('música recupera contextos Web Audio não-running e fechados no iPhone/PWA',()=>{
  assert.match(sound,/context\?\.state==='closed'/);
  assert.match(sound,/if\(ctx\.state!=='running'\)await ctx\.resume\(\)/);
- assert.match(sound,/get state\(\)\{return context\?\.state\|\|'none'\}/);
+ assert.match(sound,/get state\(\)\{return context\?\.state\|\|'none';\}/);
  assert.match(sound,/visibilitychange[^\n]*unlockAndPlay/);
  assert.match(recovery,/touchend/);
  assert.match(recovery,/pointerup/);
