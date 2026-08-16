@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const recovery=read('public/js/musicRecoveryP28.js'),css=read('public/css/p28.css'),index=read('public/index.html'),notifications=read('lib/appNotifications.js');
+const recovery=read('public/js/musicRecoveryP28.js'),recycling=read('public/js/marketplaceRecycling.js'),css=read('public/css/p28.css'),index=read('public/index.html'),notifications=read('lib/appNotifications.js');
 
 test('P28 carrega áudio com cache-bust e recovery depois da integração existente',()=>{
   assert.doesNotThrow(()=>new Function(recovery));
@@ -39,6 +39,16 @@ test('partícula percorre a elipse enquanto cresce e diminui e a própria órbit
   assert.match(css,/50%\{transform:rotate\(156deg\);background-position:0% 50%;background-size:9px 9px/);
   assert.match(css,/75%\{transform:rotate\(246deg\);background-position:50% 100%;background-size:15px 15px/);
   assert.match(css,/100%\{transform:rotate\(336deg\);background-position:100% 50%;background-size:9px 9px/);
+});
+
+test('Reciclagem não retrai o modal enquanto busca os dados',()=>{
+  assert.doesNotThrow(()=>new Function(recycling));
+  assert.match(recycling,/skeleton\(body\)/);
+  assert.match(recycling,/body\.classList\.add\('recycling-loading'\)/);
+  assert.match(recycling,/if\(this\.data\)this\.paint\(body,m\);else this\.skeleton\(body\)/);
+  assert.match(recycling,/recycling-skeleton-grid/);
+  assert.match(css,/market-body\.recycling-loading\{min-height:min\(540px,62dvh\)\}/);
+  assert.match(css,/recycling-skeleton-grid>span/);
 });
 
 test('Central registra P28',()=>{
