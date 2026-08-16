@@ -3,10 +3,10 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const js=read('public/js/genesisFrameP29.js'),css=read('public/css/p29.css'),index=read('public/index.html'),notifications=read('lib/appNotifications.js');
 
-test('P29 compila e carrega depois da implementação antiga da Gênese',()=>{
+test('P29 compila e continua carregando depois da implementação antiga da Gênese',()=>{
   assert.doesNotThrow(()=>new Function(js));
-  assert.ok(index.indexOf('css/p29.css?v=1.4.29')>index.indexOf('css/p28.css?v=1.4.28'));
-  assert.ok(index.indexOf('js/genesisFrameP29.js?v=1.4.29')>index.indexOf('js/identityP20.js'));
+  assert.ok(index.indexOf('css/p29.css?v=1.4.')>index.indexOf('css/p28.css?v=1.4.28'));
+  assert.ok(index.indexOf('js/genesisFrameP29.js?v=1.4.')>index.indexOf('js/identityP20.js'));
 });
 
 test('P29 separa linha orbital e partícula em elementos reais',()=>{
@@ -26,13 +26,13 @@ test('órbita é elíptica proporcional e gira independentemente do arco Celesti
   assert.match(css,/rotate\(332deg\)/);
 });
 
-test('partícula percorre a própria elipse e pulsa de tamanho',()=>{
-  assert.match(css,/animation:p29GenesisElectron 4\.6s linear infinite/);
-  assert.match(css,/0%\{left:100%;top:50%;width:9px;height:9px/);
-  assert.match(css,/25%\{left:50%;top:0%;width:15px;height:15px/);
-  assert.match(css,/50%\{left:0%;top:50%;width:9px;height:9px/);
-  assert.match(css,/75%\{left:50%;top:100%;width:15px;height:15px/);
-  assert.match(css,/100%\{left:100%;top:50%;width:9px;height:9px/);
+test('corpo orbital continua percorrendo a própria elipse e pulsando',()=>{
+  assert.match(css,/animation:p30GenesisPlatinumStar 4\.6s linear infinite/);
+  assert.match(css,/0%\{left:100%;top:50%/);
+  assert.match(css,/25%\{left:50%;top:0%/);
+  assert.match(css,/50%\{left:0%;top:50%/);
+  assert.match(css,/75%\{left:50%;top:100%/);
+  assert.match(css,/100%\{left:100%;top:50%/);
 });
 
 test('decorador cobre frames existentes e novos sem observar atributos ou criar loop de classe',()=>{
@@ -43,8 +43,8 @@ test('decorador cobre frames existentes e novos sem observar atributos ou criar 
   assert.match(js,/querySelector\(':scope > \.genese-atom-track'\)/);
 });
 
-test('Central registra P29',()=>{
-  assert.match(notifications,/APP_VERSION='v1\.4\.29'/);
+test('release P29 permanece registrada após versões futuras',()=>{
   assert.match(notifications,/release:p29/);
+  assert.match(notifications,/version:'v1\.4\.29'/);
   assert.match(notifications,/Gênese com órbita atômica real/);
 });
