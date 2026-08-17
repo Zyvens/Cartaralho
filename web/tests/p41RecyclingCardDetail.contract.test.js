@@ -65,10 +65,10 @@ test('card da conta não quebra Perfil e Sair para uma segunda linha no mobile',
  assert.match(css,/text-overflow:ellipsis!important/);
 });
 
-test('P41 publica versão e carrega como camada final',()=>{
+test('P41 publica versão e permanece preservado após releases futuros',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.41'/);
  assert.match(release,/release:p41/);
- assert.match(version,/releaseP41/);
+ assert.match(version,/releaseP(?:4[1-9]|[5-9]\d)/);
  assert.match(notifications,/releaseP41/);
  assert.match(notifications,/P40_RELEASE/);
  assert.match(index,/css\/p41\.css\?v=1\.4\.41/);
