@@ -33,11 +33,11 @@ test('reciclagem sincroniza imediatamente saldo do Mercado e da Home',()=>{
  assert.match(index,/marketplaceRecycling\.js\?v=1\.4\.45/);
 });
 
-test('P45 é a camada CSS final e publica a versão atual',()=>{
+test('P45 permanece preservado como camada histórica após releases futuras',()=>{
  assert.match(index,/css\/p45\.css\?v=1\.4\.45/);
  assert.ok(index.indexOf('css/p45.css?v=1.4.45')>index.indexOf('css/p44.css?v=1.4.44'));
  assert.match(release,/APP_VERSION='v1\.4\.45'/);
- assert.match(version,/releaseP45/);
- assert.match(notifications,/releaseP45/);
+ assert.match(notifications,/P45_RELEASE/);
  assert.match(notifications,/P44_RELEASE/);
+ assert.match(version,/releaseP\d+/);
 });
