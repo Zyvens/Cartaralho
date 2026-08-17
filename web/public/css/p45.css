@@ -1,4 +1,4 @@
-/* P45 — alinhamento definitivo dos controles superiores. */
+/* P45/P46 — alinhamento definitivo dos controles superiores + respiro do painel de missões. */
 
 /* Os três controles compartilham exatamente a mesma geometria e eixo vertical. */
 .mission-fab,
@@ -29,6 +29,13 @@
 .creator-admin-fab,
 #back-play.p42-home-back{left:12px!important;right:auto!important}
 
+/* P46: o painel aberto começa abaixo da linha dos pills, com respiro visual constante. */
+.mission-card{
+  top:calc(env(safe-area-inset-top,0px) + 68px)!important;
+  bottom:auto!important;
+  max-height:calc(100dvh - env(safe-area-inset-top,0px) - 80px)!important;
+}
+
 @media(max-width:620px){
   .mission-fab,
   .creator-admin-fab,
@@ -42,4 +49,9 @@
   .mission-fab{right:12px!important}
   .creator-admin-fab,
   #back-play.p42-home-back{left:12px!important}
+  .mission-card{
+    top:calc(env(safe-area-inset-top,0px) + 68px)!important;
+    bottom:auto!important;
+    max-height:calc(100dvh - env(safe-area-inset-top,0px) - 80px)!important;
+  }
 }
