@@ -15,6 +15,15 @@
   };
   CartP37.__p39Guarded=true;
  }
+ function installToastCopy(){
+  if(!window.Toast||Toast.__p39CompactReady)return;
+  const show=Toast.show.bind(Toast);
+  Toast.show=function(message,...args){
+   if(message==='Prontidão cancelada. Agora você pode editar suas cartas novamente.')message='Prontidão cancelada. Cartas liberadas para edição.';
+   return show(message,...args);
+  };
+  Toast.__p39CompactReady=true;
+ }
  function enforce(){
   installGuard();
   if(!isAdmin()||!mainHomeOpen()){removeAdmin();return;}
@@ -24,6 +33,7 @@
  function init(){
   sessionStorage.setItem(`cartaralho_update_notice_${VERSION}`,'1');
   installGuard();
+  installToastCopy();
   document.addEventListener('click',e=>{
    if(e.target.closest('#btn-play,#back-play'))schedule();
   });
