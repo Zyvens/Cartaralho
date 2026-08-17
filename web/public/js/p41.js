@@ -20,9 +20,11 @@
  }
  function polishAdmin(){
   const eyebrow=document.querySelector('.creator-admin-head small');
-  if(eyebrow)eyebrow.textContent='ADMIN • VitorIvens';
+  const adminLabel='ADMIN • VitorIvens';
+  if(eyebrow&&eyebrow.textContent!==adminLabel)eyebrow.textContent=adminLabel;
   const security=document.querySelector('.creator-admin-security');
-  if(security)security.textContent='A interface administrativa aparece apenas para o administrador autorizado. O servidor valida a identidade novamente antes de executar qualquer comando e os créditos são protegidos contra duplicação.';
+  const securityCopy='A interface administrativa aparece apenas para o administrador autorizado. O servidor valida a identidade novamente antes de executar qualquer comando e os créditos são protegidos contra duplicação.';
+  if(security&&security.textContent!==securityCopy)security.textContent=securityCopy;
   const update=document.getElementById('admin-update-send');
   if(update&&!update.dataset.p41Update){update.dataset.p41Update='1';update.onclick=()=>sendCurrentUpdate(update);}
  }
