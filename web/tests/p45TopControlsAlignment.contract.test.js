@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const css=read('public/css/p45.css'),index=read('public/index.html'),release=read('lib/releaseP45.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
+const css=read('public/css/p45.css'),index=read('public/index.html'),release=read('lib/releaseP45.js'),version=read('api/version.js'),notifications=read('api/notifications.js'),recycling=read('public/js/marketplaceRecycling.js');
 
 test('Missões, Admin e Voltar compartilham o mesmo contrato geométrico',()=>{
  assert.match(css,/\.mission-fab,\s*\.creator-admin-fab,\s*#back-play\.p42-home-back\{/);
@@ -22,6 +22,15 @@ test('posicionamento lateral continua espelhado e não sobrepõe Missões',()=>{
 test('mobile preserva exatamente o mesmo eixo vertical e altura',()=>{
  assert.match(css,/@media\(max-width:620px\)[\s\S]*top:calc\(env\(safe-area-inset-top,0px\) \+ 12px\)!important/);
  assert.match(css,/@media\(max-width:620px\)[\s\S]*height:44px!important/);
+});
+
+test('reciclagem sincroniza imediatamente saldo do Mercado e da Home',()=>{
+ assert.match(recycling,/syncBalances\(m\)/);
+ assert.match(recycling,/#market-dirty-balance/);
+ assert.match(recycling,/\.home-account-balance/);
+ assert.match(recycling,/cartaralho:wallet-updated/);
+ assert.match(recycling,/await m\.load\(\);this\.syncBalances\(m\)/);
+ assert.match(index,/marketplaceRecycling\.js\?v=1\.4\.45/);
 });
 
 test('P45 é a camada CSS final e publica a versão atual',()=>{
