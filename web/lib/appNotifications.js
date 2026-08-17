@@ -1,8 +1,9 @@
 'use strict';
 const{sql}=require('./db');
 
-const APP_VERSION='v1.4.35';
+const APP_VERSION='v1.4.36';
 const RELEASES=[
+ {id:'release:p36',type:'update',icon:'🪽',title:'P36 — Scroll nos spoilers, Asas em primeiro plano e Voltar alinhado',description:'A Central de Notificações ganha rolagem interna em cada spoiler aberto. As Asas passam para a base do avatar e ficam acima da foto e da moldura. O botão Voltar da etapa de apelido fica alinhado ao topo esquerdo do formulário.',version:'v1.4.36',publishedAt:'2026-08-17T02:51:00.000Z'},
  {id:'release:p35',type:'update',icon:'🔔',title:'P35 — Spoilers na Central e Asas para fora',description:'Últimas atualizações e Prêmios recebidos viram seções recolhíveis na Central de Notificações. As Asas mantêm 45° e passam a apontar para fora do avatar.',version:'v1.4.35',publishedAt:'2026-08-17T02:10:00.000Z'},
  {id:'release:p34',type:'update',icon:'🛠️',title:'P34 — Voltar, Asas e identidade no Rank',description:'O botão Voltar da criação de salas passa a ficar preso ao canto superior esquerdo do viewport, Asas recuperam a geometria lateral e o Rank volta a renderizar molduras e títulos equipados.',version:'v1.4.34',publishedAt:'2026-08-16T21:11:21.000Z'},
  {id:'release:p33',type:'update',icon:'✨',title:'P33 — Hotfix de cosméticos, navegação e Rank',description:'Refina Fita Isolante Premium e Cintilante, reposiciona a navegação da criação e prepara identidade completa no Rank.',version:'v1.4.33',publishedAt:'2026-08-16T17:20:08.000Z'},
