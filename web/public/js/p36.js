@@ -4,7 +4,7 @@
  if(RoomRulesUI.__p36UnifiedAccordions)return;
  RoomRulesUI.__p36UnifiedAccordions=true;
 
- const RULE_ITEMS='<ul class="rules-list"><li><strong>Recompensa:</strong> Somente pontos e participantes alimentam o Reward Engine; a mão não aumenta prêmio.</li><li><strong>Participantes reais:</strong> O preview inicial presume mesa cheia; no Lobby a liquidação usa participação efetiva.</li><li><strong>Cartas novas:</strong> Criar Carta Suja custa Carta Limpa e pode ser desativado separadamente.</li><li><strong>Cartas próprias:</strong> Usar cartas já possuídas é outra permissão e nunca cria nova autoria.</li><li><strong>BUFFs:</strong> Quando permitidos, são consumíveis server-side; falhas não gastam item e cada pessoa ativa no máximo um novo BUFF por rodada.</li><li><strong>Narrador:</strong> Quando ativo, o dispositivo do criador narra apenas informações públicas da partida.</li><li><strong>Espólio:</strong> Cartas dos outros não entram automaticamente na coleção; a curadoria ocorre ao fim de partida válida.</li><li><strong>AFK:</strong> Quando ativo, inatividade prolongada remove da mesa com possibilidade de reingresso.</li></ul>';
+ const RULE_ITEMS='<ul class="rules-list"><li><strong>Objetivo da partida:</strong> Seja o primeiro a alcançar a quantidade de pontos escolhida para a mesa. Cada rodada vencida vale 1 ponto.</li><li><strong>Como funciona uma rodada:</strong> Uma Carta Preta apresenta a frase ou situação da vez. Os demais jogadores escolhem suas respostas entre as Cartas Brancas da mão, e o jogador responsável pela rodada escolhe a resposta vencedora.</li><li><strong>Sua mão de cartas:</strong> Cada jogador começa com a quantidade de Cartas Brancas definida nas configurações. Depois de usar cartas, a mão é completada novamente para a rodada seguinte.</li><li><strong>Cartas de Jogador:</strong> A mesa pode permitir cartas personalizadas que você já possui e, separadamente, permitir a criação de novas cartas antes da partida.</li><li><strong>Recompensas:</strong> Mesas com mais participantes e partidas com mais pontos para vencer podem oferecer recompensas maiores. A quantidade de cartas na mão serve apenas para dar mais opções durante a rodada.</li><li><strong>Espólio:</strong> Para poder receber Cartas de Jogador dos outros ao final, você precisa contribuir com pelo menos uma Carta de Jogador para aquela partida. Quem não contribuir ainda pode jogar normalmente, mas fica sem Espólio.</li><li><strong>BUFFs:</strong> Se estiverem liberados, os jogadores podem usar vantagens consumíveis compradas no Mercado Paralelo. Cada pessoa pode ativar no máximo um novo BUFF por rodada.</li><li><strong>Narrador e inatividade:</strong> O Narrador pode ler os momentos públicos da partida em voz alta. Se a remoção por inatividade estiver ligada, quem ficar muito tempo sem interagir pode sair da mesa e depois reingressar pelo código.</li></ul>';
  const chevron='<span class="dashboard-collapse-chevron" aria-hidden="true">⌄</span>';
 
  function accordion(title,subtitle,eyebrow,body,extra=''){
@@ -12,7 +12,7 @@
  }
 
  RoomRulesUI.howToPlay=function(extra=''){
-  return accordion('📜 Como Jogar','Abra quando quiser revisar como cada opção afeta a partida.','REGRAS',RULE_ITEMS,`how-to-play-card ${extra}`);
+  return accordion('📜 Como Jogar','Um guia rápido da partida, das cartas e das opções especiais da mesa.','REGRAS',RULE_ITEMS,`how-to-play-card ${extra}`);
  };
 
  const baseSummary=RoomRulesUI.summary.bind(RoomRulesUI);
@@ -32,7 +32,7 @@
    const body=old.querySelector('#preview-economic');
    const details=document.createElement('details');
    details.className='dashboard-card dashboard-estimate-card room-info-accordion';
-   details.innerHTML=`<summary class="dashboard-section-heading dashboard-collapsible-heading"><div><small>RECOMPENSAS</small><h3>🏆 Estimativa para mesa cheia</h3><p>Veja o que uma mesa completa pode render antes de criar a partida.</p></div>${chevron}</summary><div class="dashboard-card-body"></div>`;
+   details.innerHTML=`<summary class="dashboard-section-heading dashboard-collapsible-heading"><div><small>RECOMPENSAS</small><h3>🏆 Estimativa para mesa cheia</h3><p>Confira as recompensas previstas quando a sala estiver com sua capacidade máxima.</p></div>${chevron}</summary><div class="dashboard-card-body"></div>`;
    if(body)details.querySelector('.dashboard-card-body').appendChild(body);
    old.replaceWith(details);
   }
@@ -48,7 +48,7 @@
    const body=old.querySelector('#lobby-economy-preview');
    const details=document.createElement('details');
    details.className='lobby-reward-card room-info-accordion lobby-info-accordion';
-   details.innerHTML=`<summary class="dashboard-section-heading dashboard-collapsible-heading"><div><small>RECOMPENSAS</small><h3>🏆 Estimativa para mesa cheia</h3><p>Cenário econômico com a capacidade máxima configurada para a sala.</p></div>${chevron}</summary><div class="dashboard-card-body"></div>`;
+   details.innerHTML=`<summary class="dashboard-section-heading dashboard-collapsible-heading"><div><small>RECOMPENSAS</small><h3>🏆 Estimativa para mesa cheia</h3><p>Veja quanto cada colocação pode receber se a sala atingir o número máximo de jogadores.</p></div>${chevron}</summary><div class="dashboard-card-body"></div>`;
    if(body)details.querySelector('.dashboard-card-body').appendChild(body);
    old.replaceWith(details);
   }
@@ -67,7 +67,7 @@
   try{
    const d=await RewardPreviewUI.request({code:App.state.roomCode});
    const full=d.fullTable||d.preview;
-   if(token===this.previewToken&&box)box.innerHTML=RewardPreviewUI.card(full,'Estimativa para mesa cheia','Cenário com a capacidade máxima da sala.');
+   if(token===this.previewToken&&box)box.innerHTML=RewardPreviewUI.card(full,'Estimativa para mesa cheia','Valores previstos para uma sala com a capacidade máxima configurada.');
   }catch(e){if(token===this.previewToken&&box)box.innerHTML=`<div class="economy-preview"><small>${e.message}</small></div>`;}
  };
 })();
