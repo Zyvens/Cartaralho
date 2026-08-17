@@ -38,7 +38,9 @@ test('editor mantém apenas o botão inferior de salvar quando está editável',
 test('decisão de produto preserva criação imediata de cartas como no modelo anterior',()=>{
  assert.match(cards,/AuthClient\.createPaidCard\(/);
  assert.match(cards,/if\(d\.inventory\)this\.cleanInventory=/);
- assert.match(createApi,/result=await cleanCards\.create\(\{userId:user\.id,type:cardType,text:display,matchId:room\.code/);
+ assert.match(createApi,/if\(!libraryMode\)\{/);
+ assert.match(createApi,/matchId=room\.code/);
+ assert.match(createApi,/result=await cleanCards\.create\(\{userId:user\.id,type:cardType,text:display,matchId,creatorName,creationId\}\)/);
  assert.doesNotMatch(createApi,/draft|reservation|reserve/i);
 });
 
