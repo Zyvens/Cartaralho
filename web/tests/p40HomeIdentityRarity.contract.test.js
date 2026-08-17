@@ -39,15 +39,15 @@ test('Foto e aparência básica nunca mostra a moldura equipada',()=>{
  assert.match(css,/::before,[\s\S]*::after\{display:none!important\}/);
 });
 
-test('P40 publica 1.4.40 e entra na Central',()=>{
+test('P40 permanece publicado e preservado após releases futuros',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.40'/);
  assert.match(release,/release:p40/);
- assert.match(version,/releaseP40/);
- assert.match(notifications,/releaseP40/);
- assert.match(notifications,/releaseP39/);
+ assert.match(version,/APP_VERSION/);
+ assert.match(notifications,/P40_RELEASE|releaseP40/);
+ assert.match(notifications,/data\.currentVersion=APP_VERSION/);
 });
 
-test('P40 carrega por último com cache-busting',()=>{
+test('P40 permanece carregado com cache-busting próprio',()=>{
  assert.match(index,/css\/p40\.css\?v=1\.4\.40/);
  assert.match(index,/js\/p40\.js\?v=1\.4\.40/);
  assert.ok(index.indexOf('css/p40.css?v=1.4.40')>index.indexOf('css/p39.css?v=1.4.39'));
