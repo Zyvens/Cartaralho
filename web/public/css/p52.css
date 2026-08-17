@@ -1,5 +1,16 @@
 /* P52 — regressões visuais e estabilidade da Home. */
 
+/* A ordem nasce correta no CSS final, antes de qualquer reconciliação JS. */
+.profile-actions > #marketplace-menu-btn{order:1!important}
+.profile-actions > #friends-menu-btn{order:2!important}
+.profile-actions > [data-panel="cards"]{order:3!important}
+.profile-actions > [data-panel="rank"]{order:4!important}
+.profile-actions > [data-panel="history"]{order:5!important}
+.profile-actions > #notifications-menu-btn{order:6!important}
+.profile-actions > [data-panel="stats"]{order:7!important}
+.profile-actions > #audio-settings-menu-btn{order:8!important}
+.profile-actions > [data-panel="credits"]{order:9!important}
+
 /* “JOGO DE CARTAS” volta ao cabeçalho visual, mas pertence ao fundo/fluxo da Home: não é um FAB. */
 body[data-cart-screen="home"] .home-content{
   position:relative!important;
