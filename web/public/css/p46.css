@@ -1,0 +1,62 @@
+/* P46 — navegação superior global baseada na proporção de Configurar Mesa. */
+
+/* Missões, Admin e os botões Voltar de tela compartilham exatamente o mesmo envelope. */
+.mission-fab,
+.creator-admin-fab,
+#back-play.p42-home-back,
+button.back-button{
+  position:fixed!important;
+  top:calc(env(safe-area-inset-top,0px) + 12px)!important;
+  bottom:auto!important;
+  height:40px!important;
+  min-height:40px!important;
+  padding:0 14px!important;
+  margin:0!important;
+  border-radius:999px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  box-sizing:border-box!important;
+  font-family:var(--font-display)!important;
+  font-size:.9rem!important;
+  font-weight:700!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  z-index:9600!important;
+}
+
+/* Navegação espelhada: Voltar/Admin à esquerda, Missões à direita. */
+.mission-fab{right:12px!important;left:auto!important}
+.creator-admin-fab,
+#back-play.p42-home-back,
+button.back-button{left:12px!important;right:auto!important}
+
+/* O conteúdo aberto de Missões começa depois da linha de navegação, com 12 px de respiro. */
+.mission-card{
+  top:calc(env(safe-area-inset-top,0px) + 64px)!important;
+  bottom:auto!important;
+  max-height:calc(100dvh - env(safe-area-inset-top,0px) - 76px)!important;
+}
+
+@media(max-width:620px){
+  .mission-fab,
+  .creator-admin-fab,
+  #back-play.p42-home-back,
+  button.back-button{
+    top:calc(env(safe-area-inset-top,0px) + 12px)!important;
+    height:40px!important;
+    min-height:40px!important;
+    padding:0 14px!important;
+    font-size:.9rem!important;
+  }
+  .mission-fab{right:12px!important}
+  .creator-admin-fab,
+  #back-play.p42-home-back,
+  button.back-button{left:12px!important}
+  .mission-card{
+    top:calc(env(safe-area-inset-top,0px) + 64px)!important;
+    bottom:auto!important;
+    max-height:calc(100dvh - env(safe-area-inset-top,0px) - 76px)!important;
+  }
+}
