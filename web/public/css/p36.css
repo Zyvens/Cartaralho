@@ -1,4 +1,4 @@
-/* P36 — scroll interno nos spoilers e Asas na base acima do avatar. */
+/* P36 — scroll interno nos spoilers, Asas na base acima do avatar e Voltar do apelido à esquerda. */
 
 /* Central: cada spoiler aberto possui rolagem interna propria. */
 .notifications-spoiler-content{
@@ -12,6 +12,17 @@
 }
 .notifications-spoiler[open]>.notifications-spoiler-content{
   padding:12px!important;
+}
+
+/* Etapa de apelido/entrada: o Voltar fica no topo esquerdo do proprio formulario. */
+#play-form>#back-play{
+  display:flex!important;
+  width:max-content!important;
+  max-width:100%!important;
+  margin:0 auto 12px 0!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  text-align:left!important;
 }
 
 /* Asas: saem das laterais, descem para a base e ficam acima de foto/moldura. */
