@@ -1,0 +1,125 @@
+/* P48 — hierarquia da Home, Lobby, Cartas e notificações. */
+
+/* HOME: subtítulo vira assinatura superior; CARTARALHO recupera protagonismo no centro. */
+body[data-cart-screen="home"] .home-content{
+  padding-top:calc(env(safe-area-inset-top,0px) + 56px)!important;
+}
+body[data-cart-screen="home"] .home-subtitle{
+  position:fixed!important;
+  top:calc(env(safe-area-inset-top,0px) + 12px)!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  z-index:9550!important;
+  height:40px!important;
+  margin:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  white-space:nowrap!important;
+  font-size:.72rem!important;
+  font-weight:700!important;
+  letter-spacing:.22em!important;
+  text-transform:uppercase!important;
+  color:rgba(205,205,224,.64)!important;
+  pointer-events:none!important;
+}
+body[data-cart-screen="home"] .home-logo{
+  min-height:52svh!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:3.5rem 0 1.4rem!important;
+  margin:0!important;
+}
+body[data-cart-screen="home"] .home-logo .logo-image{
+  width:min(84vw,560px)!important;
+  max-width:560px!important;
+  transform:scale(1.08)!important;
+  filter:drop-shadow(0 18px 34px rgba(0,0,0,.5)) drop-shadow(0 0 18px rgba(178,135,255,.13))!important;
+}
+body[data-cart-screen="home"] #home-account{
+  margin-top:.35rem!important;
+  scroll-margin-top:calc(env(safe-area-inset-top,0px) + 76px)!important;
+}
+body[data-cart-screen="home"] #home-main{margin-top:1rem!important}
+
+/* Estado de tela é definido antes da animação: sem flash de Admin/Missões. */
+body:not([data-cart-screen="home"]) .creator-admin-fab{display:none!important}
+body[data-cart-screen="cardCreation"] .mission-fab{display:none!important}
+
+/* Host externo dos Voltar: mesmo referencial de viewport de Missões/Admin. */
+#p48-top-nav-host{position:static!important}
+#p48-top-nav-host>.p48-promoted-back{
+  position:fixed!important;
+  top:calc(env(safe-area-inset-top,0px) + 12px)!important;
+  left:12px!important;
+  right:auto!important;
+  height:40px!important;
+  min-height:40px!important;
+  padding:0 14px!important;
+  margin:0!important;
+  transform:none!important;
+  translate:none!important;
+  z-index:9700!important;
+}
+
+/* LOBBY: código mais integrado ao conteúdo e página com scroll confortável. */
+body[data-cart-screen="lobby"] .lobby-screen{
+  padding-top:calc(env(safe-area-inset-top,0px) + 92px)!important;
+  padding-bottom:150px!important;
+  min-height:calc(100svh + 100px)!important;
+}
+body[data-cart-screen="lobby"] .room-code-display{
+  margin:18px auto 14px!important;
+  padding-bottom:0!important;
+}
+body[data-cart-screen="lobby"] .room-code-display .room-code-hint{
+  margin:.35rem 0 0!important;
+}
+body[data-cart-screen="lobby"] .lobby-content{
+  margin-top:12px!important;
+  padding-top:0!important;
+  gap:18px!important;
+}
+body[data-cart-screen="lobby"] .lobby-section{margin-top:0!important}
+
+/* MINHAS CARTAS — criação acessível antes da pesquisa. */
+.p48-create-card-entry{
+  width:100%;
+  margin:.75rem 0 1rem!important;
+  min-height:48px;
+}
+.p48-card-creator-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.p48-card-creator-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 16px}
+.p48-card-creator-tabs button{min-height:44px}
+.p48-card-creator-tabs button.active{background:#f4f4f5;color:#09090d;border-color:#f4f4f5}
+.p48-clean-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.p48-clean-card{padding:14px;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:rgba(255,255,255,.035)}
+.p48-clean-card small{display:block;color:var(--text-muted)}
+.p48-clean-card b{display:block;font-size:1.65rem;line-height:1.15;margin-top:4px}
+.p48-create-help{display:block;margin:8px 0 14px;color:var(--text-muted);line-height:1.45}
+.p48-create-actions{display:grid;gap:10px}
+
+/* NOTIFICAÇÕES — deixa explícito onde existe novidade. */
+.notification-new-pill,
+.notifications-section-new{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:22px;padding:3px 8px;border-radius:999px;
+  font-size:.68rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  background:rgba(168,85,247,.18);border:1px solid rgba(192,132,252,.4);color:#e9d5ff;
+  white-space:nowrap;
+}
+.notification-new-pill{margin-left:8px;vertical-align:middle}
+.notifications-spoiler-summary .notifications-section-new{margin-left:auto;margin-right:8px}
+.notification-item.is-new{box-shadow:inset 3px 0 0 rgba(192,132,252,.75)}
+
+@media(max-width:620px){
+  body[data-cart-screen="home"] .home-content{padding-top:calc(env(safe-area-inset-top,0px) + 54px)!important}
+  body[data-cart-screen="home"] .home-logo{min-height:50svh!important;padding:2.8rem 0 1.2rem!important}
+  body[data-cart-screen="home"] .home-logo .logo-image{width:min(88vw,520px)!important;transform:scale(1.05)!important}
+  body[data-cart-screen="home"] .home-subtitle{font-size:.66rem!important;letter-spacing:.18em!important;max-width:32vw;overflow:hidden}
+  body[data-cart-screen="lobby"] .lobby-screen{padding-top:calc(env(safe-area-inset-top,0px) + 86px)!important;padding-bottom:140px!important}
+  body[data-cart-screen="lobby"] .room-code-display{margin:14px auto 10px!important}
+  body[data-cart-screen="lobby"] .lobby-content{margin-top:8px!important;gap:14px!important}
+  .p48-clean-summary{grid-template-columns:1fr 1fr}
+}
