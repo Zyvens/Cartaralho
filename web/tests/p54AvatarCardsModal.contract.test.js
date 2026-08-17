@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const css=read('public/css/p54.css'),js=read('public/js/p54.js'),index=read('public/index.html'),release=read('lib/releaseP54.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
 
-test('P54 compila e é a última camada carregada',()=>{
+test('P54 compila e permanece carregado depois de P53',()=>{
  assert.doesNotThrow(()=>new Function(js));
  assert.ok(index.indexOf('css/p54.css?v=1.4.54')>index.indexOf('css/p53.css?v=1.4.53'));
  assert.ok(index.indexOf('js/p54.js?v=1.4.54')>index.indexOf('js/p53.js?v=1.4.53'));
@@ -54,9 +54,10 @@ test('Extrato nunca expõe transaction_type cru e usa descrições humanas',()=>
  assert.doesNotMatch(js,/\$\{[^}]*transaction_type[^}]*\}/);
 });
 
-test('P54 publica v1.4.54 e preserva P53 na Central',()=>{
+test('P54 permanece preservado quando versões posteriores são publicadas',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.54'/);
- assert.match(version,/releaseP54/);
- assert.match(notifications,/releaseP54/);
+ assert.match(version,/releaseP(?:54|[5-9]\d)/);
+ assert.match(notifications,/releaseP(?:54|[5-9]\d)/);
+ assert.match(notifications,/P54_RELEASE|releaseP54/);
  assert.match(notifications,/P53_RELEASE/);
 });
