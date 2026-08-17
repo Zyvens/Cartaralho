@@ -1,0 +1,48 @@
+/* P36 — scroll interno nos spoilers e Asas na base acima do avatar. */
+
+/* Central: cada spoiler aberto possui rolagem interna propria. */
+.notifications-spoiler-content{
+  max-height:min(40vh,360px)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-gutter:stable;
+  min-height:0;
+}
+.notifications-spoiler[open]>.notifications-spoiler-content{
+  padding:12px!important;
+}
+
+/* Asas: saem das laterais, descem para a base e ficam acima de foto/moldura. */
+.avatar-frame.frame-cosmetic-asas{
+  position:relative!important;
+  isolation:isolate!important;
+  overflow:visible!important;
+}
+.avatar-frame.frame-cosmetic-asas::before,
+.avatar-frame.frame-cosmetic-asas::after{
+  position:absolute!important;
+  top:auto!important;
+  bottom:-10px!important;
+  z-index:40!important;
+  font-size:1.65em!important;
+  pointer-events:none!important;
+  transform-origin:center!important;
+}
+.avatar-frame.frame-cosmetic-asas::before{
+  left:-10px!important;
+  right:auto!important;
+  transform:scaleX(-1) rotate(45deg)!important;
+}
+.avatar-frame.frame-cosmetic-asas::after{
+  right:-10px!important;
+  left:auto!important;
+  transform:rotate(45deg)!important;
+}
+
+@media(max-width:620px){
+  .notifications-spoiler-content{max-height:min(38vh,300px)!important}
+  .avatar-frame.frame-cosmetic-asas::before{left:-8px!important}
+  .avatar-frame.frame-cosmetic-asas::after{right:-8px!important}
+}
