@@ -42,11 +42,12 @@ test('novidades indicam seção e item e só são lidas ao fechar',()=>{
  assert.match(js,/N\.close=function/);
 });
 
-test('P48 é a camada final e publica v1.4.48',()=>{
+test('P48 permanece carregado e preservado após releases futuros',()=>{
  assert.match(index,/css\/p48\.css\?v=1\.4\.48/);
  assert.match(index,/js\/p48\.js\?v=1\.4\.48/);
  assert.match(release,/APP_VERSION='v1\.4\.48'/);
- assert.match(version,/releaseP48/);
- assert.match(notifications,/releaseP48/);
+ const current=version.match(/releaseP(\d+)/);assert.ok(current&&Number(current[1])>=48,'endpoint atual não pode regredir abaixo do P48');
+ assert.match(notifications,/releaseP(?:48|49)/);
+ assert.match(notifications,/P48_RELEASE|releaseP48/);
  assert.match(notifications,/P47_RELEASE/);
 });
