@@ -15,6 +15,41 @@
   line-height:1.2!important;
 }
 
+/* Card da conta: controles permanecem na mesma linha no celular. */
+.home-account-bar{
+  flex-wrap:nowrap!important;
+  justify-content:flex-start!important;
+  width:100%!important;
+}
+.home-account-bar .home-account-identity{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  overflow:hidden!important;
+}
+.home-account-bar .home-account-identity strong,
+.home-account-bar .home-account-identity>span,
+.home-account-bar .account-equipped-title{
+  max-width:100%!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.home-account-bar .home-account-balance{
+  min-width:92px!important;
+  max-width:128px!important;
+  padding-left:8px!important;
+  padding-right:8px!important;
+  gap:5px!important;
+}
+.home-account-bar #profile-shortcut,
+.home-account-bar #logout-btn{
+  flex:0 0 48px!important;
+  width:48px!important;
+  min-width:48px!important;
+  padding-left:8px!important;
+  padding-right:8px!important;
+}
+
 /* Detalhe de carta sempre acima de Minhas Cartas. */
 .p41-card-detail-overlay,.p41-recycle-confirm-overlay{
   position:fixed;
@@ -102,10 +137,23 @@
 
 @media(max-width:620px){
  .creator-admin-fab,.mission-fab{min-height:44px!important;padding:10px 14px!important;font-size:.88rem!important}
+ .home-account-bar{gap:6px!important}
+ .home-account-bar>.user-avatar,.home-account-bar>.avatar-frame{flex:0 0 auto!important}
+ .home-account-bar .home-account-balance{height:46px!important;min-height:46px!important;min-width:82px!important;max-width:104px!important;padding:0 6px!important;gap:3px!important;font-size:1.08rem!important}
+ .home-account-bar #profile-shortcut,.home-account-bar #logout-btn{height:46px!important;min-height:46px!important;flex-basis:44px!important;width:44px!important;min-width:44px!important;padding:0 6px!important}
+ .home-account-bar .home-account-identity strong{font-size:clamp(.82rem,3.6vw,1rem)!important}
+ .home-account-bar .home-account-identity>span{font-size:.66rem!important}
+ .home-account-bar .account-equipped-title{font-size:.55rem!important}
  .p41-card-detail-overlay,.p41-recycle-confirm-overlay{place-items:end center;padding-left:7px;padding-right:7px}
  .p41-card-detail-shell,.p41-recycle-confirm-shell{max-height:90vh;border-radius:21px 21px 12px 12px}
  .p41-card-detail-body{padding:14px;gap:14px}.p41-card-preview{min-height:160px;padding:20px}
  .p41-progression-grid,.p41-origin-grid{grid-template-columns:1fr}.p41-origin-grid{gap:7px}
  .p41-recycle-confirm-list{grid-template-columns:1fr;max-height:52vh;padding:11px}.p41-recycle-card-preview{min-height:100px}
  .p41-recycle-confirm-actions{grid-template-columns:1fr}.p41-recycle-confirm-actions .btn{width:100%}
+}
+
+@media(max-width:390px){
+ .home-account-bar{gap:4px!important}
+ .home-account-bar .home-account-balance{min-width:76px!important;max-width:96px!important;padding:0 4px!important;font-size:1.04rem!important}
+ .home-account-bar #profile-shortcut,.home-account-bar #logout-btn{flex-basis:42px!important;width:42px!important;min-width:42px!important;padding:0 4px!important}
 }
