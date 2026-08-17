@@ -1,0 +1,81 @@
+/* P54 — consistência das molduras e estabilidade do seletor no iOS. */
+
+/*
+ * A identidade pública antiga ainda carrega .user-avatar, cuja borda cinza
+ * pertence ao avatar sem moldura. Quando existe .avatar-frame, somente a
+ * moldura deve desenhar o contorno — igual ao avatar do Lobby.
+ */
+.avatar-frame.public-avatar-frame>.user-avatar,
+.avatar-frame.public-avatar-frame>img.user-avatar{
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+
+/*
+ * No Perfil, largura/altura representam o diâmetro da FOTO. O padding de uma
+ * moldura precisa crescer para fora, não roubar pixels da imagem e criar um
+ * anel interno escuro/cinza.
+ */
+.profile-modal-avatar[class*="frame-"]{
+  box-sizing:content-box!important;
+}
+.profile-modal-avatar[class*="frame-"]>img{
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+
+/*
+ * P53 usava paint containment + camada GPU na foto. O Safari/iOS pode perder
+ * pseudo-elementos da moldura durante o scroll e recompô-los depois. Mantém
+ * somente containment de layout e deixa o compositor tratar o card normalmente.
+ */
+.profile-modal-frame-grid .profile-modal-frame-item{
+  contain:layout!important;
+  overflow:visible!important;
+}
+.profile-modal-frame-grid .profile-modal-frame-sample{
+  overflow:visible!important;
+}
+.profile-modal-frame-grid .avatar-frame,
+.profile-modal-frame-grid .avatar-frame::before,
+.profile-modal-frame-grid .avatar-frame::after,
+.profile-modal-frame-grid .avatar-frame img{
+  will-change:auto!important;
+}
+.profile-modal-frame-grid .avatar-frame img{
+  transform:none!important;
+  backface-visibility:visible!important;
+  -webkit-backface-visibility:visible!important;
+}
+
+/* Gênese fica estática somente nos thumbnails: visual completo, sem repaints contínuos. */
+.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track{
+  animation:none!important;
+  transform:translate(-50%,-50%) rotate(-28deg)!important;
+  will-change:auto!important;
+}
+.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track>.genese-atom-particle{
+  animation:none!important;
+  opacity:.88!important;
+  transform:translate(-50%,-50%) scale(.82)!important;
+  will-change:auto!important;
+}
+.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track>.genese-atom-particle:nth-child(1){left:100%!important;top:50%!important}
+.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track>.genese-atom-particle:nth-child(2){left:75%!important;top:6.7%!important}
+.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track>.genese-atom-particle:nth-child(3){left:25%!important;top:6.7%!important}
+.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track>.genese-atom-particle:nth-child(4){left:0!important;top:50%!important}
+.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track>.genese-atom-particle:nth-child(5){left:25%!important;top:93.3%!important}
+.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track>.genese-atom-particle:nth-child(6){left:75%!important;top:93.3%!important}
+
+/* A criação passa a ser parte visual nativa do modal Minhas Cartas. */
+.p41-my-cards-panel .p54-create-card-entry{
+  width:100%!important;
+  min-height:48px!important;
+  margin:0 0 14px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+}
