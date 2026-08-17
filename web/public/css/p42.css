@@ -1,0 +1,68 @@
+/* P42 — Voltar espelhado com Missões e identidade alinhada na Home. */
+
+/* A identidade inteira compartilha a mesma origem horizontal e fica afastada da foto. */
+.home-account-bar .home-account-identity{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  text-align:left!important;
+  min-width:0!important;
+  margin-left:7px!important;
+  padding:0!important;
+  gap:1px!important;
+}
+.home-account-bar .home-account-identity strong,
+.home-account-bar .home-account-identity>span,
+.home-account-bar .home-account-identity .account-equipped-title{
+  display:block!important;
+  align-self:flex-start!important;
+  width:100%!important;
+  max-width:100%!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  padding-left:0!important;
+  padding-right:0!important;
+  text-align:left!important;
+  transform:none!important;
+  translate:none!important;
+}
+.home-account-bar .home-account-identity .account-equipped-title{
+  margin-top:3px!important;
+  line-height:1.15!important;
+}
+
+/* Etapa de apelido: Voltar é o espelho exato do pill Missões. */
+#back-play.p42-home-back{
+  position:fixed!important;
+  top:calc(env(safe-area-inset-top,0px) + 12px)!important;
+  left:12px!important;
+  right:auto!important;
+  bottom:auto!important;
+  z-index:12000!important;
+  min-height:44px!important;
+  height:auto!important;
+  padding:10px 14px!important;
+  margin:0!important;
+  border-radius:999px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  font-size:.9rem!important;
+  line-height:1.2!important;
+}
+
+@media(max-width:620px){
+  .home-account-bar .home-account-identity{margin-left:6px!important}
+  #back-play.p42-home-back{
+    top:calc(env(safe-area-inset-top,0px) + 12px)!important;
+    left:12px!important;
+    min-height:44px!important;
+    padding:10px 14px!important;
+    font-size:.88rem!important;
+  }
+}
+
+@media(max-width:390px){
+  .home-account-bar .home-account-identity{margin-left:5px!important}
+}
