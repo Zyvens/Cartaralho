@@ -70,9 +70,8 @@ test('catálogo e migration descrevem a regra nova',()=>{
  assert.match(seed,/buff_amigo_de_merda','Amigo de Merda','Antes da submissão do alvo, devolva toda a mão dele ao bolo e force uma nova mão do mesmo tamanho/);
 });
 
-test('P32 é a camada final publicada',()=>{
+test('P32 permanece registrado na cadeia de publicação',()=>{
  assert.match(index,/css\/p32\.css\?v=1\.4\.32/);
  assert.ok(index.indexOf('css/p32.css?v=1.4.32')>index.indexOf('css/p29.css?v=1.4.31'));
- assert.match(notifications,/APP_VERSION='v1\.4\.32'/);
  assert.match(notifications,/release:p32/);
 });

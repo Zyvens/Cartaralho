@@ -1,8 +1,11 @@
 'use strict';
 const{sql}=require('./db');
 
-const APP_VERSION='v1.4.32';
+const APP_VERSION='v1.4.35';
 const RELEASES=[
+ {id:'release:p35',type:'update',icon:'🔔',title:'P35 — Spoilers na Central e Asas para fora',description:'Últimas atualizações e Prêmios recebidos viram seções recolhíveis na Central de Notificações. As Asas mantêm 45° e passam a apontar para fora do avatar.',version:'v1.4.35',publishedAt:'2026-08-17T02:10:00.000Z'},
+ {id:'release:p34',type:'update',icon:'🛠️',title:'P34 — Voltar, Asas e identidade no Rank',description:'O botão Voltar da criação de salas passa a ficar preso ao canto superior esquerdo do viewport, Asas recuperam a geometria lateral e o Rank volta a renderizar molduras e títulos equipados.',version:'v1.4.34',publishedAt:'2026-08-16T21:11:21.000Z'},
+ {id:'release:p33',type:'update',icon:'✨',title:'P33 — Hotfix de cosméticos, navegação e Rank',description:'Refina Fita Isolante Premium e Cintilante, reposiciona a navegação da criação e prepara identidade completa no Rank.',version:'v1.4.33',publishedAt:'2026-08-16T17:20:08.000Z'},
  {id:'release:p32',type:'update',icon:'🛠️',title:'P32 — Polimento visual, áudio e Amigo de Merda',description:'A identidade dos jogadores ganha mais respiro, Asas descem para a borda inferior e Cintilante colore a foto em RGB. A música recebe recuperação reforçada no iPhone/PWA e Amigo de Merda passa a trocar toda a mão do alvo por uma nova do mesmo tamanho antes da submissão.',version:'v1.4.32',publishedAt:'2026-08-16T04:15:00.000Z'},
  {id:'release:p31',type:'update',icon:'✦',title:'P31 — Seis estrelas orbitais da Gênese',description:'A Gênese passa a usar seis estrelas ✦ equidistantes orbitando sobre uma elipse invisível. A trajetória continua girando como guia geométrico, enquanto o avatar mantém apenas um contorno Celestial visível.',version:'v1.4.31',publishedAt:'2026-08-16T00:28:00.000Z'},
  {id:'release:p30',type:'update',icon:'✦',title:'P30 — Estrela orbital da Gênese',description:'A partícula da órbita da Gênese passa a usar a mesma estrela/faísca visual da moldura Platina. A estrela percorre a elipse, pulsa de tamanho e gira enquanto a própria órbita continua rodando ao redor do arco Celestial.',version:'v1.4.30',publishedAt:'2026-08-15T22:25:00.000Z'},
