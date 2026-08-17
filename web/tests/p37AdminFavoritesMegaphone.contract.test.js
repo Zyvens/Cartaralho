@@ -24,7 +24,7 @@ test('megafone global funciona fora de salas e aviso de versão pede reinício',
  assert.match(js,/bind\('admin_megaphone'/);
  assert.match(js,/Nova atualização \$\{server\} disponível\. Reinicie o jogo para adicionar as atualizações\./);
  assert.match(js,/setInterval\(checkVersion,60000\)/);
- assert.match(version,/releaseP37/);
+ assert.match(version,/currentVersion:APP_VERSION/);
 });
 
 test('ferramentas do Criador são exclusivas do user_id 1 no cliente e no servidor',()=>{
@@ -51,15 +51,15 @@ test('créditos administrativos são transacionais e idempotentes',()=>{
  assert.match(server,/isolationMode:'Serializable'/);
 });
 
-test('Central e endpoint de versão publicam P37 sem reescrever histórico P36',()=>{
+test('Central e endpoint de versão preservam P37 mesmo após releases futuros',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.37'/);
  assert.match(release,/release:p37/);
  assert.match(notifications,/data\.currentVersion=APP_VERSION/);
- assert.match(notifications,/data\.updates=\[RELEASE/);
+ assert.match(notifications,/P37_RELEASE|releaseP37/);
  assert.match(version,/APP_VERSION/);
 });
 
-test('P37 é a camada final com cache-busting',()=>{
+test('P37 permanece carregado com cache-busting próprio',()=>{
  assert.match(index,/css\/p37\.css\?v=1\.4\.37/);
  assert.match(index,/js\/p37\.js\?v=1\.4\.37/);
  assert.ok(index.indexOf('css/p37.css?v=1.4.37')>index.indexOf('css/p36.css?v=1.4.36'));
