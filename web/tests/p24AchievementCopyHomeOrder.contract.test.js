@@ -3,40 +3,8 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const defs=require('../lib/achievementDefinitions');
 const service=read('lib/achievementService.js'),refinement=read('public/js/refinementP13.js'),menu=read('public/js/homeMenuP24.js'),p27=read('public/js/homeMenuP27.js'),index=read('public/index.html'),notifications=read('lib/appNotifications.js');
-
-test('títulos derivados de achievements usam a descrição canônica do requisito real',()=>{
- assert.ok(defs.ACHIEVEMENTS.filter(a=>a.title).length>0);
- assert.match(service,/function titleDefinitions\(\)\{return defs\.ACHIEVEMENTS\.filter\(x=>x\.title\)\.map\(x=>\(\{key:x\.title\.key,name:x\.title\.name,icon:x\.icon,rarity:x\.rarity,description:x\.description,achievementKey:x\.key,target:x\.target\}\)\);\}/);
-});
-
-test('copy genérica antiga não é mais produzida e o scrubber legado continua convertendo caches antigos',()=>{
- const generic=['Título','por','achievement'].join(' ');
- assert.ok(!service.includes(generic));
- assert.match(refinement,/TITLE_DESCRIPTIONS/);
- assert.match(refinement,/node\.nodeValue=title/);
- assert.match(refinement,/p\.textContent=copy/);
-});
-
-test('ordem autoritativa da Home acompanha a sequência atual consolidada',()=>{
- assert.doesNotThrow(()=>new Function(menu));
- const expected=['#marketplace-menu-btn','#friends-menu-btn','[data-panel="cards"]','[data-panel="rank"]','[data-panel="history"]','#notifications-menu-btn','[data-panel="stats"]','#audio-settings-menu-btn','[data-panel="credits"]'];
- let previous=-1;
- for(const selector of expected){const at=menu.indexOf(`'${selector}'`);assert.ok(at>previous,`${selector} fora de ordem`);previous=at;}
- assert.match(menu,/'#friends-menu-btn':'Amigos de Merda'/);
- assert.match(menu,/'\[data-panel="stats"\]':'Estatística'/);
-});
-
-test('P24 não mantém observer concorrente; P27 é o único reconciliador da Home',()=>{
- assert.doesNotMatch(menu,/new MutationObserver/);
- assert.doesNotMatch(menu,/observe\(document\.body/);
- assert.match(p27,/new MutationObserver/);
- assert.match(p27,/mainObserver\?\.disconnect\(\)/);
- assert.match(p27,/mainObserver\.observe\(main,\{childList:true,subtree:true\}\)/);
- assert.doesNotMatch(p27,/observe\(document\.body/);
-});
-
-test('P24 carrega depois do showcase, continua registrado e a versão não regride abaixo de v1.4.24',()=>{
- assert.ok(index.indexOf('js/homeMenuP24.js')>index.indexOf('js/playerShowcaseP20.js'));
- const version=notifications.match(/APP_VERSION='v1\.4\.(\d+)'/);assert.ok(version);assert.ok(Number(version[1])>=24);
- assert.match(notifications,/release:p24/);
-});
+test('títulos derivados de achievements usam a descrição canônica do requisito real',()=>{assert.ok(defs.ACHIEVEMENTS.filter(a=>a.title).length>0);assert.match(service,/function titleDefinitions\(\)\{return defs\.ACHIEVEMENTS\.filter\(x=>x\.title\)\.map\(x=>\(\{key:x\.title\.key,name:x\.title\.name,icon:x\.icon,rarity:x\.rarity,description:x\.description,achievementKey:x\.key,target:x\.target\}\)\);\}/);});
+test('copy genérica antiga não é mais produzida e o scrubber legado continua convertendo caches antigos',()=>{const generic=['Título','por','achievement'].join(' ');assert.ok(!service.includes(generic));assert.match(refinement,/TITLE_DESCRIPTIONS/);assert.match(refinement,/node\.nodeValue=title/);assert.match(refinement,/p\.textContent=copy/);});
+test('ordem autoritativa da Home acompanha a sequência atual consolidada',()=>{assert.doesNotThrow(()=>new Function(menu));const expected=['#marketplace-menu-btn','#friends-menu-btn','[data-panel="cards"]','[data-panel="rank"]','#notifications-menu-btn','[data-panel="history"]','[data-panel="stats"]','#audio-settings-menu-btn','[data-panel="credits"]'];let previous=-1;for(const selector of expected){const at=menu.indexOf(`'${selector}'`);assert.ok(at>previous,`${selector} fora de ordem`);previous=at;}assert.match(menu,/'#friends-menu-btn':'Amigos de Merda'/);assert.match(menu,/'\[data-panel="stats"\]':'Estatística'/);});
+test('P24 não mantém observer concorrente; P27 é o único reconciliador da Home',()=>{assert.doesNotMatch(menu,/new MutationObserver/);assert.doesNotMatch(menu,/observe\(document\.body/);assert.match(p27,/new MutationObserver/);assert.match(p27,/mainObserver\?\.disconnect\(\)/);assert.match(p27,/mainObserver\.observe\(main,\{childList:true,subtree:true\}\)/);assert.doesNotMatch(p27,/observe\(document\.body/);});
+test('P24 carrega depois do showcase, continua registrado e a versão não regride abaixo de v1.4.24',()=>{assert.ok(index.indexOf('js/homeMenuP24.js')>index.indexOf('js/playerShowcaseP20.js'));const version=notifications.match(/APP_VERSION='v1\.4\.(\d+)'/);assert.ok(version);assert.ok(Number(version[1])>=24);assert.match(notifications,/release:p24/);});

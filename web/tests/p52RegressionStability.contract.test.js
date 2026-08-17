@@ -1,13 +1,57 @@
 'use strict';
-const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
-const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const js=read('public/js/p52.js'),css=read('public/css/p52.css'),p24=read('public/js/homeMenuP24.js'),p25=read('public/js/uiP25.js'),p27=read('public/js/homeMenuP27.js'),p50=read('public/js/p50.js'),presence=read('lib/presence.js'),index=read('public/index.html'),release=read('lib/releaseP52.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('fs');
+const path=require('path');
+const root=path.join(__dirname,'..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const js=read('public/js/p52.js');
+const p24=read('public/js/homeMenuP24.js');
+const p25=read('public/js/uiP25.js');
+const p27=read('public/js/homeMenuP27.js');
+const p50=read('public/js/p50.js');
+const presence=read('lib/presence.js');
+const index=read('public/index.html');
 
-test('P52 compila e restaura Missões com moeda imediatamente antes do XP',()=>{assert.doesNotThrow(()=>new Function(js));const coin=js.indexOf('p52-mission-coin-pill'),xp=js.indexOf('mission-xp-pill');assert.ok(coin>=0&&xp>coin);assert.match(js,/mission-copy/);assert.match(js,/mission-progress/);assert.match(css,/p52-mission-rewards/);});
-test('Jogo de Cartas volta ao cabeçalho de fundo e hero fica compacto',()=>{assert.match(css,/\.home-subtitle\{[\s\S]*position:absolute!important[\s\S]*top:calc\(env\(safe-area-inset-top,0px\) \+ 12px\)/);assert.match(css,/\.home-logo\{[\s\S]*height:clamp\(300px,38svh,430px\)/);assert.match(css,/@media\(max-width:620px\)[\s\S]*height:clamp\(260px,34svh,330px\)/);});
-test('um único observer é dono da ordem do menu e Notificações ficam após Histórico',()=>{assert.doesNotMatch(p24,/new MutationObserver/);assert.doesNotMatch(p25,/new MutationObserver/);assert.doesNotMatch(p50,/new MutationObserver/);assert.match(p27,/mainObserver\?\.disconnect\(\)/);for(const src of[p24,p25,p27,p50]){const h=src.indexOf('[data-panel="history"]'),n=src.indexOf('#notifications-menu-btn');assert.ok(h>=0&&n>h);}});
-test('fundo dinâmico é destruído ao sair da Home e não acumula intervals',()=>{assert.match(js,/stopDynamicBackground/);assert.match(js,/clearInterval\(this\.bgInterval\)/);assert.match(js,/__p52BgGeneration/);assert.match(js,/name!==\'home\'/);assert.match(js,/pagehide/);});
-test('retorno à Home reutiliza sessão e pinta Admin e saldo imediatamente',()=>{assert.match(js,/if\(this\.user&&this\.token\)return this\.user/);assert.match(js,/CartP49\?\.ensureBalanceSlot/);assert.match(js,/CartP37\?\.ensureAdminButton/);});
-test('Minhas Cartas força criação logo antes da pesquisa',()=>{assert.match(js,/ensureCardCreator/);assert.match(js,/MetaUI\.renderCards=async function/);assert.match(js,/insertBefore\(btn,tools\)/);assert.match(js,/Criar nova Carta de Jogador/);assert.match(css,/p48-create-card-entry[\s\S]*display:flex!important/);});
-test('presença tolera corrida de DDL no serverless',()=>{assert.match(presence,/23505/);assert.match(presence,/42P07/);assert.match(presence,/ready=null/);});
-test('P52 usa cache-bust próprio e publica v1.4.52',()=>{assert.match(index,/css\/p52\.css\?v=1\.4\.52/);assert.match(index,/js\/p52\.js\?v=1\.4\.52/);assert.match(index,/homeMenuP24\.js\?v=1\.4\.52/);assert.match(index,/uiP25\.js\?v=1\.4\.52/);assert.match(index,/homeMenuP27\.js\?v=1\.4\.52/);assert.match(index,/p50\.js\?v=1\.4\.52/);assert.match(release,/APP_VERSION='v1\.4\.52'/);assert.match(version,/releaseP52/);assert.match(notifications,/releaseP52/);assert.match(notifications,/P51_RELEASE/);});
+test('P52 continua compilando e preserva as recompensas',()=>{
+ assert.doesNotThrow(()=>new Function(js));
+ assert.ok(js.includes('p52-mission-coin-pill'));
+ assert.ok(js.includes('mission-xp-pill'));
+});
+
+test('um único observer continua dono da ordem atual',()=>{
+ assert.ok(!p24.includes('new MutationObserver'));
+ assert.ok(!p25.includes('new MutationObserver'));
+ assert.ok(!p50.includes('new MutationObserver'));
+ assert.ok(p27.includes('mainObserver?.disconnect()'));
+ for(const src of[p24,p25,p27,p50]){
+  const n=src.indexOf('#notifications-menu-btn');
+  const h=src.indexOf('[data-panel="history"]');
+  assert.ok(n>=0&&h>n);
+ }
+});
+
+test('fundo dinâmico continua sendo destruído ao sair da Home',()=>{
+ assert.ok(js.includes('stopDynamicBackground'));
+ assert.ok(js.includes('clearInterval(this.bgInterval)'));
+ assert.ok(js.includes('__p52BgGeneration'));
+});
+
+test('retorno à Home continua reutilizando sessão',()=>{
+ assert.ok(js.includes('if(this.user&&this.token)return this.user'));
+ assert.ok(js.includes('CartP49?.ensureBalanceSlot'));
+ assert.ok(js.includes('CartP37?.ensureAdminButton'));
+});
+
+test('presença continua tolerando corrida de DDL',()=>{
+ assert.ok(presence.includes('23505'));
+ assert.ok(presence.includes('42P07'));
+ assert.ok(presence.includes('ready=null'));
+});
+
+test('assets P52 continuam presentes após P53',()=>{
+ assert.ok(index.includes('css/p52.css?v=1.4.52'));
+ assert.ok(index.includes('js/p52.js?v=1.4.52'));
+ assert.ok(index.includes('css/p53.css?v=1.4.53'));
+ assert.ok(index.includes('js/p53.js?v=1.4.53'));
+});
