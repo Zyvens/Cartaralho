@@ -16,7 +16,7 @@
   CartP37.__p39Guarded=true;
  }
  function installToastCopy(){
-  if(!window.Toast||Toast.__p39CompactReady)return;
+  if(typeof Toast==='undefined'||Toast.__p39CompactReady)return;
   const show=Toast.show.bind(Toast);
   Toast.show=function(message,...args){
    if(message==='Prontidão cancelada. Agora você pode editar suas cartas novamente.')message='Prontidão cancelada. Cartas liberadas para edição.';
