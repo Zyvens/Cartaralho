@@ -2,8 +2,8 @@
 (()=>{
   const ORDER=[
     '#marketplace-menu-btn',
-    '#notifications-menu-btn',
     '#friends-menu-btn',
+    '#notifications-menu-btn',
     '[data-panel="cards"]',
     '[data-panel="rank"]',
     '[data-panel="history"]',
@@ -22,7 +22,10 @@
     const copy=node.querySelector('.home-action-copy b');
     if(copy){if(copy.textContent!==label)copy.textContent=label;return;}
     const icon=(node.textContent||'').trim().match(/^\S+/)?.[0]||'';
-    node.textContent=`${icon?icon+' ':''}${label}`;
+    const pill=node.querySelector('.p48-friends-online-pill');
+    node.childNodes.forEach(n=>{if(n.nodeType===Node.TEXT_NODE)n.remove();});
+    if(!node.querySelector('.home-action-copy'))node.insertAdjacentText('afterbegin',`${icon?icon+' ':''}${label}`);
+    if(pill&&!pill.isConnected)node.appendChild(pill);
   }
 
   function orderHome(){

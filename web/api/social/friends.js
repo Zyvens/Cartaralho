@@ -1,14 +1,18 @@
 const{sql}=require('../../lib/db');
 const{withErrors,ok,fail,getBody}=require('../../lib/http');
 const{requireUser}=require('../../lib/auth');
+const presence=require('../../lib/presence');
 
 module.exports=withErrors(async(req,res)=>{
   const user=await requireUser(req,res);if(!user)return;
   if(req.method==='GET'){
-    const friends=await sql`SELECT f.id,f.updated_at,u.id user_id,u.username,u.display_name,u.avatar_data,u.bio
+    await presence.ensure();
+    const friends=await sql`SELECT f.id,f.updated_at,u.id user_id,u.username,u.display_name,u.avatar_data,u.bio,p.last_seen_at,
+      COALESCE(p.last_seen_at > now() - (${presence.ONLINE_WINDOW_SECONDS} * interval '1 second'),false) AS online
       FROM friendships f JOIN users u ON u.id=CASE WHEN f.user_a=${user.id} THEN f.user_b ELSE f.user_a END
+      LEFT JOIN user_presence p ON p.user_id=u.id
       WHERE (f.user_a=${user.id} OR f.user_b=${user.id}) AND f.status='accepted'
-      ORDER BY lower(u.display_name),lower(u.username)`;
+      ORDER BY online DESC,lower(u.display_name),lower(u.username)`;
     const incoming=await sql`SELECT f.id,f.created_at,u.id user_id,u.username,u.display_name,u.avatar_data
       FROM friendships f JOIN users u ON u.id=f.requested_by
       WHERE (f.user_a=${user.id} OR f.user_b=${user.id}) AND f.status='pending' AND f.requested_by<>${user.id}
@@ -17,7 +21,7 @@ module.exports=withErrors(async(req,res)=>{
       FROM friendships f JOIN users u ON u.id=CASE WHEN f.user_a=${user.id} THEN f.user_b ELSE f.user_a END
       WHERE (f.user_a=${user.id} OR f.user_b=${user.id}) AND f.status='pending' AND f.requested_by=${user.id}
       ORDER BY f.created_at DESC`;
-    return ok(res,{friends,incoming,outgoing});
+    return ok(res,{friends,incoming,outgoing,onlineCount:friends.filter(x=>x.online).length,onlineWindowSeconds:presence.ONLINE_WINDOW_SECONDS});
   }
   if(req.method!=='POST')return fail(res,405,'Método não permitido.');
   const{action,username,friendshipId}=getBody(req);

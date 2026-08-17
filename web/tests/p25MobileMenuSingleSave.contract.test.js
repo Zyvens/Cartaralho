@@ -3,15 +3,15 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const ui=read('public/js/uiP25.js'),index=read('public/index.html'),cards=read('public/js/screens/cardCreation.js'),createApi=read('api/cards/create.js'),notifications=read('lib/appNotifications.js');
 
-test('P25 UI compila e é carregado por último com URL nova para Safari/PWA',()=>{
+test('P25 UI compila e permanece carregado após HomeMenuP24 com cache-bust atualizável',()=>{
  assert.doesNotThrow(()=>new Function(ui));
  assert.match(index,/js\/homeMenuP24\.js/);
- assert.match(index,/js\/uiP25\.js\?v=1\.4\.25/);
- assert.ok(index.indexOf('js/uiP25.js?v=1.4.25')>index.indexOf('js/homeMenuP24.js'));
+ assert.match(index,/js\/uiP25\.js\?v=1\.4\.\d+/);
+ assert.ok(index.indexOf('js/uiP25.js')>index.indexOf('js/homeMenuP24.js'));
 });
 
 test('ordem visual e DOM da Home é autoritativa inclusive no mobile',()=>{
- const expected=['#marketplace-menu-btn','#notifications-menu-btn','#friends-menu-btn','[data-panel="cards"]','[data-panel="rank"]','[data-panel="history"]','[data-panel="stats"]','#audio-settings-menu-btn','[data-panel="credits"]'];
+ const expected=['#marketplace-menu-btn','#friends-menu-btn','#notifications-menu-btn','[data-panel="cards"]','[data-panel="rank"]','[data-panel="history"]','[data-panel="stats"]','#audio-settings-menu-btn','[data-panel="credits"]'];
  let previous=-1;
  for(const selector of expected){const at=ui.indexOf(`'${selector}'`);assert.ok(at>previous,`${selector} fora de ordem`);previous=at;}
  assert.match(ui,/style\.setProperty\('order',String\(index\+1\),'important'\)/);
@@ -38,7 +38,9 @@ test('editor mantém apenas o botão inferior de salvar quando está editável',
 test('decisão de produto preserva criação imediata de cartas como no modelo anterior',()=>{
  assert.match(cards,/AuthClient\.createPaidCard\(/);
  assert.match(cards,/if\(d\.inventory\)this\.cleanInventory=/);
- assert.match(createApi,/result=await cleanCards\.create\(\{userId:user\.id,type:cardType,text:display,matchId:room\.code/);
+ assert.match(createApi,/if\(!libraryMode\)\{/);
+ assert.match(createApi,/matchId=room\.code/);
+ assert.match(createApi,/result=await cleanCards\.create\(\{userId:user\.id,type:cardType,text:display,matchId,creatorName,creationId\}\)/);
  assert.doesNotMatch(createApi,/draft|reservation|reserve/i);
 });
 

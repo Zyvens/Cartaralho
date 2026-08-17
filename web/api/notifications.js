@@ -2,7 +2,8 @@
 const{withErrors,ok,requireMethod}=require('../lib/http');
 const{requireUser}=require('../lib/auth');
 const notifications=require('../lib/appNotifications');
-const{APP_VERSION,RELEASE}=require('../lib/releaseP47');
+const{APP_VERSION,RELEASE}=require('../lib/releaseP48');
+const{RELEASE:P47_RELEASE}=require('../lib/releaseP47');
 const{RELEASE:P46_RELEASE}=require('../lib/releaseP46');
 const{RELEASE:P45_RELEASE}=require('../lib/releaseP45');
 const{RELEASE:P44_RELEASE}=require('../lib/releaseP44');
@@ -18,7 +19,7 @@ module.exports=withErrors(async(req,res)=>{
  const user=await requireUser(req,res);if(!user)return;
  const data=await notifications.center(user.id);
  data.currentVersion=APP_VERSION;
- const blocked=new Set([RELEASE.id,P46_RELEASE.id,P45_RELEASE.id,P44_RELEASE.id,P43_RELEASE.id,P42_RELEASE.id,P41_RELEASE.id,P40_RELEASE.id,P39_RELEASE.id,P38_RELEASE.id,P37_RELEASE.id]);
- data.updates=[RELEASE,P46_RELEASE,P45_RELEASE,P44_RELEASE,P43_RELEASE,P42_RELEASE,P41_RELEASE,P40_RELEASE,P39_RELEASE,P38_RELEASE,P37_RELEASE,...(data.updates||[]).filter(x=>!blocked.has(x.id))];
+ const blocked=new Set([RELEASE.id,P47_RELEASE.id,P46_RELEASE.id,P45_RELEASE.id,P44_RELEASE.id,P43_RELEASE.id,P42_RELEASE.id,P41_RELEASE.id,P40_RELEASE.id,P39_RELEASE.id,P38_RELEASE.id,P37_RELEASE.id]);
+ data.updates=[RELEASE,P47_RELEASE,P46_RELEASE,P45_RELEASE,P44_RELEASE,P43_RELEASE,P42_RELEASE,P41_RELEASE,P40_RELEASE,P39_RELEASE,P38_RELEASE,P37_RELEASE,...(data.updates||[]).filter(x=>!blocked.has(x.id))];
  ok(res,data);
 });
