@@ -2,7 +2,8 @@
 const{withErrors,ok,requireMethod}=require('../lib/http');
 const{requireUser}=require('../lib/auth');
 const notifications=require('../lib/appNotifications');
-const{APP_VERSION,RELEASE}=require('../lib/releaseP53');
+const{APP_VERSION,RELEASE}=require('../lib/releaseP54');
+const{RELEASE:P53_RELEASE}=require('../lib/releaseP53');
 const{RELEASE:P52_RELEASE}=require('../lib/releaseP52');
 const{RELEASE:P51_RELEASE}=require('../lib/releaseP51');
 const{RELEASE:P50_RELEASE}=require('../lib/releaseP50');
@@ -23,6 +24,6 @@ module.exports=withErrors(async(req,res)=>{
  if(!requireMethod(req,res,'GET'))return;
  const user=await requireUser(req,res);if(!user)return;
  const data=await notifications.center(user.id);data.currentVersion=APP_VERSION;
- const releases=[RELEASE,P52_RELEASE,P51_RELEASE,P50_RELEASE,P49_RELEASE,P48_RELEASE,P47_RELEASE,P46_RELEASE,P45_RELEASE,P44_RELEASE,P43_RELEASE,P42_RELEASE,P41_RELEASE,P40_RELEASE,P39_RELEASE,P38_RELEASE,P37_RELEASE];
+ const releases=[RELEASE,P53_RELEASE,P52_RELEASE,P51_RELEASE,P50_RELEASE,P49_RELEASE,P48_RELEASE,P47_RELEASE,P46_RELEASE,P45_RELEASE,P44_RELEASE,P43_RELEASE,P42_RELEASE,P41_RELEASE,P40_RELEASE,P39_RELEASE,P38_RELEASE,P37_RELEASE];
  const blocked=new Set(releases.map(x=>x.id));data.updates=[...releases,...(data.updates||[]).filter(x=>!blocked.has(x.id))];ok(res,data);
 });
