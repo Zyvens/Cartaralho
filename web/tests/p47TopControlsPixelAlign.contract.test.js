@@ -16,11 +16,11 @@ test('transição do app não cria containing block diferente para Voltar',()=>{
  assert.match(css,/#app\.screen-enter:has\(#back-play\.p42-home-back\)/);
 });
 
-test('P47 é a camada final e publica v1.4.47',()=>{
+test('P47 permanece carregado e preservado após releases futuros',()=>{
  assert.match(index,/css\/p47\.css\?v=1\.4\.47/);
  assert.ok(index.indexOf('css/p47.css?v=1.4.47')>index.indexOf('css/p46.css?v=1.4.46'));
  assert.match(release,/APP_VERSION='v1\.4\.47'/);
- assert.match(version,/releaseP47/);
- assert.match(notifications,/releaseP47/);
+ assert.match(notifications,/P47_RELEASE/);
  assert.match(notifications,/P46_RELEASE/);
+ assert.match(version,/releaseP\d+/);
 });
