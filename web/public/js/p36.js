@@ -26,7 +26,8 @@
  };
 
  function normalizeCreate(){
-  document.querySelector('.create-room-screen .how-to-play-card')?.classList.add('room-info-accordion');
+  const oldHow=document.querySelector('.create-room-screen .how-to-play-card');
+  if(oldHow){oldHow.insertAdjacentHTML('beforebegin',RoomRulesUI.howToPlay('create-how-to-play'));oldHow.remove();}
   const old=document.querySelector('.create-room-screen .dashboard-estimate-card');
   if(old&&!old.matches('details')){
    const body=old.querySelector('#preview-economic');
