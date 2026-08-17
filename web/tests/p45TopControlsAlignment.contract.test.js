@@ -30,7 +30,7 @@ test('reciclagem sincroniza imediatamente saldo do Mercado e da Home',()=>{
  assert.match(recycling,/\.home-account-balance/);
  assert.match(recycling,/cartaralho:wallet-updated/);
  assert.match(recycling,/await m\.load\(\);this\.syncBalances\(m\)/);
- assert.match(index,/marketplaceRecycling\.js\?v=1\.4\.45/);
+ assert.match(index,/marketplaceRecycling\.js\?v=1\.4\.(?:4[5-9]|[5-9]\d)/);
 });
 
 test('P45 permanece preservado como camada histórica após releases futuras',()=>{
