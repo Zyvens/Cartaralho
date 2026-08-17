@@ -33,6 +33,18 @@ button[id^='back-']{
   z-index:9600!important;
 }
 
+/* Card de conta da Home: Perfil e Sair acompanham a altura real do quadro de moedas. */
+.home-account-bar #profile-shortcut,
+.home-account-bar #logout-btn{
+  align-self:stretch!important;
+  height:auto!important;
+  min-height:0!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  box-sizing:border-box!important;
+}
+
 /* Toast: nunca força uma única linha maior que a viewport. */
 #toast-container{
   width:min(420px,calc(100vw - 24px))!important;
