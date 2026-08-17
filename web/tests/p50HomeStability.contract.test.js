@@ -1,0 +1,10 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
+const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const css=read('public/css/p50.css'),js=read('public/js/p50.js'),index=read('public/index.html'),release=read('lib/releaseP50.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
+test('Jogo de Cartas volta ao fluxo e hero centraliza Cartaralho',()=>{assert.match(css,/\.home-subtitle\{[\s\S]*position:static!important/);assert.match(css,/\.home-logo\{[\s\S]*height:clamp/);});
+test('Amigos mantém seta à direita e contador antes dela',()=>{assert.match(css,/home-action-arrow[\s\S]*right:20px/);assert.match(css,/p48-friends-online-pill[\s\S]*right:48px/);});
+test('Notificações ficam abaixo de Histórico',()=>{const h=js.indexOf("[data-panel=\"history\"]"),n=js.indexOf("#notifications-menu-btn");assert.ok(h>=0&&n>h);});
+test('Minhas Cartas garante entrada de criação',()=>{assert.match(js,/ensureCardCreator/);assert.match(js,/Criar nova Carta de Jogador/);assert.match(js,/openLibraryCreator/);});
+test('P50 reduz reinicialização recorrente de presença',()=>{assert.match(js,/__p50Started/);assert.match(js,/document\.hidden/);});
+test('P50 é carregado e publica v1.4.50',()=>{assert.match(index,/css\/p50\.css\?v=1\.4\.50/);assert.match(index,/js\/p50\.js\?v=1\.4\.50/);assert.match(release,/APP_VERSION='v1\.4\.50'/);assert.match(version,/releaseP50/);assert.match(notifications,/releaseP50/);assert.match(notifications,/P49_RELEASE/);});
