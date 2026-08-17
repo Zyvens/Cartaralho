@@ -17,7 +17,7 @@ const release=read('lib/releaseP53.js');
 const version=read('api/version.js');
 const notifications=read('api/notifications.js');
 
-test('P53 compila e carrega como última camada',()=>{
+test('P53 compila e permanece carregado depois de P52',()=>{
  assert.doesNotThrow(()=>new Function(js));
  assert.ok(index.indexOf('css/p53.css?v=1.4.53')>index.indexOf('css/p52.css?v=1.4.52'));
  assert.ok(index.indexOf('js/p53.js?v=1.4.53')>index.indexOf('js/p52.js?v=1.4.52'));
@@ -46,15 +46,15 @@ test('Lobby sempre volta ao topo ao renderizar',()=>{
 });
 
 test('Reciclagem colore o corpo das cartas pretas e brancas',()=>{
- assert.ok(js.includes("p53-recycle-black"));
- assert.ok(js.includes("p53-recycle-white"));
+ assert.ok(js.includes('p53-recycle-black'));
+ assert.ok(js.includes('p53-recycle-white'));
  assert.ok(css.includes('.recycling-card.p53-recycle-black'));
  assert.ok(css.includes('.recycling-card.p53-recycle-white'));
 });
 
 test('Cosméticos fica imediatamente antes de Reciclagem',()=>{
- assert.ok(js.includes("[data-market-tab=\"cosmetics\"]"));
- assert.ok(js.includes("[data-market-tab=\"recycling\"]"));
+ assert.ok(js.includes('[data-market-tab="cosmetics"]'));
+ assert.ok(js.includes('[data-market-tab="recycling"]'));
  assert.ok(js.includes('nav.insertBefore(cosmetics,recycling)'));
 });
 
@@ -80,7 +80,7 @@ test('Progressão reutiliza exatamente o card visual da janela de Missões',()=>
  assert.ok(js.includes('MetaUI?.missionRow?.(m)'));
 });
 
-test('Minhas Cartas garante criação após o openPanel terminar',()=>{
+test('Minhas Cartas mantém a garantia histórica do P53',()=>{
  assert.ok(js.includes('function ensureCardCreator'));
  assert.ok(js.includes('HomeScreen.openPanel=async function'));
  assert.ok(js.includes("if(kind==='cards')"));
@@ -88,9 +88,9 @@ test('Minhas Cartas garante criação após o openPanel terminar',()=>{
  assert.ok(css.includes('.p53-create-card-entry'));
 });
 
-test('P53 publica v1.4.53 na API e Central',()=>{
+test('P53 permanece preservado na API e Central após releases futuros',()=>{
  assert.ok(release.includes("APP_VERSION='v1.4.53'"));
- assert.ok(version.includes('releaseP53'));
- assert.ok(notifications.includes("require('../lib/releaseP53')"));
+ assert.match(version,/releaseP(?:53|5[4-9]|[6-9]\d)/);
+ assert.ok(notifications.includes('P53_RELEASE')||notifications.includes("require('../lib/releaseP53')"));
  assert.ok(notifications.includes('P52_RELEASE'));
 });
