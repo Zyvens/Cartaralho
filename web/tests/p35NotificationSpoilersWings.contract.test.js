@@ -27,7 +27,7 @@ test('Spoilers têm cabeçalho, contagem, seta e conteúdo abaixo',()=>{
  assert.match(css,/\.notifications-spoiler-content\{padding:12px!important\}/);
 });
 
-test('P35 é carregado por último com cache-busting',()=>{
+test('P35 permanece carregado após P34 com cache-busting próprio',()=>{
  assert.match(index,/css\/p35\.css\?v=1\.4\.35/);
  assert.match(index,/js\/p35\.js\?v=1\.4\.35/);
  assert.match(index,/js\/notificationsUI\.js\?v=1\.4\.35/);
@@ -35,8 +35,7 @@ test('P35 é carregado por último com cache-busting',()=>{
  assert.ok(index.indexOf('js/p35.js?v=1.4.35')>index.indexOf('js/p34.js?v=1.4.34'));
 });
 
-test('Central publica a versão P35 e registra as versões recentes',()=>{
- assert.match(notifications,/APP_VERSION='v1\.4\.35'/);
+test('Central mantém o release P35 e o histórico recente',()=>{
  assert.match(notifications,/release:p35/);
  assert.match(notifications,/release:p34/);
  assert.match(notifications,/release:p33/);
