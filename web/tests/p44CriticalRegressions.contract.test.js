@@ -26,10 +26,10 @@ test('reciclagem tipa parâmetros usados em jsonb_build_object',()=>{
  assert.match(recycling,/\$\{reward\}::int/);
 });
 
-test('P44 publica versão e força asset corrigido do P41',()=>{
+test('P44 permanece publicado e preservado após releases futuros',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.44'/);
- assert.match(version,/releaseP44/);
  assert.match(notifications,/releaseP44/);
  assert.match(index,/css\/p44\.css\?v=1\.4\.44/);
  assert.match(index,/js\/p41\.js\?v=1\.4\.44/);
+ assert.match(version,/releaseP\d+/);
 });
