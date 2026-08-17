@@ -2,7 +2,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const defs=require('../lib/achievementDefinitions');
-const service=read('lib/achievementService.js'),refinement=read('public/js/refinementP13.js'),menu=read('public/js/homeMenuP24.js'),index=read('public/index.html'),notifications=read('lib/appNotifications.js');
+const service=read('lib/achievementService.js'),refinement=read('public/js/refinementP13.js'),menu=read('public/js/homeMenuP24.js'),p27=read('public/js/homeMenuP27.js'),index=read('public/index.html'),notifications=read('lib/appNotifications.js');
 
 test('títulos derivados de achievements usam a descrição canônica do requisito real',()=>{
  assert.ok(defs.ACHIEVEMENTS.filter(a=>a.title).length>0);
@@ -17,19 +17,22 @@ test('copy genérica antiga não é mais produzida e o scrubber legado continua 
  assert.match(refinement,/p\.textContent=copy/);
 });
 
-test('ordem autoritativa da Home segue exatamente a sequência solicitada',()=>{
+test('ordem autoritativa da Home acompanha a sequência atual consolidada',()=>{
  assert.doesNotThrow(()=>new Function(menu));
- const expected=['#marketplace-menu-btn','#notifications-menu-btn','#friends-menu-btn','[data-panel="cards"]','[data-panel="rank"]','[data-panel="history"]','[data-panel="stats"]','#audio-settings-menu-btn','[data-panel="credits"]'];
+ const expected=['#marketplace-menu-btn','#friends-menu-btn','[data-panel="cards"]','[data-panel="rank"]','[data-panel="history"]','#notifications-menu-btn','[data-panel="stats"]','#audio-settings-menu-btn','[data-panel="credits"]'];
  let previous=-1;
  for(const selector of expected){const at=menu.indexOf(`'${selector}'`);assert.ok(at>previous,`${selector} fora de ordem`);previous=at;}
  assert.match(menu,/'#friends-menu-btn':'Amigos de Merda'/);
  assert.match(menu,/'\[data-panel="stats"\]':'Estatística'/);
 });
 
-test('ordenação reage somente dentro da grade de atalhos e não observa o body inteiro',()=>{
- assert.match(menu,/obs\.observe\(actions,\{childList:true\}\)/);
+test('P24 não mantém observer concorrente; P27 é o único reconciliador da Home',()=>{
+ assert.doesNotMatch(menu,/new MutationObserver/);
  assert.doesNotMatch(menu,/observe\(document\.body/);
- assert.match(menu,/if\(!already\)nodes\.forEach\(node=>actions\.appendChild\(node\)\)/);
+ assert.match(p27,/new MutationObserver/);
+ assert.match(p27,/mainObserver\?\.disconnect\(\)/);
+ assert.match(p27,/mainObserver\.observe\(main,\{childList:true,subtree:true\}\)/);
+ assert.doesNotMatch(p27,/observe\(document\.body/);
 });
 
 test('P24 carrega depois do showcase, continua registrado e a versão não regride abaixo de v1.4.24',()=>{

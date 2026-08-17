@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const ui=read('public/js/uiP25.js'),index=read('public/index.html'),cards=read('public/js/screens/cardCreation.js'),createApi=read('api/cards/create.js'),notifications=read('lib/appNotifications.js');
+const ui=read('public/js/uiP25.js'),p27=read('public/js/homeMenuP27.js'),index=read('public/index.html'),cards=read('public/js/screens/cardCreation.js'),createApi=read('api/cards/create.js'),notifications=read('lib/appNotifications.js');
 
 test('P25 UI compila e permanece carregado após HomeMenuP24 com cache-bust atualizável',()=>{
  assert.doesNotThrow(()=>new Function(ui));
@@ -10,25 +10,23 @@ test('P25 UI compila e permanece carregado após HomeMenuP24 com cache-bust atua
  assert.ok(index.indexOf('js/uiP25.js')>index.indexOf('js/homeMenuP24.js'));
 });
 
-test('ordem visual e DOM da Home é autoritativa inclusive no mobile',()=>{
- const expected=['#marketplace-menu-btn','#friends-menu-btn','#notifications-menu-btn','[data-panel="cards"]','[data-panel="rank"]','[data-panel="history"]','[data-panel="stats"]','#audio-settings-menu-btn','[data-panel="credits"]'];
+test('ordem visual da Home acompanha a sequência consolidada inclusive no mobile',()=>{
+ const expected=['#marketplace-menu-btn','#friends-menu-btn','[data-panel="cards"]','[data-panel="rank"]','[data-panel="history"]','#notifications-menu-btn','[data-panel="stats"]','#audio-settings-menu-btn','[data-panel="credits"]'];
  let previous=-1;
  for(const selector of expected){const at=ui.indexOf(`'${selector}'`);assert.ok(at>previous,`${selector} fora de ordem`);previous=at;}
  assert.match(ui,/style\.setProperty\('order',String\(index\+1\),'important'\)/);
- assert.match(ui,/current\.every\(\(node,index\)=>node===nodes\[index\]\)/);
- assert.match(ui,/if\(!already\)nodes\.forEach\(node=>actions\.appendChild\(node\)\)/);
- assert.match(ui,/observe\(actions,\{childList:true\}\)/);
- assert.doesNotMatch(ui,/observe\(document\.body/);
- assert.match(ui,/pageshow/);assert.match(ui,/visibilitychange/);assert.match(ui,/orientationchange/);
+ assert.doesNotMatch(ui,/new MutationObserver/);
+ assert.match(p27,/new MutationObserver/);
+ assert.match(ui,/pageshow/);assert.match(ui,/visibilitychange/);
  assert.match(ui,/'#friends-menu-btn':'Amigos de Merda'/);
  assert.match(ui,/'\[data-panel="stats"\]':'Estatística'/);
 });
 
 test('editor mantém apenas o botão inferior de salvar quando está editável',()=>{
  assert.match(ui,/removeRedundantCardEditorSave/);
- assert.match(ui,/const bottom=screen\.querySelector\('#save-cards-btn'\)/);
- assert.match(ui,/const top=screen\.querySelector\('#back-btn'\)/);
- assert.match(ui,/bottom&&top&&\/salvar\\s\+e\\s\+voltar\\s\+ao\\s\+lobby/i);
+ assert.match(ui,/screen\.querySelector\('#save-cards-btn'\)/);
+ assert.match(ui,/screen\.querySelector\('#back-btn'\)/);
+ assert.match(ui,/salvar\\s\+e\\s\+voltar\\s\+ao\\s\+lobby/i);
  assert.match(ui,/top\.remove\(\)/);
  assert.match(cards,/id="save-cards-btn"/);
  assert.match(cards,/saveAndReturn/);

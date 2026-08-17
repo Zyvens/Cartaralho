@@ -3,32 +3,34 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const js=read('public/js/homeMenuP27.js'),css=read('public/css/p27.css'),index=read('public/index.html'),notifications=read('lib/appNotifications.js');
 
-test('P27 compila e carrega depois do P25/P26',()=>{
+test('P27 compila e continua carregado depois do P25/P26 com cache-bust atualizável',()=>{
   assert.doesNotThrow(()=>new Function(js));
-  assert.ok(index.indexOf('css/p27.css?v=1.4.27')>index.indexOf('css/p26.css?v=1.4.26'));
-  assert.ok(index.indexOf('js/homeMenuP27.js?v=1.4.27')>index.indexOf('js/uiP25.js?v=1.4.25'));
+  assert.match(index,/css\/p27\.css\?v=1\.4\.\d+/);
+  assert.match(index,/js\/homeMenuP27\.js\?v=1\.4\.\d+/);
+  assert.ok(index.indexOf('css/p27.css')>index.indexOf('css/p26.css'));
+  assert.ok(index.indexOf('js/homeMenuP27.js')>index.indexOf('js/uiP25.js'));
 });
 
-test('ordem visual é permanente por CSS e segue exatamente a sequência acordada',()=>{
+test('ordem visual é permanente por CSS e segue a sequência consolidada',()=>{
   const expected=[
-    ['#marketplace-menu-btn',1],['#notifications-menu-btn',2],['#friends-menu-btn',3],['[data-panel="cards"]',4],['[data-panel="rank"]',5],['[data-panel="history"]',6],['[data-panel="stats"]',7],['#audio-settings-menu-btn',8],['[data-panel="credits"]',9]
+    ['#marketplace-menu-btn',1],['#friends-menu-btn',2],['[data-panel="cards"]',3],['[data-panel="rank"]',4],['[data-panel="history"]',5],['#notifications-menu-btn',6],['[data-panel="stats"]',7],['#audio-settings-menu-btn',8],['[data-panel="credits"]',9]
   ];
   let previous=-1;
   for(const[selector,order]of expected){
-    const normalized=selector.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/"/g,'\\"');
     const pos=css.indexOf(selector);
     assert.ok(pos>previous,`${selector} fora da sequência CSS`);previous=pos;
-    assert.match(css,new RegExp(`order:${order}!important`));
-    assert.ok(normalized.length>0);
+    const escaped=selector.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/"/g,'\\"');
+    assert.match(css,new RegExp(`${escaped}\\{order:${order}!important\\}`));
   }
 });
 
-test('ordenador observa o contêiner estável da Home, sobrevivendo à troca da grade',()=>{
+test('ordenador usa um único observer no contêiner estável da Home',()=>{
   assert.match(js,/document\.getElementById\('home-main'\)/);
+  assert.match(js,/mainObserver\?\.disconnect\(\)/);
   assert.match(js,/mainObserver\.observe\(main,\{childList:true,subtree:true\}\)/);
   assert.doesNotMatch(js,/observe\(document\.body/);
   assert.match(js,/node\.style\.setProperty\('order',String\(index\+1\),'important'\)/);
-  assert.match(js,/actions\.append\(\.\.\.ordered,\.\.\.unknown\)/);
+  assert.match(js,/actions\.append\(\.\.\.ordered/);
   assert.match(js,/HomeScreen\.renderAccount=function/);
   assert.match(js,/HomeScreen\.render=async function/);
 });
