@@ -14,6 +14,15 @@
   font-weight:700!important;
   line-height:1.2!important;
 }
+.creator-admin-head small{font-size:0!important}
+.creator-admin-head small::after{
+  content:'admin • VitorIvens';
+  display:block;
+  color:#facc15;
+  font-size:.68rem;
+  font-weight:900;
+  letter-spacing:.1em;
+}
 
 /* Card da conta: controles permanecem na mesma linha no celular. */
 .home-account-bar{
