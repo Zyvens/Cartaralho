@@ -1,0 +1,73 @@
+/* P39 — navegação consistente, Admin só no menu principal e toasts seguros no mobile. */
+
+/* Todos os botões Voltar seguem o mesmo envelope visual do pill Missões. */
+button.back-button,
+button.ghost-back,
+button[id^='back-']{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  width:max-content!important;
+  min-width:0!important;
+  min-height:40px!important;
+  padding:10px 14px!important;
+  border:1px solid rgba(255,255,255,.15)!important;
+  border-radius:999px!important;
+  background:#161621!important;
+  color:#fff!important;
+  box-shadow:0 8px 30px rgba(0,0,0,.35)!important;
+  font:700 .9rem/1 var(--font-display)!important;
+  white-space:nowrap!important;
+  text-decoration:none!important;
+}
+
+/* Etapa de apelido: Voltar no mesmo topo esquerdo das demais telas. */
+#play-form>#back-play{
+  position:fixed!important;
+  top:calc(env(safe-area-inset-top,0px) + 12px)!important;
+  left:12px!important;
+  right:auto!important;
+  bottom:auto!important;
+  margin:0!important;
+  z-index:9600!important;
+}
+
+/* Toast: nunca força uma única linha maior que a viewport. */
+#toast-container{
+  width:min(420px,calc(100vw - 24px))!important;
+  max-width:calc(100vw - 24px)!important;
+}
+.toast{
+  width:auto!important;
+  max-width:100%!important;
+  min-width:0!important;
+  align-items:flex-start!important;
+  padding:.78rem .95rem!important;
+  white-space:normal!important;
+}
+.toast-icon{flex:none;line-height:1.35}
+.toast-message{
+  display:block;
+  min-width:0;
+  max-width:100%;
+  line-height:1.38;
+  overflow-wrap:anywhere;
+  word-break:normal;
+  white-space:normal!important;
+}
+
+@media(max-width:620px){
+  button.back-button,
+  button.ghost-back,
+  button[id^='back-']{
+    min-height:40px!important;
+    padding:10px 14px!important;
+    font-size:.9rem!important;
+  }
+  #play-form>#back-play{
+    top:calc(env(safe-area-inset-top,0px) + 9px)!important;
+    left:10px!important;
+  }
+  #toast-container{width:calc(100vw - 20px)!important;max-width:calc(100vw - 20px)!important}
+}
