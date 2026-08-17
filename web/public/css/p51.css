@@ -1,0 +1,56 @@
+/* P51 — alinhamento da identidade e hierarquia compacta da Central de Notificações. */
+
+/* Card da conta: @usuário e título começam no mesmo eixo esquerdo do nome. */
+.home-account-bar .home-account-identity>span,
+.home-account-bar .home-account-identity>.account-equipped-title{
+  text-align:left!important;
+}
+.home-account-bar .home-account-identity>.account-equipped-title{
+  align-self:flex-start!important;
+}
+
+/* Central: título, novidade, registros e seta ficam em uma única linha coerente. */
+.notifications-spoiler-summary{
+  justify-content:flex-start!important;
+  gap:12px!important;
+}
+.notifications-spoiler-heading{
+  order:1;
+  flex:1 1 auto!important;
+  min-width:0!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.notifications-spoiler-summary>.notifications-section-new{
+  order:2;
+  flex:none!important;
+  margin:0!important;
+}
+.notifications-spoiler-meta{
+  order:3;
+  flex:0 0 118px!important;
+  width:118px!important;
+  justify-content:flex-end!important;
+  gap:10px!important;
+}
+.notifications-spoiler-meta small{
+  display:block!important;
+  width:76px!important;
+  text-align:right!important;
+  white-space:nowrap!important;
+}
+.notifications-spoiler-chevron{
+  flex:0 0 30px!important;
+  width:30px!important;
+  height:30px!important;
+}
+
+@media(max-width:620px){
+  .notifications-spoiler-summary{gap:8px!important;padding-left:11px!important;padding-right:11px!important}
+  .notifications-spoiler-heading{font-size:.82rem!important}
+  .notifications-spoiler-summary>.notifications-section-new{font-size:.6rem!important;padding:2px 6px!important;min-height:20px!important}
+  .notifications-spoiler-meta{flex-basis:100px!important;width:100px!important;gap:7px!important}
+  .notifications-spoiler-meta small{width:66px!important;font-size:.58rem!important}
+  .notifications-spoiler-chevron{flex-basis:27px!important;width:27px!important;height:27px!important}
+}
