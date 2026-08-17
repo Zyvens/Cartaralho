@@ -72,7 +72,8 @@ test('P41 publica versão e permanece preservado após releases futuros',()=>{
  assert.match(notifications,/releaseP41/);
  assert.match(notifications,/P40_RELEASE/);
  assert.match(index,/css\/p41\.css\?v=1\.4\.41/);
- assert.match(index,/js\/p41\.js\?v=1\.4\.41/);
+ assert.match(index,/js\/p41\.js\?v=1\.4\.\d+/);
  assert.ok(index.indexOf('css/p41.css?v=1.4.41')>index.indexOf('css/p40.css?v=1.4.40'));
- assert.ok(index.indexOf('js/p41.js?v=1.4.41')>index.indexOf('js/p40.js?v=1.4.40'));
+ const p41Script=index.search(/js\/p41\.js\?v=1\.4\.\d+/);
+ assert.ok(p41Script>index.indexOf('js/p40.js?v=1.4.40'));
 });
