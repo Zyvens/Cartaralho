@@ -30,7 +30,7 @@ test('megafone global funciona fora de salas e aviso de versão pede reinício',
 test('ferramentas do Criador são exclusivas do user_id 1 no cliente e no servidor',()=>{
  assert.match(js,/Number\(AuthClient\.user\?\.id\)===1/);
  assert.match(server,/CREATOR_ADMIN_USER_ID=1/);
- assert.match(server,/Number\(user\.id\\)!==CREATOR_ADMIN_USER_ID|Number\(user\.id\)!==CREATOR_ADMIN_USER_ID/);
+ assert.ok(server.includes('Number(user.id)!==CREATOR_ADMIN_USER_ID'));
  assert.match(api,/requireCreatorAdmin/);
  assert.match(css,/#home-admin-btn\{display:none!important\}/);
  assert.match(css,/\.creator-admin-fab\{/);
@@ -46,7 +46,7 @@ test('créditos administrativos são transacionais e idempotentes',()=>{
  assert.match(server,/sql\.transaction/);
  assert.match(server,/idempotency_key/);
  assert.match(server,/ON CONFLICT\(idempotency_key\) DO NOTHING/);
- assert.match(server,/transaction_type.*adjustment|\'adjustment\'/);
+ assert.ok(server.includes("'adjustment'"));
  assert.match(server,/admin:\$\{operationId\}:\$\{id\}/);
  assert.match(server,/isolationMode:'Serializable'/);
 });
