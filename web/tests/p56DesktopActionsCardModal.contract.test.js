@@ -1,0 +1,56 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
+const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const js=read('public/js/p56.js'),css=read('public/css/p56.css'),index=read('public/index.html'),release=read('lib/releaseP56.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
+
+test('P56 compila e é a última camada de interface',()=>{
+ assert.doesNotThrow(()=>new Function(js));
+ assert.ok(index.indexOf('css/p56.css?v=1.4.56')>index.indexOf('css/p55.css?v=1.4.55'));
+ assert.ok(index.indexOf('js/p56.js?v=1.4.56')>index.indexOf('js/p55.js?v=1.4.55'));
+});
+
+test('Perfil e Sair viram ações de conta próprias no desktop',()=>{
+ assert.match(js,/p56-account-actions/);
+ assert.match(js,/p56-profile-action/);
+ assert.match(js,/Conta e aparência/);
+ assert.match(js,/p56-logout-action/);
+ assert.match(js,/Encerrar sessão/);
+ assert.match(css,/@media\(min-width:621px\)/);
+ assert.match(css,/\.home-account-bar \.p56-account-action[\s\S]*min-width:142px!important/);
+ assert.match(css,/\.home-account-bar \.p56-logout-action[\s\S]*border-color:rgba\(248,113,113/);
+});
+
+test('Minhas Cartas possui um único renderer para todos os caminhos históricos',()=>{
+ assert.match(js,/ProfessionalUI\.renderCards=\(panel,\.\.\.args\)=>Library\.render/);
+ assert.match(js,/HomeScreen\.renderCards=\(panel,\.\.\.args\)=>Library\.render/);
+ assert.match(js,/MetaUI\.renderCards=\(panel,\.\.\.args\)=>Library\.render/);
+ assert.doesNotMatch(js,/Modal\.show\(/);
+ assert.match(js,/Detail\.open\(c\)/);
+});
+
+test('Ficha P56 elimina os overlays concorrentes e fica definitivamente acima do AppPanel',()=>{
+ assert.match(js,/p41-card-detail-overlay/);
+ assert.match(js,/p55-card-detail-overlay/);
+ assert.match(js,/p56-card-detail-overlay/);
+ assert.match(css,/\.p56-card-detail-overlay[\s\S]*z-index:65000/);
+ assert.match(js,/Ficha da carta/);
+ assert.match(js,/Do uso ao prestígio/);
+ assert.match(js,/Histórico da carta/);
+});
+
+test('Ficha reduz texto corrido e expõe metas e origem como dados visuais',()=>{
+ assert.match(js,/p56-progress-metric/);
+ assert.match(js,/\+\$\{fmt\(remaining\)\} → \$\{tier\(next\)\}/);
+ assert.match(js,/MESAS VISITADAS/);
+ assert.match(js,/PESSOAS QUE POSSUEM/);
+ assert.match(js,/PRIMEIRA MESA/);
+ assert.match(js,/CardComponent\._formatBlackText/);
+ assert.match(css,/\.p56-origin-grid\{display:grid/);
+});
+
+test('P56 publica v1.4.56 e mantém P55 na Central',()=>{
+ assert.match(release,/APP_VERSION='v1\.4\.56'/);
+ assert.match(version,/releaseP56/);
+ assert.match(notifications,/releaseP56/);
+ assert.match(notifications,/P55_RELEASE/);
+});
