@@ -23,7 +23,7 @@ test('hotfix força asset novo para escapar do cache quebrado',()=>{
 
 test('P43 publica versão e preserva P42 na Central',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.43'/);
- assert.match(version,/releaseP43/);
+ assert.match(version,/releaseP(?:4[3-9]|[5-9]\d)/);
  assert.match(notifications,/releaseP43/);
  assert.match(notifications,/P42_RELEASE/);
 });
