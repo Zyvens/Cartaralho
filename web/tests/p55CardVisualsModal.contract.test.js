@@ -39,9 +39,9 @@ test('Detalhe apresenta a carta real, evolução e origem em linguagem visual pr
  assert.doesNotMatch(js,/rarityExplanation/);
 });
 
-test('P55 publica v1.4.55 e preserva P54 na Central',()=>{
+test('P55 permanece no histórico após releases posteriores',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.55'/);
- assert.match(version,/releaseP55/);
- assert.match(notifications,/releaseP55/);
+ assert.match(version,/releaseP\d+/);
+ assert.match(notifications,/P55_RELEASE/);
  assert.match(notifications,/P54_RELEASE/);
 });
