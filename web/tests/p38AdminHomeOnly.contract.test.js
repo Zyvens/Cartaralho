@@ -20,18 +20,19 @@ test('navegação remove o pill e o modal administrativo fora da Home',()=>{
  assert.match(js,/scheduleEnforcement\(\)/);
 });
 
-test('P38 usa cache-bust novo e não é confundido com atualização pendente após reload',()=>{
+test('P38 permanece carregado no histórico de camadas',()=>{
  assert.match(js,/VERSION='v1\.4\.38'/);
  assert.match(js,/sessionStorage\.setItem\(`cartaralho_update_notice_\$\{VERSION\}`,'1'\)/);
  assert.match(index,/js\/p38\.js\?v=1\.4\.38/);
  assert.ok(index.indexOf('js/p38.js?v=1.4.38')>index.indexOf('js/p37.js?v=1.4.37'));
 });
 
-test('endpoint e Central publicam P38 preservando P37',()=>{
+test('release P38 permanece preservado na Central mesmo quando o endpoint avança',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.38'/);
  assert.match(release,/release:p38/);
- assert.match(version,/releaseP38/);
+ assert.match(version,/releaseP\d+/);
  assert.match(notifications,/releaseP38/);
  assert.match(notifications,/releaseP37/);
+ assert.match(notifications,/P38_RELEASE/);
  assert.match(notifications,/P37_RELEASE/);
 });
