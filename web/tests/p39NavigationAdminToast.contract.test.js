@@ -40,16 +40,16 @@ test('toasts longos quebram linha e o aviso de prontidão fica compacto',()=>{
  assert.ok(!js.includes('window.Toast'));
 });
 
-test('P39 publica versão e preserva P38/P37 na Central',()=>{
+test('P39 permanece publicado no histórico após versões futuras',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.39'/);
  assert.match(release,/release:p39/);
- assert.match(version,/releaseP39/);
+ assert.match(version,/releaseP\d+/);
  assert.match(notifications,/releaseP39/);
  assert.match(notifications,/releaseP38/);
  assert.match(notifications,/releaseP37/);
 });
 
-test('P39 é carregado como camada final com cache-busting',()=>{
+test('P39 continua carregado antes das camadas posteriores',()=>{
  assert.match(index,/css\/p39\.css\?v=1\.4\.39/);
  assert.match(index,/js\/p39\.js\?v=1\.4\.39/);
  assert.ok(index.indexOf('css/p39.css?v=1.4.39')>index.indexOf('css/p37.css?v=1.4.37'));
