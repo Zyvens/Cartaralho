@@ -21,7 +21,7 @@
    let badge=identity.querySelector('.account-equipped-title');
    if(title){
     if(!badge){badge=document.createElement('small');badge.className='account-equipped-title equipped-title public-equipped-title';identity.appendChild(badge);}
-    badge.dataset.titleKey=title;badge.textContent=titleName(title);
+    const label=titleName(title);badge.dataset.titleKey=title;if(badge.textContent!==label)badge.textContent=label;
    }else badge?.remove();
   }
 
