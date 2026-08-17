@@ -19,7 +19,7 @@ const DEFAULTS={
     {key:'insana',min:3,label:'Insana',icon:'☠️',duration:'muito longa'}
   ],
   loot:{placementBase:[10,7,5],otherBase:3},
-  recycling:{batchSize:10,rewardPerBatch:250},
+  recycling:{rewardPerCard:25},
   bestWorld:{winsLog:2,winRate:3,minWinRateUses:5,presenceLog:1.3,adoptionsLog:1.5,reachLog:1.1,ageLog:.5,ageSeconds:2592000}
 };
 
