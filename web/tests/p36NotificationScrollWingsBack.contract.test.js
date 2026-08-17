@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const css=read('public/css/p36.css'),js=read('public/js/p36.js'),rules=read('public/js/roomRulesUI.js'),index=read('public/index.html'),notifications=read('lib/appNotifications.js');
+const css=read('public/css/p36.css'),js=read('public/js/p36.js'),rules=read('public/js/roomRulesUI.js'),create=read('public/js/screens/createRoom.js'),index=read('public/index.html'),notifications=read('lib/appNotifications.js');
 
 test('P36 JS crítico compila',()=>assert.doesNotThrow(()=>new Function(js)));
 
@@ -37,14 +37,18 @@ test('Como Jogar também aparece no Lobby e a estimativa usa mesa cheia',()=>{
  assert.match(js,/RewardPreviewUI\.card\(full,'Estimativa para mesa cheia'/);
 });
 
-test('Como Jogar explica a partida em linguagem de jogador',()=>{
- for(const trecho of['Objetivo da partida','Como funciona uma rodada','Sua mão de cartas','Cartas de Jogador','Recompensas','Espólio','BUFFs','Narrador e inatividade'])assert.ok(js.includes(trecho),trecho);
- assert.doesNotMatch(js,/Reward Engine|server-side|snapshot econômico|liquidação/i);
+test('Como Jogar é o mesmo guia na criação e no Lobby',()=>{
+ assert.match(js,/oldHow\.insertAdjacentHTML\('beforebegin',RoomRulesUI\.howToPlay/);
+ for(const trecho of['Objetivo da partida','Como funciona uma rodada','Sua mão de cartas','Cartas de Jogador','Recompensas','Espólio','BUFFs','Narrador e inatividade']){
+  assert.ok(js.includes(trecho),`P36:${trecho}`);
+  assert.ok(create.includes(trecho),`createRoom:${trecho}`);
+ }
+ assert.doesNotMatch(`${js}\n${create}`,/Reward Engine|server-side|snapshot econômico|liquidação|participação efetiva/i);
 });
 
 test('Configurações explicam o efeito prático de cada opção',()=>{
  for(const trecho of['quantas pessoas podem entrar','partida termina quando alguém alcança','quantas Cartas Brancas cada jogador terá','cartas salvas pelo criador','Cada nova carta consome 1 Carta Limpa','cartas personalizadas que já fazem parte da sua coleção','vantagens consumíveis compradas no Mercado Paralelo','ler em voz alta','voltar usando o código da mesa'])assert.ok(rules.includes(trecho),trecho);
- assert.doesNotMatch(rules,/Reward Engine|server-side|snapshot econômico|liquidação/i);
+ assert.doesNotMatch(rules,/Reward Engine|server-side|snapshot econômico|liquidação|participação efetiva/i);
 });
 
 test('P36 é a camada final publicada',()=>{
