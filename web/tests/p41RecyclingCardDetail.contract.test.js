@@ -50,12 +50,19 @@ test('Minhas Cartas usa detalhe dedicado acima do painel e sem Modal genérico r
  assert.match(css,/p41-card-detail-shell/);
 });
 
-test('Admin tem simetria com Missões e menu usa admin • VitorIvens',()=>{
+test('Admin tem simetria com Missões e menu mostra admin • VitorIvens',()=>{
  assert.match(css,/\.creator-admin-fab,\.mission-fab/);
  assert.match(css,/min-height:44px!important/);
  assert.match(css,/padding:10px 14px!important/);
- assert.match(js,/ADMIN • VitorIvens/);
- assert.doesNotMatch(js,/USER_ID 1 · VITORIVENS/);
+ assert.match(css,/content:'admin • VitorIvens'/);
+});
+
+test('card da conta não quebra Perfil e Sair para uma segunda linha no mobile',()=>{
+ assert.match(css,/\.home-account-bar\{[\s\S]*flex-wrap:nowrap!important/);
+ assert.match(css,/\.home-account-bar \.home-account-balance\{[\s\S]*padding-left:8px!important/);
+ assert.match(css,/@media\(max-width:620px\)[\s\S]*min-width:82px!important;max-width:104px!important;padding:0 6px!important/);
+ assert.match(css,/flex-basis:44px!important;width:44px!important;min-width:44px!important/);
+ assert.match(css,/text-overflow:ellipsis!important/);
 });
 
 test('P41 publica versão e carrega como camada final',()=>{
