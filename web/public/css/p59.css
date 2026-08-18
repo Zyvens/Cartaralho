@@ -1,0 +1,89 @@
+/* P59 — lacuna contínua e cartas compactas 1:1. */
+
+/*
+ * A marcação continua semanticamente sendo "___", mas a representação visual
+ * ocupa exatamente o comprimento de três underscores como uma linha única.
+ * O texto permanece no DOM para leitores de tela e para o contrato canônico.
+ */
+.black-card-gap,
+.p57-library-game-card .black-card-gap,
+.p57-detail-game-card .black-card-gap,
+.recycling-card b .black-card-gap,
+.p41-recycle-card-preview.black b .black-card-gap{
+  display:inline-block!important;
+  width:1.72em!important;
+  min-width:1.72em!important;
+  height:.92em!important;
+  margin:0 .06em!important;
+  padding:0!important;
+  overflow:hidden!important;
+  color:transparent!important;
+  border:0!important;
+  background-image:linear-gradient(90deg,#d946ef,#d946ef)!important;
+  background-position:0 82%!important;
+  background-repeat:no-repeat!important;
+  background-size:100% .12em!important;
+  line-height:1!important;
+  vertical-align:baseline!important;
+  white-space:nowrap!important;
+}
+
+/*
+ * Minhas Cartas: 300px -> 200px (2/3 da dimensão anterior) e proporção 1:1.
+ * O componente, fundo, contorno e watermark continuam sendo os canônicos.
+ */
+.p57-library-grid{
+  grid-template-columns:repeat(auto-fit,minmax(0,200px))!important;
+  justify-content:center!important;
+  align-items:start!important;
+  gap:16px!important;
+}
+.p57-library-card-shell{
+  width:100%!important;
+  max-width:200px!important;
+  justify-self:center!important;
+}
+.p57-library-game-card{
+  width:200px!important;
+  max-width:100%!important;
+  aspect-ratio:1/1!important;
+  min-height:0!important;
+  height:auto!important;
+  padding:1rem!important;
+  border-radius:18px!important;
+}
+.p57-library-game-card .card-text{
+  font-size:.9rem!important;
+  line-height:1.34!important;
+}
+.p57-library-game-card .card-watermark{
+  margin-top:.65rem!important;
+  font-size:.52rem!important;
+  letter-spacing:.12em!important;
+}
+
+/* A ficha segue a mesma linguagem: 330px -> 220px e preview quadrado. */
+.p56-card-preview-host .p57-detail-game-card{
+  width:min(100%,220px)!important;
+  aspect-ratio:1/1!important;
+  min-height:0!important;
+  height:auto!important;
+  padding:1.1rem!important;
+  border-radius:20px!important;
+}
+.p56-card-preview-host .p57-detail-game-card .card-text{
+  font-size:1rem!important;
+  line-height:1.35!important;
+}
+.p56-card-preview-host .p57-detail-game-card .card-watermark{
+  margin-top:.7rem!important;
+  font-size:.56rem!important;
+}
+
+@media(max-width:620px){
+  .p57-library-grid{grid-template-columns:200px!important}
+  .p57-library-card-shell{max-width:200px!important}
+  .p57-library-game-card{width:200px!important;padding:.95rem!important;border-radius:17px!important}
+  .p57-library-game-card .card-text{font-size:.88rem!important}
+  .p56-card-preview-host .p57-detail-game-card{width:min(100%,193px)!important;padding:1rem!important;border-radius:18px!important}
+}
