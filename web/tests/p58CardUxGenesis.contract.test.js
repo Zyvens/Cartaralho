@@ -46,9 +46,10 @@ test('Gênese no Perfil usa órbita de transform único para estabilidade no scr
  assert.match(css,/genese-atom-track[\s\S]*will-change:transform!important/);
 });
 
-test('P58 publica v1.4.58 e preserva P57 na Central',()=>{
+test('P58 permanece publicado e preservado na Central após releases posteriores',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.58'/);
- assert.match(version,/releaseP58/);
+ assert.match(version,/releaseP\d+/);
  assert.match(notifications,/releaseP58/);
+ assert.match(notifications,/P58_RELEASE/);
  assert.match(notifications,/P57_RELEASE/);
 });
