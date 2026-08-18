@@ -1,8 +1,7 @@
-' strict';
+'use strict';
 (()=>{
  if(window.CartP65)return;
  const VERSION='v1.4.65';
- const SLOT_SELECTOR='.account-strip .home-account-balance,.account-strip .p49-balance-slot,.home-account-bar .home-account-balance,.home-account-bar .p49-balance-slot';
  const money=v=>Number(v||0).toLocaleString('pt-BR');
  const userKey=()=>AuthClient?.user?.id||AuthClient?.user?.username||'anon';
  const cacheKey=()=>`cartaralho_dirty_balance_${userKey()}`;
