@@ -30,10 +30,10 @@ test('saldo reage a transação e mantém fallback independente',()=>{
  assert.doesNotMatch(realtime,/balance:Number\.isFinite\(Number\(balance\)\)\?Number\(balance\):null/);
 });
 
-test('P64 permanece no histórico e pode ser supersedido por P65',()=>{
+test('P64 permanece no histórico após releases posteriores',()=>{
  assert.ok(index.indexOf('js/p64.js?v=1.4.64')>index.indexOf('js/p63.js?v=1.4.63'));
  assert.match(release,/APP_VERSION='v1\.4\.64'/);
- assert.match(version,/releaseP(?:64|65)/);
+ assert.match(version,/releaseP\d+/);
  assert.match(notifications,/releaseP64/);
  assert.match(notifications,/P63_RELEASE/);
 });
