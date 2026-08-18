@@ -1,0 +1,25 @@
+/* P62 — um único extrato: Mercado Paralelo. */
+
+/* Segurança visual: o painel redundante de economia nunca aparece em Estatísticas. */
+.p61-stats-ledger,
+.p54-stats-ledger,
+.stats-economy,
+.economy-history,
+.economy-ledger{
+  display:none!important;
+}
+
+/* O saldo da Home vira um atalho explícito para Mercado Paralelo > Extrato. */
+.account-strip .p62-market-ledger-shortcut{
+  cursor:pointer;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  transition:filter .16s ease,box-shadow .16s ease;
+}
+.account-strip .p62-market-ledger-shortcut:hover{
+  filter:brightness(1.08);
+}
+.account-strip .p62-market-ledger-shortcut:focus-visible{
+  outline:2px solid rgba(250,204,21,.88);
+  outline-offset:3px;
+}

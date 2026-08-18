@@ -41,11 +41,11 @@ test('extrato de Estatísticas nasce contraído e é expansível',()=>{
  assert.match(css,/\.p61-stats-ledger\[open\] \.p61-ledger-summary i/);
 });
 
-test('P61 carrega por último e publica v1.4.61',()=>{
+test('P61 permanece versionado como v1.4.61 mesmo após releases posteriores',()=>{
  assert.ok(index.indexOf('css/p61.css?v=1.4.61')>index.indexOf('css/p60.css?v=1.4.60'));
  assert.ok(index.indexOf('js/p61.js?v=1.4.61')>index.indexOf('js/p58.js?v=1.4.58'));
  assert.match(release,/APP_VERSION='v1\.4\.61'/);
- assert.match(version,/releaseP61/);
+ assert.match(version,/APP_VERSION/);
  assert.match(notifications,/releaseP61/);
  assert.match(notifications,/P60_RELEASE/);
 });
