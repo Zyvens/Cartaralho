@@ -30,11 +30,11 @@ test('atalho do saldo também funciona por teclado',()=>{
  assert.match(js,/tabindex','0/);
 });
 
-test('P62 carrega depois de P61 e publica v1.4.62',()=>{
+test('P62 permanece carregado e versionado após releases posteriores',()=>{
  assert.ok(index.indexOf('css/p62.css?v=1.4.62')>index.indexOf('css/p61.css?v=1.4.61'));
  assert.ok(index.indexOf('js/p62.js?v=1.4.62')>index.indexOf('js/p61.js?v=1.4.61'));
  assert.match(release,/APP_VERSION='v1\.4\.62'/);
- assert.match(version,/releaseP62/);
+ assert.match(version,/APP_VERSION/);
  assert.match(notifications,/releaseP62/);
  assert.match(notifications,/P61_RELEASE/);
 });
