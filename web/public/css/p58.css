@@ -1,0 +1,131 @@
+/* P58 — cartas em formato real, lacunas canônicas, criador unificado e Gênese estável. */
+
+/* A lacuna é um underline textual real, não uma barra contínua. */
+.black-card-gap,
+.p57-library-game-card .black-card-gap,
+.p57-detail-game-card .black-card-gap,
+.recycling-card b .black-card-gap,
+.p41-recycle-card-preview.black b .black-card-gap{
+ display:inline!important;
+ min-width:0!important;
+ width:auto!important;
+ height:auto!important;
+ padding:0!important;
+ margin:0 .08em!important;
+ border:0!important;
+ border-bottom:0!important;
+ color:#d946ef!important;
+ font:inherit!important;
+ font-weight:850!important;
+ letter-spacing:.04em!important;
+ line-height:inherit!important;
+ vertical-align:baseline!important;
+ transform:none!important;
+ text-decoration:none!important;
+ white-space:nowrap!important;
+}
+
+/* Minhas Cartas volta a ter proporção de carta de baralho, não painel horizontal. */
+.p57-library-grid{
+ grid-template-columns:repeat(auto-fit,minmax(220px,300px))!important;
+ justify-content:center!important;
+ gap:18px!important;
+ align-items:start!important;
+}
+.p57-library-card-shell{width:100%!important;max-width:300px!important;justify-self:center!important;grid-template-rows:auto auto!important}
+.p57-library-game-card{
+ width:100%!important;
+ aspect-ratio:5/7!important;
+ min-height:0!important;
+ height:auto!important;
+ padding:1.35rem!important;
+ border-radius:22px!important;
+}
+.p57-library-game-card .card-progression-badge,
+.p57-detail-game-card .card-progression-badge{display:none!important}
+.p57-library-favorite{right:-8px!important;top:-8px!important}
+.p57-library-card-meta{align-items:flex-start!important}
+
+/* A ficha mantém o layout aprovado, mas o preview usa a mesma proporção do baralho. */
+.p56-card-preview-host{display:grid!important;place-items:center!important}
+.p56-card-preview-host .p57-detail-game-card{
+ width:min(100%,330px)!important;
+ aspect-ratio:5/7!important;
+ min-height:0!important;
+ height:auto!important;
+ padding:1.5rem!important;
+ border-radius:24px!important;
+}
+
+/* Reciclagem: a própria cor já identifica o tipo; sobra apenas favorito quando houver. */
+.recycling-card>small.p58-recycle-favorite{color:#facc15!important;font-size:.58rem!important;letter-spacing:.06em!important}
+.recycling-card:not(:has(>small)){padding-top:18px!important}
+.p41-recycle-card-preview>span{display:none!important}
+
+/* Criador dentro de Minhas Cartas replica a linguagem visual de Escolher/Criar Cartas. */
+.p58-library-creator{max-width:760px!important;margin:0 auto!important;padding:4px 0 18px!important}
+.p58-library-creator-head{margin:4px 0 18px;text-align:center}
+.p58-library-creator-head small{display:block;color:var(--text-muted);font-size:.65rem;font-weight:900;letter-spacing:.14em}
+.p58-library-creator-head h2{margin:4px 0 6px;font-size:clamp(1.45rem,3vw,2rem)}
+.p58-library-creator-head p{margin:0 auto;max-width:620px;color:var(--text-muted);font-size:.8rem;line-height:1.5}
+.p58-card-type-tabs{margin:0 0 18px!important}
+.p58-clean-stack-grid{margin-bottom:20px!important}
+.p58-creator-workspace{display:grid;gap:12px;margin-top:4px}
+.p58-creator-workspace .creation-instruction{margin:0!important;text-align:center!important}
+.p58-creator-workspace .creation-input-row{margin:0!important}
+.p58-creator-workspace .input-group{margin:0!important}
+.p58-buy-clean{padding:14px!important;margin:2px 0!important}
+.p58-buy-clean small{display:block;margin:4px 0 10px;color:var(--text-muted)}
+.p58-creator-note{display:block;text-align:center;color:var(--text-muted);font-size:.7rem;line-height:1.45}
+.p58-back-library{margin-top:10px!important}
+.p58-clean-fallback{min-height:120px;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px;display:grid;align-content:center;gap:6px;background:rgba(255,255,255,.025)}
+.p58-clean-fallback.white{background:#f5f5f0;color:#17171b}.p58-clean-fallback.black{background:#0d0d15;color:#fff}.p58-clean-fallback b{font-size:2rem}
+
+/* Gênese no Perfil: animação reduzida a um único transform de órbita.
+   Evita seis partículas recalculando left/top durante o scroll no Safari. */
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview{
+ animation:none!important;
+ will-change:auto!important;
+}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track{
+ width:142%!important;
+ height:110%!important;
+ animation:p58GenesisPreviewOrbit 7.2s linear infinite!important;
+ transform:translate(-50%,-50%) rotate(-28deg)!important;
+ will-change:transform!important;
+ backface-visibility:hidden;
+ -webkit-backface-visibility:hidden;
+}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track>.genese-atom-particle{
+ animation:none!important;
+ opacity:.92!important;
+ transform:translate(-50%,-50%) scale(.82)!important;
+ will-change:auto!important;
+}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track>.genese-atom-particle:nth-child(1){left:100%!important;top:50%!important}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track>.genese-atom-particle:nth-child(2){left:75%!important;top:6.7%!important}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track>.genese-atom-particle:nth-child(3){left:25%!important;top:6.7%!important}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track>.genese-atom-particle:nth-child(4){left:0!important;top:50%!important}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track>.genese-atom-particle:nth-child(5){left:25%!important;top:93.3%!important}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track>.genese-atom-particle:nth-child(6){left:75%!important;top:93.3%!important}
+@keyframes p58GenesisPreviewOrbit{
+ from{transform:translate(-50%,-50%) rotate(-28deg)}
+ to{transform:translate(-50%,-50%) rotate(332deg)}
+}
+
+@media(max-width:620px){
+ .p57-library-grid{grid-template-columns:minmax(0,300px)!important;justify-content:center!important}
+ .p57-library-card-shell{max-width:300px!important}
+ .p57-library-game-card{padding:1.25rem!important;border-radius:20px!important}
+ .p56-card-preview-host .p57-detail-game-card{width:min(100%,290px)!important;padding:1.35rem!important}
+ .p58-library-creator{padding-bottom:12px!important}
+ .p58-library-creator-head{margin-bottom:14px}
+ .p58-card-type-tabs{margin-bottom:14px!important}
+ .p58-clean-stack-grid{margin-bottom:16px!important}
+ .p58-creator-workspace .creation-input-row{display:grid!important;grid-template-columns:1fr!important;gap:9px!important}
+ .p58-creator-workspace .creation-input-row .btn{width:100%!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+ .p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track{animation:none!important}
+}
