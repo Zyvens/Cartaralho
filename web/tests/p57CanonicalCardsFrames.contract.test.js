@@ -51,9 +51,9 @@ test('P57 preserva o layout P56 do modal e troca somente preview e progressão',
  assert.match(css,/\.p56-card-preview-host \.p57-detail-game-card/);
 });
 
-test('P57 publica v1.4.57 e preserva P56 na Central',()=>{
+test('P57 permanece publicado e preservado após releases futuros',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.57'/);
- assert.match(version,/releaseP57/);
- assert.match(notifications,/releaseP57/);
+ assert.match(version,/releaseP(?:57|5[8-9]|[6-9]\d)/);
+ assert.ok(notifications.includes('P57_RELEASE')||notifications.includes("require('../lib/releaseP57')"));
  assert.match(notifications,/P56_RELEASE/);
 });
