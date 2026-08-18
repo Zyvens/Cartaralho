@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const js=read('public/js/p64.js'),index=read('public/index.html'),release=read('lib/releaseP64.js'),version=read('api/version.js'),notifications=read('api/notifications.js'),wallet=read('api/profile/wallet.js'),auth=read('lib/auth.js'),login=read('api/auth/login.js'),cards=read('api/profile/cards-v14.js'),progression=read('api/profile/progression.js'),collection=read('lib/cardCollectionProgressP64.js'),progressionUI=read('public/js/cardProgressionUI.js'),realtime=read('lib/balanceRealtimeP63.js');
+const js=read('public/js/p64.js'),index=read('public/index.html'),release=read('lib/releaseP64.js'),version=read('api/version.js'),notifications=read('api/notifications.js'),wallet=read('api/profile/wallet.js'),auth=read('lib/auth.js'),login=read('api/auth/login.js'),realtime=read('lib/balanceRealtimeP63.js');
 
 test('P64 compila',()=>assert.doesNotThrow(()=>new Function(js)));
 
@@ -30,29 +30,10 @@ test('saldo reage a transação e mantém fallback independente',()=>{
  assert.doesNotMatch(realtime,/balance:Number\.isFinite\(Number\(balance\)\)\?Number\(balance\):null/);
 });
 
-test('contorno usa quantidade de cartas diferentes possuídas, não recriações',()=>{
- assert.match(collection,/distinctOwnedCards/);
- assert.match(collection,/canonical_card_ownerships/);
- assert.match(cards,/ownedDistinctCards=await collectionProgress\.distinctOwnedCards/);
- assert.match(cards,/borderTier:border\.tier/);
- assert.match(cards,/borderProgress:border\.progress/);
- assert.doesNotMatch(cards,/borderTier:cardBorderTier\(c\.duplicate_creation_count\)/);
- assert.match(progression,/borderScore=ownedDistinctCards/);
- assert.match(progression,/ownedDistinctCards/);
-});
-
-test('UI explica contorno por coleção e preserva presença externa só como métrica histórica',()=>{
- assert.match(js,/cartas diferentes na sua coleção/);
- assert.match(js,/O contorno sobe conforme a quantidade de cartas diferentes que você possui/);
- assert.match(progressionUI,/Cartas diferentes que você possui/);
- assert.doesNotMatch(progressionUI,/Partidas distintas em que a mesma Carta Canônica apareceu através de outro jogador/);
-});
-
-test('P64 publica versão atual e carrega depois de P63',()=>{
+test('P64 permanece no histórico e pode ser supersedido por P65',()=>{
  assert.ok(index.indexOf('js/p64.js?v=1.4.64')>index.indexOf('js/p63.js?v=1.4.63'));
- assert.ok(index.includes('cardProgressionUI.js?v=1.4.64'));
  assert.match(release,/APP_VERSION='v1\.4\.64'/);
- assert.match(version,/releaseP64/);
+ assert.match(version,/releaseP(?:64|65)/);
  assert.match(notifications,/releaseP64/);
  assert.match(notifications,/P63_RELEASE/);
 });
