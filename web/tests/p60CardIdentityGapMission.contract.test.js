@@ -30,10 +30,11 @@ test('pills de Moedas e XP têm exatamente a mesma altura',()=>{
  assert.match(css,/@media\(max-width:430px\)[\s\S]*height:26px!important/);
 });
 
-test('P60 carrega depois de P59 e publica v1.4.60',()=>{
+test('P60 permanece carregado e registrado após releases futuros',()=>{
  assert.ok(index.indexOf('css/p60.css?v=1.4.60')>index.indexOf('css/p59.css?v=1.4.59'));
  assert.match(release,/APP_VERSION='v1\.4\.60'/);
- assert.match(version,/releaseP60/);
- assert.match(notifications,/releaseP60/);
+ assert.match(version,/releaseP(?:60|6[1-9]|[7-9]\d)/);
+ assert.match(notifications,/releaseP(?:60|6[1-9]|[7-9]\d)/);
+ assert.match(notifications,/P60_RELEASE|releaseP60/);
  assert.match(notifications,/P59_RELEASE/);
 });
