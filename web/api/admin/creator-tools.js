@@ -2,6 +2,7 @@
 const{withErrors,ok,fail,getBody}=require('../../lib/http');
 const admin=require('../../lib/creatorAdminP37');
 const{broadcastGlobal}=require('../../lib/pusherServer');
+const{notifyBalanceUpdated}=require('../../lib/balanceRealtimeP63');
 
 function scopeOf(v){return String(v||'global')==='individual'?'individual':'global';}
 function targetIds(scope,user){return scope==='individual'?[Number(user.id)]:null;}
@@ -28,9 +29,17 @@ module.exports=withErrors(async(req,res)=>{
   let credited=0,balance=null;
   if(scope==='individual'){balance=await admin.creditIndividual(target.id,amount,operationId,message);credited=1;}
   else credited=await admin.creditAll(amount,operationId,message);
+
+  /* O saldo é sincronizado a partir da transação confirmada, independente do megafone. */
+  const balanceEventId=await notifyBalanceUpdated({
+   userIds:targetIds(scope,target),
+   balance:scope==='individual'?balance:null,
+   reason:'admin_reward'
+  });
+
   let eventId=null,megaphoneDelivered=true;
   try{eventId=await broadcastGlobal('admin_megaphone',{kind:'reward',message,amount,targetUserIds:targetIds(scope,target),sentByUserId:Number(actor.id)});}catch(_){megaphoneDelivered=false;}
-  return ok(res,{scope,amount,credited,balance,eventId,megaphoneDelivered,target:target?{id:Number(target.id),username:target.username,displayName:target.display_name}:null});
+  return ok(res,{scope,amount,credited,balance,balanceEventId,eventId,megaphoneDelivered,target:target?{id:Number(target.id),username:target.username,displayName:target.display_name}:null});
  }
  return fail(res,400,'Ação administrativa inválida.');
 });
