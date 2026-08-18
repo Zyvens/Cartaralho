@@ -2,6 +2,7 @@
 const{withErrors,ok,fail,getBody}=require('../lib/http');
 const{requireUser}=require('../lib/auth');
 const marketplace=require('../lib/marketplace');
+const{notifyBalanceUpdated}=require('../lib/balanceRealtimeP63');
 module.exports=withErrors(async(req,res)=>{
  const user=await requireUser(req,res);if(!user)return;
  const enabled=process.env.MARKETPLACE_ENABLED!=='false';
@@ -19,5 +20,6 @@ module.exports=withErrors(async(req,res)=>{
  if(r.status==='empty_pool')return fail(res,409,'Você já possui todas as Cartas de Jogador disponíveis para este pack.');
  if(r.status==='insufficient_pool')return fail(res,409,`Não há ${r.required} Cartas Canônicas elegíveis ainda. Disponíveis: ${r.available}.`);
  if(r.status!=='ok')return fail(res,409,'Não foi possível concluir esta compra agora.');
+ await notifyBalanceUpdated({userIds:[user.id],balance:r.dirtyBalance,reason:'marketplace_purchase'});
  ok(res,{purchase:r});
 });
