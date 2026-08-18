@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const js=read('public/js/p56.js'),css=read('public/css/p56.css'),index=read('public/index.html'),release=read('lib/releaseP56.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
 
-test('P56 compila e é a última camada de interface',()=>{
+test('P56 compila e permanece carregado depois de P55',()=>{
  assert.doesNotThrow(()=>new Function(js));
  assert.ok(index.indexOf('css/p56.css?v=1.4.56')>index.indexOf('css/p55.css?v=1.4.55'));
  assert.ok(index.indexOf('js/p56.js?v=1.4.56')>index.indexOf('js/p55.js?v=1.4.55'));
@@ -48,9 +48,9 @@ test('Ficha reduz texto corrido e expõe metas e origem como dados visuais',()=>
  assert.match(css,/\.p56-origin-grid\{display:grid/);
 });
 
-test('P56 publica v1.4.56 e mantém P55 na Central',()=>{
+test('P56 permanece no histórico após releases posteriores',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.56'/);
- assert.match(version,/releaseP56/);
- assert.match(notifications,/releaseP56/);
+ assert.match(version,/releaseP(?:56|5[7-9]|[6-9]\d)/);
+ assert.match(notifications,/P56_RELEASE|releaseP56/);
  assert.match(notifications,/P55_RELEASE/);
 });
