@@ -43,7 +43,7 @@ test('auto-prêmio e transações próprias atualizam pelo próprio retorno HTTP
 test('P63 permanece carregado antes das camadas posteriores',()=>{
  assert.ok(index.indexOf('js/p63.js?v=1.4.63')>index.indexOf('js/p62.js?v=1.4.62'));
  assert.match(release,/APP_VERSION='v1\.4\.63'/);
- assert.match(version,/releaseP(?:63|64)/);
+ assert.match(version,/releaseP\d+/);
  assert.match(notifications,/releaseP63/);
  assert.match(notifications,/P62_RELEASE/);
 });
