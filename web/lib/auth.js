@@ -1,4 +1,4 @@
-const crypto=require('crypto');const{promisify}=require('util');const{sql}=require('./db');const scrypt=promisify(crypto.scrypt),SESSION_DAYS=30;
+const crypto=require('crypto');const{promisify}=require('util');const{sql}=require('./db');const cardProgressionRules=require('./cardProgressionRules');const scrypt=promisify(crypto.scrypt),SESSION_DAYS=30;
 function normalizeUsername(v){return String(v||'').trim().toLowerCase();}
 function normalizeEmail(v){const s=String(v||'').trim().toLowerCase();return s||null;}
 async function hashPassword(password,salt=crypto.randomBytes(16).toString('hex')){const d=await scrypt(String(password),salt,64);return`${salt}:${Buffer.from(d).toString('hex')}`;}
@@ -9,7 +9,7 @@ function createRecoveryCode(){return crypto.randomBytes(8).toString('hex').toUpp
 function readBearer(req){const h=req.headers&&(req.headers.authorization||req.headers.Authorization);return h&&String(h).startsWith('Bearer ')?String(h).slice(7).trim():null;}
 async function getUserFromRequest(req){if(req.authUser)return req.authUser;const token=readBearer(req);if(!token)return null;const rows=await sql`SELECT u.id,u.username,u.display_name,u.email,u.avatar_data,u.bio,u.equipped_title_key,u.equipped_frame_key,u.xp,u.created_at,COALESCE(w.balance,0)::int dirty_balance FROM auth_sessions s JOIN users u ON u.id=s.user_id LEFT JOIN dirty_coin_wallets w ON w.user_id=u.id WHERE s.token_hash=${tokenHash(token)} AND s.expires_at>now() LIMIT 1`;return rows[0]||null;}
 async function requireUser(req,res){const u=await getUserFromRequest(req);if(!u){res.statusCode=401;res.setHeader('Content-Type','application/json');res.end(JSON.stringify({success:false,error:'Faça login para continuar.'}));return null;}return u;}
-function cardMaterialTier(n){n=Number(n||0);if(n>100)return'platinum';if(n>60)return'gold';if(n>30)return'silver';if(n>10)return'copper';return'standard';}
-function cardBorderTier(n){n=Number(n||0);if(n>100)return'platinum';if(n>50)return'gold';if(n>30)return'silver';if(n>10)return'copper';return'standard';}
-function nextTierProgress(value,kind='material'){const n=Number(value||0),levels=kind==='border'?[[10,'copper'],[30,'silver'],[50,'gold'],[100,'platinum']]:[[10,'copper'],[30,'silver'],[60,'gold'],[100,'platinum']];for(const[target,tier]of levels)if(n<=target)return{nextTier:tier,target,current:n,remaining:Math.max(0,target+1-n)};return{nextTier:null,target:null,current:n,remaining:0};}
+function cardMaterialTier(n){return cardProgressionRules.tierFor(n,'material').key;}
+function cardBorderTier(n){return cardProgressionRules.tierFor(n,'border').key;}
+function nextTierProgress(value,kind='material'){const p=cardProgressionRules.progressFor(value,kind);return{nextTier:p.nextTier,target:p.target,current:p.score,remaining:p.remaining};}
 module.exports={normalizeUsername,normalizeEmail,hashPassword,verifyPassword,createSession,createRecoveryCode,tokenHash,readBearer,getUserFromRequest,requireUser,cardMaterialTier,cardBorderTier,nextTierProgress};

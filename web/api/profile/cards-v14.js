@@ -31,7 +31,7 @@ module.exports=withErrors(async(req,res)=>{
   const personalRoundWins=Number(meta?.white_personal_wins??row.times_won??0);
   const worldHolders=Number(meta?.holders||0);
   const lootCollectors=Number(meta?.adoptions||0);
-  const border=borderState(worldHolders);
+  const border=borderState(lootCollectors);
   const card={...row,text:meta?.display_text||row.text,canonicalCardId:meta?.id||null,isOriginal,times_used:Number(row.times_used||0),matches_used:Number(row.matches_used||0),times_seen:Number(row.times_seen||0),times_won:Number(row.times_won||0),duplicate_creation_count:Number(row.duplicate_creation_count||0),personalRoundWins,worldHolders,lootCollectors,externalPresenceMatches:Number(meta?.external_presence_matches||0),borderTier:border.tier,borderProgress:border.progress,origin:{authors:authors.map(a=>({userId:a.user_id,displayName:a.display_name,username:a.username||null,authoredAt:a.authored_at})),creatorUserId:authors[0]?.user_id||row.legacy_creator_user_id||null,creatorName,creatorUsername:authors[0]?.username||row.legacy_creator_username||null,firstRoomCode:meta?.origin_match_id||row.legacy_first_room_code||null,firstSeenAt:meta?.created_at||row.legacy_first_seen_at||null,originUncertain:Boolean(meta?.origin_uncertain),tablesVisited:Number(row.tables_visited||0),holders:worldHolders,adoptions:lootCollectors,recreatedCount:Number(row.legacy_recreated_count||0)},genealogy:{acquisitionSource:meta?.acquisition_source||'legacy_import',sourceUserId:meta?.source_user_id||null,sourceUserName:meta?.source_display_name||null,sourceUsername:meta?.source_username||null,sourceMatchId:meta?.source_match_id||null,acquiredAt:meta?.acquired_at||row.created_at||null}};
   byKey.set(key,card);merged.push(card);
  }
@@ -41,7 +41,7 @@ module.exports=withErrors(async(req,res)=>{
   materialProgress:nextTierProgress(c.personalRoundWins,'material'),
   rarityExplanation:{
    material:'O fundo evolui pela quantidade de rodadas que você venceu utilizando esta carta.',
-   border:'A borda evolui pela quantidade de jogadores distintos que possuem esta mesma Carta Canônica no mundo. Aquisições por Espólio aumentam essa circulação automaticamente.'
+   border:'A borda evolui pela quantidade de jogadores distintos que coletaram esta Carta Canônica em Espólios.'
   }
  }))});
 });

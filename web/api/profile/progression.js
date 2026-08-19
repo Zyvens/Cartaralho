@@ -10,8 +10,9 @@ module.exports=withErrors(async(req,res)=>{
  const rows=await sql`SELECT o.canonical_card_id,COALESCE(p.white_personal_wins,0)::int white_personal_wins,COALESCE(p.black_personal_uses,0)::int black_personal_uses,COALESCE(p.external_presence_matches,0)::int external_presence_matches,EXISTS(SELECT 1 FROM canonical_card_authors a WHERE a.canonical_card_id=o.canonical_card_id AND a.user_id=${user.id}) is_original,(SELECT COUNT(DISTINCT x.user_id)::int FROM canonical_card_ownerships x WHERE x.canonical_card_id=o.canonical_card_id) reach_count,(SELECT COUNT(DISTINCT x.user_id)::int FROM canonical_card_ownerships x WHERE x.canonical_card_id=o.canonical_card_id AND x.acquisition_source='match_loot') adoption_count,(SELECT COUNT(DISTINCT e.user_id)::int FROM canonical_card_creation_events e WHERE e.canonical_card_id=o.canonical_card_id AND e.creation_kind='independent') creative_coincidence_count,(SELECT COUNT(*)::int FROM canonical_card_match_presence m WHERE m.canonical_card_id=o.canonical_card_id) presence_count,(SELECT COUNT(*)::int FROM canonical_card_round_events e WHERE e.canonical_card_id=o.canonical_card_id AND e.event_type IN('white_revealed','black_used')) total_uses,(SELECT COUNT(*)::int FROM canonical_card_round_events e WHERE e.canonical_card_id=o.canonical_card_id AND e.event_type='white_win') global_wins FROM canonical_card_ownerships o LEFT JOIN user_card_progress p ON p.user_id=o.user_id AND p.canonical_card_id=o.canonical_card_id WHERE o.user_id=${user.id}`;
  const cards=rows.map(r=>{
   const materialScore=Number(r.white_personal_wins||0);
-  const borderScore=Number(r.reach_count||0);
-  const score=progression.legacyScore({reach:r.reach_count,adoption:r.adoption_count,coincidence:r.creative_coincidence_count,presence:r.presence_count,wins:r.global_wins});
+  const borderScore=Number(r.adoption_count||0);
+  const reach=Number(r.reach_count||0),lootCollectors=borderScore;
+  const score=progression.legacyScore({reach,adoption:lootCollectors,coincidence:r.creative_coincidence_count,presence:r.presence_count,wins:r.global_wins});
   const level=progression.legacyLevel(score);
   return{
    canonicalCardId:r.canonical_card_id,
@@ -19,11 +20,11 @@ module.exports=withErrors(async(req,res)=>{
    whitePersonalWins:materialScore,
    blackPersonalUses:Number(r.black_personal_uses||0),
    externalPresenceMatches:Number(r.external_presence_matches||0),
-   worldHolders:borderScore,
-   lootCollectors:Number(r.adoption_count||0),
+   worldHolders:reach,
+   lootCollectors,
    material:progression.progressFor(materialScore,'material'),
    border:progression.progressFor(borderScore,'border'),
-   global:{reach:borderScore,adoptions:Number(r.adoption_count||0),creativeCoincidences:Number(r.creative_coincidence_count||0),presence:Number(r.presence_count||0),uses:Number(r.total_uses||0),wins:Number(r.global_wins||0),legacyScore:score,legacyLevel:level.key,legacyLabel:level.label}
+   global:{reach,adoptions:lootCollectors,creativeCoincidences:Number(r.creative_coincidence_count||0),presence:Number(r.presence_count||0),uses:Number(r.total_uses||0),wins:Number(r.global_wins||0),legacyScore:score,legacyLevel:level.key,legacyLabel:level.label}
   };
  });
  ok(res,{progressionEnabled:process.env.CARD_PROGRESSION_V2_ENABLED!=='false',cards,thresholds:{material:progression.MATERIAL_THRESHOLDS,border:progression.BORDER_THRESHOLDS,legacy:progression.LEGACY_THRESHOLDS}});

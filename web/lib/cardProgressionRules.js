@@ -1,6 +1,6 @@
 'use strict';
 const MATERIAL_THRESHOLDS=[{key:'copper',label:'Bronze',min:10},{key:'silver',label:'Prata',min:30},{key:'gold',label:'Ouro',min:60},{key:'platinum',label:'Platina',min:100}];
-const BORDER_THRESHOLDS=[{key:'copper',label:'Bronze',min:5},{key:'silver',label:'Prata',min:15},{key:'gold',label:'Ouro',min:40},{key:'platinum',label:'Platina',min:100}];
+const BORDER_THRESHOLDS=[{key:'copper',label:'Bronze',min:10},{key:'silver',label:'Prata',min:30},{key:'gold',label:'Ouro',min:60},{key:'platinum',label:'Platina',min:100}];
 const LEGACY_THRESHOLDS=[{key:'nascente',label:'Nascente',min:0},{key:'espalhando',label:'Espalhando',min:4},{key:'viral',label:'Viral',min:12},{key:'classico',label:'Clássico',min:30},{key:'folclore',label:'Folclore',min:60}];
 const LEGACY_WEIGHTS={reach:1,adoption:1.4,coincidence:.8,presence:1.1,wins:1.3};
 function tierFor(score,kind='material'){const thresholds=kind==='border'?BORDER_THRESHOLDS:MATERIAL_THRESHOLDS,n=Math.max(0,Number(score)||0);let tier={key:'standard',label:'Sem tier',min:0};for(const t of thresholds)if(n>=t.min)tier=t;return tier;}

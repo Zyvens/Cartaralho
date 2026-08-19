@@ -19,14 +19,14 @@ test('P65 não reintroduz progressão por tamanho total da coleção',()=>{
  assert.doesNotMatch(cards,/borderTier:cardBorderTier\(c\.duplicate_creation_count\)/);
 });
 
-test('thresholds de contorno permanecem centralizados',()=>{
- assert.match(rules,/BORDER_THRESHOLDS=\[\{key:'copper',label:'Bronze',min:5\},\{key:'silver',label:'Prata',min:15\},\{key:'gold',label:'Ouro',min:40\},\{key:'platinum',label:'Platina',min:100\}\]/);
+test('thresholds continuam centralizados e podem ser supersedidos por P67',()=>{
+ assert.match(rules,/BORDER_THRESHOLDS=\[\{key:'copper',label:'Bronze',min:10\},\{key:'silver',label:'Prata',min:30\},\{key:'gold',label:'Ouro',min:60\},\{key:'platinum',label:'Platina',min:100\}\]/);
 });
 
-test('P65 permanece no histórico e pode ser supersedido por P66',()=>{
+test('P65 permanece no histórico e pode ser supersedido por releases posteriores',()=>{
  assert.ok(index.indexOf('js/p65.js?v=1.4.65')>index.indexOf('js/p64.js?v=1.4.64'));
  assert.match(release,/APP_VERSION='v1\.4\.65'/);
- assert.match(version,/releaseP(?:65|66)/);
+ assert.match(version,/releaseP(?:65|66|67)/);
  assert.match(notifications,/releaseP65/);
  assert.match(notifications,/P64_RELEASE/);
 });
