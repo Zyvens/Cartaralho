@@ -52,10 +52,10 @@
   L.render=async function(panel,...args){const cards=await base(panel,...args);decorateLibrary(panel,cards);return cards;};
  }
 
- function purgeStatsEconomy(panel){
-  if(!panel)return;
-  panel.querySelectorAll('.p61-stats-ledger,.p54-stats-ledger,.stats-economy,.economy-history,.economy-ledger').forEach(node=>node.remove());
-  panel.querySelectorAll('.meta-section,.market-section').forEach(section=>{
+ function purgeStatsEconomy(root){
+  if(!root)return;
+  root.querySelectorAll('.p61-stats-ledger,.p54-stats-ledger,.stats-economy,.economy-history,.economy-ledger').forEach(node=>node.remove());
+  root.querySelectorAll('.meta-section,.market-section').forEach(section=>{
    const heading=section.querySelector('h3,h4,.market-section-title')?.textContent||'';
    if(/extrato|movimenta(?:ção|ções)|moedas sujas|economia/i.test(heading))section.remove();
   });
@@ -64,21 +64,22 @@
   if(!window.MetaUI?.renderStats)throw new Error('Estatísticas indisponíveis.');
   statsObserver?.disconnect();statsObserver=null;
   const out=await MetaUI.renderStats(panel);
-  purgeStatsEconomy(panel);
+  const root=panel.querySelector('.home-form.profile-panel')||panel;
+  purgeStatsEconomy(root);
   if(window.MutationObserver){
-   statsObserver=new MutationObserver(()=>purgeStatsEconomy(panel));
-   statsObserver.observe(panel,{childList:true,subtree:true});
+   statsObserver=new MutationObserver(()=>purgeStatsEconomy(root));
+   statsObserver.observe(root,{childList:true,subtree:true});
   }
-  queueMicrotask(()=>purgeStatsEconomy(panel));
-  requestAnimationFrame(()=>purgeStatsEconomy(panel));
+  queueMicrotask(()=>purgeStatsEconomy(root));
+  requestAnimationFrame(()=>purgeStatsEconomy(root));
   return out;
  }
  function patchStats(){
   if(!window.HomeScreen||!window.MetaUI)return;
   HomeScreen.renderStats=renderStats;
   HomeScreen.__p67StatsOnly=true;
-  const panel=document.getElementById('home-panel');
-  if(panel?.querySelector('.profile-panel'))purgeStatsEconomy(panel);
+  const panel=document.getElementById('home-panel'),root=panel?.querySelector('.home-form.profile-panel');
+  if(root)purgeStatsEconomy(root);
  }
 
  function settle(){patchDetail();patchLibrary();patchStats();}
