@@ -45,11 +45,11 @@ test('rodapé da carta exibe somente autoria',()=>{
  assert.doesNotMatch(js,/Fundo \$\{label\(c\.materialTier\)\}/);
 });
 
-test('P67 é a versão atual e carrega depois de P66',()=>{
+test('P67 permanece no histórico e P68 pode supersedi-lo',()=>{
  assert.ok(index.indexOf('js/p67.js?v=1.4.67')>index.indexOf('js/p66.js?v=1.4.66'));
  assert.ok(index.includes('cardProgressionUI.js?v=1.4.67'));
  assert.match(release,/APP_VERSION='v1\.4\.67'/);
- assert.match(version,/releaseP67/);
+ assert.match(version,/releaseP(?:67|68)/);
  assert.match(notifications,/releaseP67/);
  assert.match(notifications,/P66_RELEASE/);
 });
