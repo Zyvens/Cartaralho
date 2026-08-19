@@ -8,12 +8,14 @@ test('P67 e UI de progressão compilam',()=>{
  assert.doesNotThrow(()=>new Function(progressUi));
 });
 
-test('modal de Estatísticas é protegido contra qualquer extrato tardio',()=>{
+test('modal de Estatísticas é protegido contra qualquer extrato tardio sem afetar outros painéis',()=>{
  assert.match(js,/HomeScreen\.renderStats=renderStats/);
  assert.match(js,/MetaUI\.renderStats\(panel\)/);
+ assert.match(js,/const root=panel\.querySelector\('\.home-form\.profile-panel'\)\|\|panel/);
  assert.match(js,/\.p61-stats-ledger,\.p54-stats-ledger/);
- assert.match(js,/new MutationObserver\(\(\)=>purgeStatsEconomy\(panel\)\)/);
- assert.match(js,/queueMicrotask\(\(\)=>purgeStatsEconomy\(panel\)\)/);
+ assert.match(js,/new MutationObserver\(\(\)=>purgeStatsEconomy\(root\)\)/);
+ assert.match(js,/statsObserver\.observe\(root,/);
+ assert.match(js,/queueMicrotask\(\(\)=>purgeStatsEconomy\(root\)\)/);
  assert.doesNotMatch(js,/Saldo:/);
 });
 
