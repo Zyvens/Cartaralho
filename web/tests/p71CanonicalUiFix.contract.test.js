@@ -35,9 +35,9 @@ test('P71 mantém cache-bust dos módulos estruturais alterados',()=>{
  for(const asset of ['css/p54.css','css/p62.css','js/p54.js','js/p56.js','js/p61.js','js/p62.js','js/p67.js'])assert.ok(index.includes(`${asset}?v=1.4.71`),asset);
 });
 
-test('P71 permanece no histórico após P72',()=>{
+test('P71 permanece no histórico após P73',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.71'/);
- assert.match(version,/releaseP72/);
+ assert.match(version,/releaseP73/);
  assert.match(notifications,/releaseP72/);
  assert.match(notifications,/P71_RELEASE/);
  assert.match(notifications,/P69_RELEASE/);
