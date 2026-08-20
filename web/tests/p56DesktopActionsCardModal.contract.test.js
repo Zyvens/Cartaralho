@@ -6,7 +6,7 @@ const js=read('public/js/p56.js'),css=read('public/css/p56.css'),index=read('pub
 test('P56 compila e permanece carregado depois de P55',()=>{
  assert.doesNotThrow(()=>new Function(js));
  assert.ok(index.indexOf('css/p56.css?v=1.4.56')>index.indexOf('css/p55.css?v=1.4.55'));
- const p56=index.search(/js\/p56\.js\?v=1\.4\.(?:56|69)/),p55=index.indexOf('js/p55.js?v=1.4.55');
+ const p56=index.indexOf('js/p56.js?v=1.4.70'),p55=index.indexOf('js/p55.js?v=1.4.55');
  assert.ok(p56>p55);
 });
 
@@ -27,6 +27,13 @@ test('Minhas Cartas possui um único renderer para todos os caminhos históricos
  assert.match(js,/MetaUI\.renderCards=\(panel,\.\.\.args\)=>Library\.render/);
  assert.doesNotMatch(js,/Modal\.show\(/);
  assert.match(js,/Detail\.open\(c\)/);
+});
+
+test('rodapé da coleção nasce como autoria no renderer canônico',()=>{
+ assert.match(js,/const creatorLabel=c=>/);
+ assert.match(js,/o\.creatorUsername\|\|c\?\.creator_username\|\|o\.creatorName/);
+ assert.match(js,/<small>Criado por \$\{esc\(creatorLabel\(c\)\)\}<\/small>/);
+ assert.doesNotMatch(js,/<small>\$\{tier\(c\.materialTier\)\} · contorno/);
 });
 
 test('Ficha P56 elimina os overlays concorrentes e fica definitivamente acima do AppPanel',()=>{
@@ -51,7 +58,7 @@ test('Ficha reduz texto corrido e expõe metas e origem como dados visuais',()=>
 
 test('P56 permanece no histórico após releases posteriores',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.56'/);
- assert.match(version,/releaseP(?:56|5[7-9]|[6-9]\d)/);
+ assert.match(version,/releaseP(?:56|5[7-9]|[6-9]\d|70)/);
  assert.match(notifications,/P56_RELEASE|releaseP56/);
  assert.match(notifications,/P55_RELEASE/);
 });
