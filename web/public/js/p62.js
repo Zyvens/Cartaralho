@@ -11,26 +11,6 @@
   localStorage.setItem(key,'1');
  }catch(_){ }
 
- function stripStatsEconomy(panel){
-  if(!panel)return panel;
-  panel.querySelectorAll('.p61-stats-ledger,.p54-stats-ledger,.stats-economy,.economy-history,.economy-ledger').forEach(node=>node.remove());
-  return panel;
- }
-
- async function renderStats(panel){
-  if(!window.MetaUI?.renderStats)throw new Error('Estatísticas indisponíveis.');
-  const out=await MetaUI.renderStats(panel);
-  stripStatsEconomy(panel);
-  queueMicrotask(()=>stripStatsEconomy(panel));
-  return out;
- }
-
- function installStatsRenderer(){
-  if(!window.HomeScreen||!window.MetaUI)return;
-  HomeScreen.renderStats=renderStats;
-  HomeScreen.__p62StatsNoEconomy=true;
- }
-
  async function openMarketLedger(){
   if(!AuthClient?.user)return Toast.warning('Entre na sua conta para consultar o extrato.');
   if(!window.MarketUI?.open)return Toast.error('Mercado Paralelo indisponível.');
@@ -56,7 +36,6 @@
   return slot&&document.contains(slot)?slot:null;
  }
 
- /* Captura antes de qualquer handler legado que ainda tente abrir Estatísticas. */
  document.addEventListener('click',e=>{
   if(!eventBalanceSlot(e.target))return;
   e.preventDefault();
@@ -86,15 +65,12 @@
  }
 
  function settle(){
-  installStatsRenderer();
   patchAccountLifecycle();
   decorateBalanceShortcut();
-  const currentStats=document.querySelector('.app-panel-body,.home-panel,#home-panel');
-  stripStatsEconomy(currentStats);
  }
 
  settle();
  document.addEventListener('DOMContentLoaded',settle,{once:true});
  window.addEventListener('pageshow',settle);
- window.CartP62={VERSION,stripStatsEconomy,renderStats,openMarketLedger,decorateBalanceShortcut,installStatsRenderer};
+ window.CartP62={VERSION,openMarketLedger,decorateBalanceShortcut};
 })();
