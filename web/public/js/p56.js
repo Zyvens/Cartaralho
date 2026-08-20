@@ -8,6 +8,11 @@
  const tier=v=>TIER_LABEL[String(v||'standard').toLowerCase()]||String(v||'Padrão');
  const isBlack=c=>String(c?.type)==='blackCards'||String(c?.type)==='black';
  const cardText=c=>isBlack(c)&&window.CardComponent?CardComponent._formatBlackText(c.text):esc(c?.text||'');
+ const creatorLabel=c=>{
+  if(c?.is_native)return'Cartaralho';
+  const o=c?.origin||{};
+  return String(o.creatorUsername||c?.creator_username||o.creatorName||c?.creator_name||'Não identificado').replace(/^@/,'');
+ };
 
  const AccountActions={
   decorate(){
@@ -61,7 +66,7 @@
   open(c){
    if(!c)return;
    this.close();this.clearLegacy();
-   const o=c.origin||{},black=isBlack(c),creator=c.is_native?'Cartaralho':(o.creatorName||'Não identificado');
+   const o=c.origin||{},black=isBlack(c),creator=creatorLabel(c);
    const overlay=document.createElement('div');overlay.className='p56-card-detail-overlay';
    overlay.innerHTML=`<section class="p56-card-detail-shell" role="dialog" aria-modal="true" aria-label="Detalhes da carta"><header class="p56-card-detail-header"><div><span>MINHAS CARTAS</span><h2>Ficha da carta</h2></div><button type="button" class="p56-card-detail-close" aria-label="Fechar detalhes">✕</button></header><div class="p56-card-detail-body"><aside class="p56-card-detail-visual"><div class="p56-card-preview-host"></div><div class="p56-card-tags"><span>${black?'🖤 Preta':'🤍 Branca'}</span>${c.is_native?'<span>🎴 Nativa</span>':''}${c.is_player_card?'<span>★ De jogador</span>':''}${c.is_favorite?'<span>⭐ Favorita</span>':''}</div></aside><main class="p56-card-detail-info"><section class="p56-detail-section-head"><span>PROGRESSÃO</span><h3>Do uso ao prestígio</h3><p>Os números abaixo mostram o estado atual da carta sem esconder a próxima meta.</p></section><div class="p56-progress-grid">${this.track('material',c)}${this.track('border',c)}</div><section class="p56-origin-panel"><div class="p56-origin-heading"><span>ORIGEM</span><h3>Histórico da carta</h3></div><div class="p56-origin-grid"><div><small>CRIADA POR</small><b>${esc(creator)}</b>${o.creatorUsername&&!c.is_native?`<em>@${esc(o.creatorUsername)}</em>`:''}</div><div><small>MESAS VISITADAS</small><b>${fmt(o.tablesVisited)}</b></div><div><small>PESSOAS QUE POSSUEM</small><b>${fmt(o.holders)}</b></div><div><small>PRIMEIRA MESA</small><b>${esc(o.firstRoomCode||'—')}</b></div></div>${o.originUncertain?'<p class="p56-origin-note">Parte do histórico veio de registros antigos e pode estar incompleta.</p>':''}</section></main></div></section>`;
    document.body.appendChild(overlay);
@@ -82,7 +87,7 @@
    const draw=()=>{
     const root=panel.querySelector('#library-grid');if(!root)return;
     const list=cards.filter(c=>(!query||String(c.text||'').toLowerCase().includes(query))&&owned(c));
-    root.innerHTML=list.map(c=>`<article class="library-card p56-library-card tier-${esc(c.materialTier)} border-${esc(c.borderTier)}" data-card-id="${c.id}" tabindex="0"><button class="favorite-card ${c.is_favorite?'on':''}" data-fav-id="${c.id}" aria-label="${c.is_favorite?'Remover dos favoritos':'Adicionar aos favoritos'}">${c.is_favorite?'★':'☆'}</button><div class="library-card-top"><span>${isBlack(c)?'🖤':'🤍'}</span><div>${c.is_native?'<em class="card-origin-tag native">NATIVA</em>':c.is_player_card?'<em class="card-origin-tag player">DE JOGADOR</em>':'<em class="card-origin-tag legacy">COLEÇÃO</em>'}</div></div><b class="p56-library-card-text">${cardText(c)}</b><small>${tier(c.materialTier)} · contorno ${tier(c.borderTier)} · ${fmt(c.matches_used)} partida${Number(c.matches_used||0)===1?'':'s'}</small></article>`).join('')||'<div class="app-panel-empty"><b>Nenhuma carta encontrada.</b><p>Tente outro filtro ou termo de busca.</p></div>';
+    root.innerHTML=list.map(c=>`<article class="library-card p56-library-card tier-${esc(c.materialTier)} border-${esc(c.borderTier)}" data-card-id="${c.id}" tabindex="0"><button class="favorite-card ${c.is_favorite?'on':''}" data-fav-id="${c.id}" aria-label="${c.is_favorite?'Remover dos favoritos':'Adicionar aos favoritos'}">${c.is_favorite?'★':'☆'}</button><div class="library-card-top"><span>${isBlack(c)?'🖤':'🤍'}</span><div>${c.is_native?'<em class="card-origin-tag native">NATIVA</em>':c.is_player_card?'<em class="card-origin-tag player">DE JOGADOR</em>':'<em class="card-origin-tag legacy">COLEÇÃO</em>'}</div></div><b class="p56-library-card-text">${cardText(c)}</b><small>Criado por ${esc(creatorLabel(c))}</small></article>`).join('')||'<div class="app-panel-empty"><b>Nenhuma carta encontrada.</b><p>Tente outro filtro ou termo de busca.</p></div>';
     root.querySelectorAll('[data-fav-id]').forEach(btn=>btn.onclick=async e=>{e.stopPropagation();const c=cards.find(x=>String(x.id)===String(btn.dataset.favId));if(!c)return;const old=!!c.is_favorite;c.is_favorite=!old;try{await AuthClient.favoriteCard(c.id,c.is_favorite);draw();}catch(err){c.is_favorite=old;Toast.error(err.message);}});
     root.querySelectorAll('[data-card-id]').forEach(el=>{const open=e=>{if(e?.target?.closest?.('[data-fav-id]'))return;const c=cards.find(x=>String(x.id)===String(el.dataset.cardId));if(c)Detail.open(c);};el.onclick=open;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open(e);}};});
    };
@@ -101,5 +106,5 @@
  AccountActions.patch();Library.consolidate();
  window.addEventListener('pageshow',()=>{AccountActions.decorate();Library.consolidate();});
  window.CardDetailUI=Detail;
- window.CartP56={VERSION,AccountActions,Detail,Library};
+ window.CartP56={VERSION,AccountActions,Detail,Library,creatorLabel};
 })();
