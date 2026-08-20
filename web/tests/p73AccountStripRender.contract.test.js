@@ -24,11 +24,11 @@ test('carteira é reconciliada no render síncrono e após o decorator profissio
  assert.match(js,/cartaralho:balance-updated/);
 });
 
-test('P73 é carregado por último e se torna a versão atual sem apagar P72 do histórico',()=>{
- assert.ok(index.indexOf('css/p73.css?v=1.4.73')>index.indexOf('css/p68.css?v=1.4.68'));
- assert.ok(index.indexOf('js/p73.js?v=1.4.73')>index.indexOf('js/p68.js?v=1.4.68'));
+test('P73 permanece carregado no histórico depois do P74',()=>{
+ assert.ok(index.includes('css/p73.css?v=1.4.73'));
+ assert.ok(index.includes('js/p73.js?v=1.4.73'));
  assert.match(release,/APP_VERSION='v1\.4\.73'/);
- assert.match(version,/releaseP73/);
- assert.match(notifications,/releaseP73/);
- assert.match(notifications,/P72_RELEASE/);
+ assert.match(version,/releaseP74/);
+ assert.match(notifications,/releaseP74/);
+ assert.match(notifications,/P73_RELEASE/);
 });
