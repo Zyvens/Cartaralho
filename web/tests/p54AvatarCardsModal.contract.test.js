@@ -5,8 +5,8 @@ const css=read('public/css/p54.css'),js=read('public/js/p54.js'),index=read('pub
 
 test('P54 compila e permanece carregado depois de P53',()=>{
  assert.doesNotThrow(()=>new Function(js));
- assert.ok(index.indexOf('css/p54.css?v=1.4.54')>index.indexOf('css/p53.css?v=1.4.53'));
- const p54=index.search(/js\/p54\.js\?v=1\.4\.(?:54|69)/),p53=index.indexOf('js/p53.js?v=1.4.53');
+ assert.ok(index.indexOf('css/p54.css?v=1.4.71')>index.indexOf('css/p53.css?v=1.4.53'));
+ const p54=index.indexOf('js/p54.js?v=1.4.71'),p53=index.indexOf('js/p53.js?v=1.4.53');
  assert.ok(p54>p53);
 });
 
@@ -29,7 +29,7 @@ test('grid de Molduras desfaz paint containment e camada GPU que piscavam no iOS
 });
 
 test('Minhas Cartas monta criação no renderer profissional realmente usado pelo modal',()=>{
- assert.match(js,/ProfessionalUI\.renderCards=async function/);
+ assert.match(js,/ProfessionalUI\.__p54NativeCardCreator/);
  assert.match(js,/cards-library/);
  assert.match(js,/cards-library-toolbar/);
  assert.match(js,/p54-create-card-entry/);
@@ -38,27 +38,15 @@ test('Minhas Cartas monta criação no renderer profissional realmente usado pel
  assert.match(js,/CartP48\?\.openLibraryCreator/);
 });
 
-test('Estatística traz movimentações junto do primeiro render e fechadas por padrão',()=>{
- assert.match(js,/AuthClient\.stats=async function/);
- assert.match(js,/latestStatsPayload=data/);
- assert.match(js,/HomeScreen\.renderStats=async function/);
- assert.match(js,/mountStatsLedger\(panel,latestStatsPayload\)/);
- assert.match(js,/<details class="p54-stats-ledger">/);
- assert.doesNotMatch(js,/<details class="p54-stats-ledger" open/);
-});
-
-test('Extrato nunca expõe transaction_type cru e usa descrições humanas',()=>{
- assert.match(js,/starter_grant:'Bônus inicial recebido'/);
- assert.match(js,/mission_reward:'Missão concluída'/);
- assert.match(js,/card_recycling:'Reciclagem de cartas'/);
- assert.match(js,/TRANSACTION_COPY\[type\]\|\|'Movimentação de moedas'/);
- assert.doesNotMatch(js,/\$\{[^}]*transaction_type[^}]*\}/);
+test('P54 não contém mais implementação de extrato dentro de Estatísticas',()=>{
+ assert.doesNotMatch(js,/p54-stats-ledger|mountStatsLedger|ledgerHtml|transaction_type|latestStatsPayload|patchStats/);
+ assert.doesNotMatch(css,/p54-stats-ledger|ledger-row|ledger-body/);
 });
 
 test('P54 permanece preservado quando versões posteriores são publicadas',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.54'/);
- assert.match(version,/releaseP(?:54|[5-9]\d)/);
- assert.match(notifications,/releaseP(?:54|[5-9]\d)/);
+ assert.match(version,/releaseP71/);
+ assert.match(notifications,/releaseP71/);
  assert.match(notifications,/P54_RELEASE|releaseP54/);
  assert.match(notifications,/P53_RELEASE/);
 });
