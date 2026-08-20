@@ -12,6 +12,13 @@ const SPECIAL_FRAMES={
  'xp-10000':{key:'xp-10000',name:'Viciado(a) Oficial',icon:'⚡',rarity:'legendary',description:'Acumule 10.000 XP em missões e Legado.',target:1,progress:1,unlocked:true},
  'genese-celestial':{...prestige.SPECIAL_FRAMES['genese-celestial'],target:1,progress:1,unlocked:true,isEntitlement:true}
 };
+const PROGRESSION_FRAMES={
+ bronze:{name:'Bronze',description:'Tenha 5 cartas Bronze no seu baralho. Depois de desbloqueada, esta moldura pode ser equipada livremente no Perfil.'},
+ silver:{name:'Prata',description:'Tenha 5 cartas Prata no seu baralho. Depois de desbloqueada, esta moldura pode ser equipada livremente no Perfil.'},
+ gold:{name:'Ouro',description:'Tenha 5 cartas Ouro no seu baralho. Depois de desbloqueada, esta moldura pode ser equipada livremente no Perfil.'},
+ platinum:{name:'Platina',description:'Tenha 5 cartas Platina no seu baralho. Depois de desbloqueada, esta moldura pode ser equipada livremente no Perfil.'}
+};
+const normalizeFrame=f=>PROGRESSION_FRAMES[f?.key]?{...f,...PROGRESSION_FRAMES[f.key],progressionFrame:true}:f;
 const RARITY_LABELS={common:'Comum',rare:'Incomum',superrare:'Raro',epic:'Épico',legendary:'Lendário',celestial:'Celestial'};
 const RARITY_ORDER={common:1,rare:2,superrare:3,epic:4,legendary:5,celestial:6};
 function rarityInfo(key){if(key==='celestial')return prestige.rarityInfo('celestial');const base=RARITIES[key]||RARITIES.common||{};return{...base,label:RARITY_LABELS[key]||base.label||'Comum'};}
@@ -25,7 +32,7 @@ module.exports=withErrors(async(req,res)=>{
  const fresh=(await sql`SELECT equipped_title_key,equipped_frame_key,xp FROM users WHERE id=${user.id}`)[0]||{};
  const extra=await sql`SELECT unlock_key FROM user_unlocks WHERE user_id=${user.id} AND unlock_type='frame' UNION SELECT entitlement_key AS unlock_key FROM special_entitlements WHERE user_id=${user.id} AND entitlement_type='frame'`;
  const titles=[...state.titles.map(t=>({...t,rarityInfo:rarityInfo(t.rarity)})),...p11.titles];
- const frames=[...state.frames.map(f=>({...f,rarityInfo:rarityInfo(f.rarity)})),...p11.frames];
+ const frames=[...state.frames.map(f=>normalizeFrame({...f,rarityInfo:rarityInfo(f.rarity)})),...p11.frames.map(normalizeFrame)];
  const achievements=(state.achievements||[]).map(a=>({...a,rarityInfo:rarityInfo(a.rarity)}));
  const specialKeys=new Set(extra.map(r=>r.unlock_key));
  if(fresh.equipped_frame_key&&SPECIAL_FRAMES[fresh.equipped_frame_key])specialKeys.add(fresh.equipped_frame_key);
