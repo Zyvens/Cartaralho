@@ -5,36 +5,38 @@ const fs=require('fs');
 const path=require('path');
 const root=path.join(__dirname,'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const js=read('public/js/cleanCardStacksFix.js');
+const legacy=read('public/js/cleanCardStacksFix.js');
 const css=read('public/css/cleanCardStacksFix.css');
+const screen=read('public/js/screens/cardCreation.js');
+const domain=read('public/js/domains/cardCreationUI.js');
 const html=read('public/index.html');
 
-test('fix das pilhas compila e carrega por último',()=>{
-  assert.doesNotThrow(()=>new Function(js));
-  assert.match(html,/css\/cleanCardStacksFix\.css/);
-  assert.match(html,/js\/refinementP13\.js[^]*js\/cleanCardStacksFix\.js/);
+test('pilhas são fonte do CardCreationScreen e owner final compila',()=>{
+ assert.doesNotThrow(()=>new Function(domain));
+ assert.match(screen,/cleanStack\(type,count\)/);
+ assert.match(screen,/clean-stack-grid-live/);
+ assert.match(screen,/clean-stack-sheet/);
+ assert.match(screen,/clean-stack-empty/);
+ assert.match(html,/css\/cleanCardStacksFix\.css/);
 });
 
-test('substitui explicitamente os contadores legados pelas pilhas',()=>{
-  assert.match(js,/Cartas Limpas Brancas/);
-  assert.match(js,/Cartas Limpas Pretas/);
-  assert.match(js,/closest\('\.account-card'\)/);
-  assert.match(js,/clean-stack-grid-live/);
-  assert.match(js,/clean-stack-sheet/);
-  assert.match(js,/clean-stack-empty/);
+test('hotfix antigo permanece apenas para rastreabilidade',()=>{
+ assert.doesNotThrow(()=>new Function(legacy));
+ assert.doesNotMatch(html,/<script\s+src="js\/cleanCardStacksFix\.js/);
+ assert.match(html,/type="application\/x-cartaralho-legacy" src="js\/cleanCardStacksFix\.js/);
 });
 
-test('saldo zero usa slot pontilhado e consumo possui animação',()=>{
-  assert.match(css,/border:2px dashed/);
-  assert.match(css,/cleanCardSpent/);
-  assert.match(js,/previous\.white/);
-  assert.match(js,/previous\.black/);
-  assert.match(js,/white<previous\.white/);
-  assert.match(js,/black<previous\.black/);
+test('saldo zero, profundidade e animação continuam preservados',()=>{
+ assert.match(css,/border:2px dashed/);
+ assert.match(css,/cleanCardSpent/);
+ assert.match(screen,/Math\.min\(n,12\)/);
+ assert.match(screen,/clean-stack-depth/);
+ assert.match(screen,/\+\$\{n-visible\}/);
 });
 
-test('pilha mostra profundidade sem renderizar centenas de nós',()=>{
-  assert.match(js,/Math\.min\(n,12\)/);
-  assert.match(js,/clean-stack-depth/);
-  assert.match(js,/\+\$\{n-visible\}/);
+test('owner preserva uma única pilha ativa e largura integral',()=>{
+ assert.match(domain,/enforceSingleCleanStack/);
+ assert.match(domain,/clean-stack-white/);
+ assert.match(domain,/clean-stack-black/);
+ assert.match(domain,/gridTemplateColumns='minmax\(0,1fr\)'/);
 });
