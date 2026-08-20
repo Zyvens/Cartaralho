@@ -4,7 +4,7 @@ const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'
 const index=read('public/index.html'),domainDir=path.join(root,'public/js/domains');
 const domainFiles=fs.readdirSync(domainDir).filter(x=>x.endsWith('.js')).sort(),sources=Object.fromEntries(domainFiles.map(name=>[name,read(`public/js/domains/${name}`)]));
 const expectedOwners={
- 'accountUI.js':'accountUI','adminUI.js':'adminUI','achievementsUI.js':'achievementsUI','audioUI.js':'audioUI','buffsUI.js':'buffsUI','cardCreationUI.js':'cardCreationUI','cardProgression.js':'cardProgression','cardsLibrary.js':'cardsLibrary','gameplayUI.js':'gameplayUI','genesisFrameUI.js':'genesisFrameUI','identityUI.js':'identityUI','marketplaceCatalogUI.js':'marketplaceCatalogUI','marketplaceUI.js':'marketplaceUI','missionsUI.js':'missionsUI','navigationUI.js':'navigationUI','notificationsUI.js':'notificationsUI','profileUI.js':'profileUI','rankUI.js':'rankUI','rewardsUI.js':'rewardsUI','roomUI.js':'roomUI','showcaseUI.js':'showcaseUI','socialUI.js':'socialUI','statsUI.js':'statsUI','uiPolishUI.js':'uiPolishUI'
+ 'accountUI.js':'accountUI','adminUI.js':'adminUI','achievementsUI.js':'achievementsUI','audioUI.js':'audioUI','buffsUI.js':'buffsUI','cardCreationUI.js':'cardCreationUI','cardProgression.js':'cardProgression','cardsLibrary.js':'cardsLibrary','cosmeticsUI.js':'cosmeticsUI','gameplayUI.js':'gameplayUI','genesisFrameUI.js':'genesisFrameUI','identityUI.js':'identityUI','marketplaceCatalogUI.js':'marketplaceCatalogUI','marketplaceUI.js':'marketplaceUI','missionsUI.js':'missionsUI','navigationUI.js':'navigationUI','notificationsUI.js':'notificationsUI','profileUI.js':'profileUI','rankUI.js':'rankUI','rewardsUI.js':'rewardsUI','roomUI.js':'roomUI','showcaseUI.js':'showcaseUI','socialUI.js':'socialUI','statsUI.js':'statsUI','uiPolishUI.js':'uiPolishUI'
 };
 
 test('todos os owners compilam e o registry carrega antes deles',()=>{
@@ -17,6 +17,7 @@ test('todos os owners compilam e o registry carrega antes deles',()=>{
 });
 
 test('cada arquivo de domínio declara exatamente um owner único',()=>{
+ assert.deepEqual(Object.keys(sources).sort(),Object.keys(expectedOwners).sort(),'todo arquivo de domínio deve estar explicitamente registrado no contrato');
  const seen=new Map();
  for(const [name,expected] of Object.entries(expectedOwners)){
   const source=sources[name];assert.ok(source,`arquivo ausente: ${name}`);
@@ -35,7 +36,7 @@ test('PXX numérico P33-P74 não executa mais e histórico permanece rastreável
 });
 
 test('patches históricos nomeados absorvidos também não executam',()=>{
- for(const name of['gameplayP19','roomP14Sync','profileAppearanceP19','revisionConsolidated','refinementP13','audioIntegrationP13','musicRecoveryP28','cleanCardStacksFix','identityP20','profileAppearanceP20','playerShowcaseP20','homeMenuP24','uiP25','homeMenuP27','genesisFrameP29']){
+ for(const name of['gameplayP19','roomP14Sync','profileAppearanceP19','revisionConsolidated','refinementP13','audioIntegrationP13','musicRecoveryP28','cleanCardStacksFix','cosmeticUI','identityP20','profileAppearanceP20','playerShowcaseP20','homeMenuP24','uiP25','homeMenuP27','genesisFrameP29']){
   assert.doesNotMatch(index,new RegExp(`<script\\s+src="js/${name}\\.js`),`${name} não pode ser executável`);
   assert.match(index,new RegExp(`type="application/x-cartaralho-legacy" src="js/${name}\\.js`),`${name} deve permanecer rastreável nesta fase`);
  }
@@ -61,6 +62,16 @@ test('P73/P74 pertencem agora a account e marketplace',()=>{
  assert.match(market,/knownBalance/);
  assert.match(market,/balance_updated/);
  assert.match(market,/admin_reward/);
+});
+
+test('cosméticos têm owner canônico e nomenclatura de progressão atual',()=>{
+ const cosmetics=sources['cosmeticsUI.js'];
+ assert.match(cosmetics,/MIN|Nível 5|cosmeticMinimumLevel/);
+ assert.match(cosmetics,/Compra permanente/);
+ assert.match(cosmetics,/Bronze, Prata, Ouro e Platina/);
+ assert.doesNotMatch(cosmetics,/Copper|Silver|Gold|Platinum/);
+ assert.match(cosmetics,/O Criador/);assert.match(cosmetics,/Betinha/);
+ assert.doesNotMatch(index,/<script\s+src="js\/cosmeticUI\.js/);
 });
 
 test('Minhas Cartas nasce no owner correto e preserva autoria',()=>{
