@@ -14,4 +14,13 @@
 .clean-stack-live .clean-stack-copy span{margin-top:5px;color:var(--text-muted);font-size:.72rem}
 .clean-stack-live.just-consumed .clean-stack-sheet:last-of-type{animation:cleanCardSpent .34s cubic-bezier(.2,.75,.3,1)}
 @keyframes cleanCardSpent{0%{opacity:1;filter:brightness(1);transform:translate(calc(var(--stack-i)*3.6px),calc(var(--stack-i)*-1.1px)) rotate(0) scale(1)}55%{opacity:.05;filter:brightness(1.35);transform:translate(calc(var(--stack-i)*3.6px + 28px),calc(var(--stack-i)*-1.1px - 20px)) rotate(10deg) scale(1.07)}56%{opacity:0}100%{opacity:1}}
+
+/* Active-type clarity: both card creators keep a single visible resource stack. */
+.card-creation-screen:has(.card-type-tab-black.active) .clean-stack-white,
+.card-creation-screen:has(.card-type-tab-black.active) .p58-clean-fallback.white{display:none!important}
+.card-creation-screen:has(.card-type-tab-white.active) .clean-stack-black,
+.card-creation-screen:has(.card-type-tab-white.active) .p58-clean-fallback.black{display:none!important}
+.card-creation-screen:has(.card-type-tab-black.active) .clean-stack-grid,
+.card-creation-screen:has(.card-type-tab-white.active) .clean-stack-grid{grid-template-columns:minmax(0,1fr)!important}
+
 @media(max-width:600px){.clean-stack-grid-live{grid-template-columns:1fr!important}.clean-stack-live{min-height:104px!important}.clean-stack-live .clean-stack-visual{flex-basis:94px!important;width:94px!important}}
