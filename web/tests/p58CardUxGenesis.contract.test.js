@@ -6,7 +6,7 @@ const js=read('public/js/p58.js'),css=read('public/css/p58.css'),card=read('publ
 test('P58 compila e carrega depois de P57',()=>{
  assert.doesNotThrow(()=>new Function(js));
  assert.ok(index.indexOf('css/p58.css?v=1.4.58')>index.indexOf('css/p57.css?v=1.4.57'));
- assert.ok(index.indexOf('js/p58.js?v=1.4.58')>index.indexOf('js/p57.js?v=1.4.57'));
+ assert.ok(index.indexOf('js/p58.js?v=1.4.58')>index.indexOf('js/p57.js?v=1.4.72'));
  assert.match(index,/js\/components\/card\.js\?v=1\.4\.58/);
 });
 

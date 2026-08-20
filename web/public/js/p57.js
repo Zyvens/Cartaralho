@@ -7,6 +7,11 @@
  const fmt=v=>Number(v||0).toLocaleString('pt-BR');
  const label=v=>LEVEL_LABEL[String(v||'standard').toLowerCase()]||String(v||'Padrão');
  const isBlack=c=>String(c?.type)==='blackCards'||String(c?.type)==='black';
+ const creatorLabel=c=>{
+  if(c?.is_native)return'Cartaralho';
+  const o=c?.origin||{};
+  return String(o.creatorUsername||c?.creator_username||o.creatorName||c?.creator_name||'Não identificado').replace(/^@/,'');
+ };
  const component=()=>typeof CardComponent!=='undefined'?CardComponent:null;
  const valueOf=c=>({text:c?.text||'',materialTier:c?.materialTier||'standard',borderTier:c?.borderTier||'standard',isPlayerCard:!!c?.is_player_card});
 
@@ -69,7 +74,7 @@
      const shell=document.createElement('article');shell.className='p57-library-card-shell';shell.dataset.cardId=c.id;shell.tabIndex=0;shell.setAttribute('role','button');shell.setAttribute('aria-label',`Abrir detalhes da carta: ${String(c.text||'')}`);
      const card=gameCard(c,{className:'p57-library-game-card'});
      const fav=document.createElement('button');fav.type='button';fav.className=`favorite-card p57-library-favorite ${c.is_favorite?'on':''}`;fav.dataset.favId=c.id;fav.setAttribute('aria-label',c.is_favorite?'Remover dos favoritos':'Adicionar aos favoritos');fav.textContent=c.is_favorite?'★':'☆';
-     const meta=document.createElement('div');meta.className='p57-library-card-meta';meta.innerHTML=`<span class="p57-card-origin ${c.is_native?'native':c.is_player_card?'player':'legacy'}">${c.is_native?'NATIVA':c.is_player_card?'DE JOGADOR':'COLEÇÃO'}</span><small>${label(c.materialTier)} · contorno ${label(c.borderTier)} · ${fmt(c.matches_used)} partida${Number(c.matches_used||0)===1?'':'s'}</small>`;
+     const meta=document.createElement('div');meta.className='p57-library-card-meta';meta.innerHTML=`<span class="p57-card-origin ${c.is_native?'native':c.is_player_card?'player':'legacy'}">${c.is_native?'NATIVA':c.is_player_card?'DE JOGADOR':'COLEÇÃO'}</span><small>Criado por ${esc(creatorLabel(c))}</small>`;
      shell.append(card,fav,meta);root.appendChild(shell);
      const open=()=>{const D=window.CartP56?.Detail||window.CardDetailUI;if(D?.open)D.open(c);};
      shell.onclick=e=>{if(e.target.closest('[data-fav-id]'))return;open();};
@@ -123,5 +128,5 @@
 
  function settle(){patchCardComponentLabels();Detail.patch();Library.patch();Recycling.patch();Frames.patch();Recycling.normalize(document.querySelector('.marketplace-body,.market-body'));Frames.activate();}
  settle();queueMicrotask(settle);window.addEventListener('pageshow',settle);
- window.CartP57={VERSION,label,gameCard,Detail,Library,Recycling,Frames,settle};
+ window.CartP57={VERSION,label,creatorLabel,gameCard,Detail,Library,Recycling,Frames,settle};
 })();
