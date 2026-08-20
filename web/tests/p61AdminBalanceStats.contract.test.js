@@ -23,7 +23,7 @@ test('prêmio administrativo sincroniza o saldo do destinatário em tempo real',
  assert.match(js,/cartaralho:balance-updated/);
 });
 
-test('Estatísticas usa o mesmo payload e nunca exibe transaction_type cru',()=>{
+test('Estatísticas usa o mesmo payload e nunca exibe transaction_type cru no renderer histórico',()=>{
  assert.match(js,/const d=await AuthClient\.stats\(\)/);
  assert.match(js,/economy=d\.economy\|\|\{\}/);
  assert.match(js,/card_recycling:'Reciclagem de cartas'/);
@@ -34,7 +34,7 @@ test('Estatísticas usa o mesmo payload e nunca exibe transaction_type cru',()=>
  assert.doesNotMatch(js,/\|\|type\|\|/);
 });
 
-test('extrato de Estatísticas nasce contraído e é expansível',()=>{
+test('extrato histórico de P61 permanece fechado por padrão, embora P69 o suprima da UI final',()=>{
  assert.match(js,/<details class="p61-stats-ledger">/);
  assert.doesNotMatch(js,/<details class="p61-stats-ledger" open/);
  assert.match(css,/\.p61-stats-ledger>summary/);
@@ -43,7 +43,8 @@ test('extrato de Estatísticas nasce contraído e é expansível',()=>{
 
 test('P61 permanece versionado como v1.4.61 mesmo após releases posteriores',()=>{
  assert.ok(index.indexOf('css/p61.css?v=1.4.61')>index.indexOf('css/p60.css?v=1.4.60'));
- assert.ok(index.indexOf('js/p61.js?v=1.4.61')>index.indexOf('js/p58.js?v=1.4.58'));
+ const p61=index.search(/js\/p61\.js\?v=1\.4\.(?:61|69)/),p58=index.indexOf('js/p58.js?v=1.4.58');
+ assert.ok(p61>p58);
  assert.match(release,/APP_VERSION='v1\.4\.61'/);
  assert.match(version,/APP_VERSION/);
  assert.match(notifications,/releaseP61/);
