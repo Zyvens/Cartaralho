@@ -2,48 +2,9 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const js=read('public/js/p67.js'),progressUi=read('public/js/cardProgressionUI.js'),index=read('public/index.html'),cards=read('api/profile/cards-v14.js'),progression=read('api/profile/progression.js'),rules=read('lib/cardProgressionRules.js'),auth=read('lib/auth.js'),release=read('lib/releaseP67.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
-
-test('P67 e UI de progressão compilam',()=>{
- assert.doesNotThrow(()=>new Function(js));
- assert.doesNotThrow(()=>new Function(progressUi));
-});
-
-test('P67 ficou restrito à progressão e não intercepta mais Estatísticas nem autoria',()=>{
- assert.match(js,/function progressionTrack\(kind,c\)/);
- assert.match(js,/D\.track=function\(kind,c\)/);
- assert.doesNotMatch(js,/renderStats|purgeStatsEconomy|decorateLibrary|creatorLabel|MutationObserver|HomeScreen\.renderStats/);
-});
-
-test('Fundo e Borda usam a mesma régua 10 30 60 100 sem off-by-one',()=>{
- const ladder="[{key:'copper',label:'Bronze',min:10},{key:'silver',label:'Prata',min:30},{key:'gold',label:'Ouro',min:60},{key:'platinum',label:'Platina',min:100}]";
- assert.ok(rules.includes(`MATERIAL_THRESHOLDS=${ladder}`));
- assert.ok(rules.includes(`BORDER_THRESHOLDS=${ladder}`));
- assert.match(auth,/cardProgressionRules\.tierFor\(n,'material'\)/);
- assert.match(auth,/cardProgressionRules\.tierFor\(n,'border'\)/);
- assert.match(auth,/cardProgressionRules\.progressFor\(value,kind\)/);
- assert.doesNotMatch(auth,/target\+1-n/);
-});
-
-test('Borda mede somente coletas por Espólio e preserva alcance global separado',()=>{
- assert.match(progression,/borderScore=Number\(r\.adoption_count\|\|0\)/);
- assert.match(progression,/worldHolders:reach/);
- assert.match(progression,/lootCollectors/);
- assert.match(cards,/acquisition_source='match_loot'/);
- assert.match(cards,/borderState\(lootCollectors\)/);
- assert.match(js,/coletas por Espólio por outros jogadores/);
- assert.match(js,/popularidade da carta/);
-});
-
-test('API de cartas mantém username do criador disponível ao renderer canônico',()=>{
- assert.match(cards,/creatorUsername/);
- assert.match(cards,/creator_username/);
-});
-
-test('P67 permanece no histórico e releases posteriores podem supersedi-lo',()=>{
- assert.ok(index.indexOf('js/p67.js?v=1.4.71')>index.indexOf('js/p66.js?v=1.4.66'));
- assert.ok(index.includes('cardProgressionUI.js?v=1.4.67'));
- assert.match(release,/APP_VERSION='v1\.4\.67'/);
- assert.match(version,/releaseP71/);
- assert.match(notifications,/releaseP67/);
- assert.match(notifications,/P66_RELEASE/);
-});
+test('P67 e UI de progressão compilam',()=>{assert.doesNotThrow(()=>new Function(js));assert.doesNotThrow(()=>new Function(progressUi));});
+test('P67 ficou restrito à progressão e não intercepta mais Estatísticas nem autoria',()=>{assert.match(js,/function progressionTrack\(kind,c\)/);assert.match(js,/D\.track=function\(kind,c\)/);assert.doesNotMatch(js,/renderStats|purgeStatsEconomy|decorateLibrary|creatorLabel|MutationObserver|HomeScreen\.renderStats/);});
+test('Fundo e Borda usam a mesma régua 10 30 60 100 sem off-by-one',()=>{const ladder="[{key:'copper',label:'Bronze',min:10},{key:'silver',label:'Prata',min:30},{key:'gold',label:'Ouro',min:60},{key:'platinum',label:'Platina',min:100}]";assert.ok(rules.includes(`MATERIAL_THRESHOLDS=${ladder}`));assert.ok(rules.includes(`BORDER_THRESHOLDS=${ladder}`));assert.match(auth,/cardProgressionRules\.tierFor\(n,'material'\)/);assert.match(auth,/cardProgressionRules\.tierFor\(n,'border'\)/);assert.match(auth,/cardProgressionRules\.progressFor\(value,kind\)/);assert.doesNotMatch(auth,/target\+1-n/);});
+test('Borda mede somente coletas por Espólio e preserva alcance global separado',()=>{assert.match(progression,/borderScore=Number\(r\.adoption_count\|\|0\)/);assert.match(progression,/worldHolders:reach/);assert.match(progression,/lootCollectors/);assert.match(cards,/acquisition_source='match_loot'/);assert.match(cards,/borderState\(lootCollectors\)/);assert.match(js,/coletas por Espólio por outros jogadores/);assert.match(js,/popularidade da carta/);});
+test('API de cartas mantém username do criador disponível ao renderer canônico',()=>{assert.match(cards,/creatorUsername/);assert.match(cards,/creator_username/);});
+test('P67 permanece no histórico e releases posteriores podem supersedi-lo',()=>{assert.ok(index.indexOf('js/p67.js?v=1.4.71')>index.indexOf('js/p66.js?v=1.4.66'));assert.ok(index.includes('cardProgressionUI.js?v=1.4.67'));assert.match(release,/APP_VERSION='v1\.4\.67'/);assert.match(version,/releaseP72/);assert.match(notifications,/releaseP67/);assert.match(notifications,/P66_RELEASE/);});
