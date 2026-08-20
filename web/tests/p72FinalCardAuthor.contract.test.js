@@ -30,9 +30,9 @@ test('Estatísticas continua semanticamente separada da carteira',()=>{
  assert.deepEqual(['public/js/p69.js','public/js/p70.js','public/css/p61.css'].map(p=>fs.existsSync(path.join(root,p))),[false,false,false]);
 });
 
-test('P72 permanece no histórico e P73 assume a versão atual',()=>{
+test('P72 permanece no histórico e P74 assume a versão atual',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.72'/);
- assert.match(version,/releaseP73/);
- assert.match(notifications,/releaseP73/);
+ assert.match(version,/releaseP74/);
+ assert.match(notifications,/P73_RELEASE/);
  assert.match(notifications,/P72_RELEASE/);
 });
