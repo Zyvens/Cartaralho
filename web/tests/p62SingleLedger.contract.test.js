@@ -5,14 +5,9 @@ const js=read('public/js/p62.js'),css=read('public/css/p62.css'),index=read('pub
 
 test('P62 compila',()=>assert.doesNotThrow(()=>new Function(js)));
 
-test('Estatísticas não possui mais painel de Moedas Sujas',()=>{
- assert.match(js,/async function renderStats\(panel\)/);
- assert.match(js,/MetaUI\.renderStats\(panel\)/);
- assert.match(js,/HomeScreen\.renderStats=renderStats/);
- assert.match(js,/\.p61-stats-ledger,\.p54-stats-ledger/);
- assert.match(css,/\.p61-stats-ledger[\s\S]*\.p54-stats-ledger[\s\S]*display:none!important/);
- assert.doesNotMatch(js,/function ledgerHtml/);
- assert.doesNotMatch(js,/transaction_type/);
+test('P62 não tenta mais corrigir Estatísticas por pós-processamento de DOM',()=>{
+ assert.doesNotMatch(js,/renderStats|stripStatsEconomy|installStatsRenderer|p61-stats-ledger|p54-stats-ledger|MutationObserver/);
+ assert.doesNotMatch(css,/p61-stats-ledger|p54-stats-ledger|stats-economy|economy-history|economy-ledger/);
 });
 
 test('mostrador de moedas abre Mercado Paralelo diretamente no Extrato',()=>{
@@ -31,10 +26,10 @@ test('atalho do saldo também funciona por teclado',()=>{
 });
 
 test('P62 permanece carregado e versionado após releases posteriores',()=>{
- assert.ok(index.indexOf('css/p62.css?v=1.4.62')>index.indexOf('css/p61.css?v=1.4.61'));
- assert.ok(index.indexOf('js/p62.js?v=1.4.62')>index.indexOf('js/p61.js?v=1.4.61'));
+ assert.ok(index.indexOf('css/p62.css?v=1.4.70')>index.indexOf('css/p60.css?v=1.4.60'));
+ assert.ok(index.indexOf('js/p62.js?v=1.4.70')>index.indexOf('js/p61.js?v=1.4.70'));
  assert.match(release,/APP_VERSION='v1\.4\.62'/);
- assert.match(version,/APP_VERSION/);
+ assert.match(version,/releaseP(?:62|6[3-9]|70)/);
  assert.match(notifications,/releaseP62/);
  assert.match(notifications,/P61_RELEASE/);
 });
