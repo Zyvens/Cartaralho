@@ -6,7 +6,7 @@ const js=read('public/js/p57.js'),css=read('public/css/p57.css'),index=read('pub
 test('P57 compila e carrega depois do P56',()=>{
  assert.doesNotThrow(()=>new Function(js));
  assert.ok(index.indexOf('css/p57.css?v=1.4.57')>index.indexOf('css/p56.css?v=1.4.56'));
- assert.ok(index.indexOf('js/p57.js?v=1.4.57')>index.indexOf('js/p56.js?v=1.4.56'));
+ assert.ok(index.indexOf('js/p57.js?v=1.4.57')>index.indexOf('js/p56.js?v=1.4.71'));
 });
 
 test('Minhas Cartas e a ficha usam o CardComponent real do jogo',()=>{
