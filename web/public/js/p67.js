@@ -5,7 +5,6 @@
  const LABEL={standard:'Padrão',copper:'Bronze',bronze:'Bronze',silver:'Prata',gold:'Ouro',platinum:'Platina'};
  const fmt=v=>Number(v||0).toLocaleString('pt-BR');
  const label=v=>LABEL[String(v||'standard').toLowerCase()]||String(v||'Padrão');
- let statsObserver=null;
 
  function progressionTrack(kind,c){
   const background=kind==='material';
@@ -32,59 +31,9 @@
   window.CardDetailUI=D;
  }
 
- function creatorLabel(c){
-  if(c?.is_native)return'Cartaralho';
-  const o=c?.origin||{};
-  return String(o.creatorUsername||o.creatorName||'Não identificado');
- }
- function decorateLibrary(panel,cards){
-  if(!panel||!Array.isArray(cards))return;
-  const byId=new Map(cards.map(c=>[String(c.id),c]));
-  panel.querySelectorAll('.p56-library-card[data-card-id]').forEach(el=>{
-   const c=byId.get(String(el.dataset.cardId)),small=el.querySelector('small');if(!c||!small)return;
-   small.textContent=`Criado por ${creatorLabel(c)}`;
-  });
- }
- function patchLibrary(){
-  const L=window.CartP56?.Library;if(!L||L.__p67AuthorFooter)return;
-  L.__p67AuthorFooter=true;
-  const base=L.render.bind(L);
-  L.render=async function(panel,...args){const cards=await base(panel,...args);decorateLibrary(panel,cards);return cards;};
- }
-
- function purgeStatsEconomy(root){
-  if(!root)return;
-  root.querySelectorAll('.p61-stats-ledger,.p54-stats-ledger,.stats-economy,.economy-history,.economy-ledger').forEach(node=>node.remove());
-  root.querySelectorAll('.meta-section,.market-section').forEach(section=>{
-   const heading=section.querySelector('h3,h4,.market-section-title')?.textContent||'';
-   if(/extrato|movimenta(?:ção|ções)|moedas sujas|economia/i.test(heading))section.remove();
-  });
- }
- async function renderStats(panel){
-  if(!window.MetaUI?.renderStats)throw new Error('Estatísticas indisponíveis.');
-  statsObserver?.disconnect();statsObserver=null;
-  const out=await MetaUI.renderStats(panel);
-  const root=panel.querySelector('.home-form.profile-panel')||panel;
-  purgeStatsEconomy(root);
-  if(window.MutationObserver){
-   statsObserver=new MutationObserver(()=>purgeStatsEconomy(root));
-   statsObserver.observe(root,{childList:true,subtree:true});
-  }
-  queueMicrotask(()=>purgeStatsEconomy(root));
-  requestAnimationFrame(()=>purgeStatsEconomy(root));
-  return out;
- }
- function patchStats(){
-  if(!window.HomeScreen||!window.MetaUI)return;
-  HomeScreen.renderStats=renderStats;
-  HomeScreen.__p67StatsOnly=true;
-  const panel=document.getElementById('home-panel'),root=panel?.querySelector('.home-form.profile-panel');
-  if(root)purgeStatsEconomy(root);
- }
-
- function settle(){patchDetail();patchLibrary();patchStats();}
+ function settle(){patchDetail();}
  settle();queueMicrotask(settle);
  document.addEventListener('DOMContentLoaded',settle,{once:true});
  window.addEventListener('pageshow',settle);
- window.CartP67={VERSION,progressionTrack,creatorLabel,decorateLibrary,purgeStatsEconomy,renderStats,settle};
+ window.CartP67={VERSION,progressionTrack,settle};
 })();
