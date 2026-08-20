@@ -6,7 +6,8 @@ const css=read('public/css/p54.css'),js=read('public/js/p54.js'),index=read('pub
 test('P54 compila e permanece carregado depois de P53',()=>{
  assert.doesNotThrow(()=>new Function(js));
  assert.ok(index.indexOf('css/p54.css?v=1.4.54')>index.indexOf('css/p53.css?v=1.4.53'));
- assert.ok(index.indexOf('js/p54.js?v=1.4.54')>index.indexOf('js/p53.js?v=1.4.53'));
+ const p54=index.search(/js\/p54\.js\?v=1\.4\.(?:54|69)/),p53=index.indexOf('js/p53.js?v=1.4.53');
+ assert.ok(p54>p53);
 });
 
 test('avatar com moldura remove a borda cinza legada da foto',()=>{

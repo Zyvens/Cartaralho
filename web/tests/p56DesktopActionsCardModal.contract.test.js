@@ -6,7 +6,8 @@ const js=read('public/js/p56.js'),css=read('public/css/p56.css'),index=read('pub
 test('P56 compila e permanece carregado depois de P55',()=>{
  assert.doesNotThrow(()=>new Function(js));
  assert.ok(index.indexOf('css/p56.css?v=1.4.56')>index.indexOf('css/p55.css?v=1.4.55'));
- assert.ok(index.indexOf('js/p56.js?v=1.4.56')>index.indexOf('js/p55.js?v=1.4.55'));
+ const p56=index.search(/js\/p56\.js\?v=1\.4\.(?:56|69)/),p55=index.indexOf('js/p55.js?v=1.4.55');
+ assert.ok(p56>p55);
 });
 
 test('Perfil e Sair viram ações de conta próprias no desktop',()=>{
