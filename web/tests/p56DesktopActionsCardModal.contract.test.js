@@ -3,69 +3,11 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const js=read('public/js/p56.js'),css=read('public/css/p56.css'),index=read('public/index.html'),release=read('lib/releaseP56.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
 
-test('P56 compila e permanece carregado depois de P55',()=>{
- assert.doesNotThrow(()=>new Function(js));
- assert.ok(index.indexOf('css/p56.css?v=1.4.56')>index.indexOf('css/p55.css?v=1.4.55'));
- const p56=index.indexOf('js/p56.js?v=1.4.71'),p55=index.indexOf('js/p55.js?v=1.4.55');
- assert.ok(p56>p55);
-});
-
-test('Perfil e Sair viram ações de conta próprias no desktop',()=>{
- assert.match(js,/p56-account-actions/);
- assert.match(js,/p56-profile-action/);
- assert.match(js,/Conta e aparência/);
- assert.match(js,/p56-logout-action/);
- assert.match(js,/Encerrar sessão/);
- assert.match(css,/@media\(min-width:621px\)/);
- assert.match(css,/\.home-account-bar \.p56-account-action[\s\S]*min-width:142px!important/);
- assert.match(css,/\.home-account-bar \.p56-logout-action[\s\S]*border-color:rgba\(248,113,113/);
-});
-
-test('Minhas Cartas possui um único renderer para todos os caminhos históricos',()=>{
- assert.match(js,/ProfessionalUI\.renderCards=\(panel,\.\.\.args\)=>Library\.render/);
- assert.match(js,/HomeScreen\.renderCards=\(panel,\.\.\.args\)=>Library\.render/);
- assert.match(js,/MetaUI\.renderCards=\(panel,\.\.\.args\)=>Library\.render/);
- assert.doesNotMatch(js,/Modal\.show\(/);
- assert.match(js,/Detail\.open\(c\)/);
-});
-
-test('rodapé da coleção nasce como autoria no renderer canônico',()=>{
- assert.match(js,/const creatorLabel=c=>/);
- assert.match(js,/o\.creatorUsername\|\|c\?\.creator_username\|\|o\.creatorName/);
- assert.match(js,/<small>Criado por \$\{esc\(creatorLabel\(c\)\)\}<\/small>/);
- assert.doesNotMatch(js,/<small>\$\{tier\(c\.materialTier\)\} · contorno/);
-});
-
-test('renderer canônico não depende de window para bindings lexicais',()=>{
- assert.match(js,/typeof HomeScreen===['"]undefined['"]/);
- assert.match(js,/typeof ProfessionalUI!==['"]undefined['"]/);
- assert.match(js,/typeof MetaUI!==['"]undefined['"]/);
-});
-
-test('Ficha P56 elimina os overlays concorrentes e fica definitivamente acima do AppPanel',()=>{
- assert.match(js,/p41-card-detail-overlay/);
- assert.match(js,/p55-card-detail-overlay/);
- assert.match(js,/p56-card-detail-overlay/);
- assert.match(css,/\.p56-card-detail-overlay[\s\S]*z-index:65000/);
- assert.match(js,/Ficha da carta/);
- assert.match(js,/Do uso ao prestígio/);
- assert.match(js,/Histórico da carta/);
-});
-
-test('Ficha reduz texto corrido e expõe metas e origem como dados visuais',()=>{
- assert.match(js,/p56-progress-metric/);
- assert.match(js,/\+\$\{fmt\(remaining\)\} → \$\{tier\(next\)\}/);
- assert.match(js,/MESAS VISITADAS/);
- assert.match(js,/PESSOAS QUE POSSUEM/);
- assert.match(js,/PRIMEIRA MESA/);
- assert.match(js,/CardComponent\._formatBlackText/);
- assert.match(css,/\.p56-origin-grid\{display:grid/);
-});
-
-test('P56 permanece no histórico após releases posteriores',()=>{
- assert.match(release,/APP_VERSION='v1\.4\.56'/);
- assert.match(version,/releaseP71/);
- assert.match(notifications,/releaseP71/);
- assert.match(notifications,/P56_RELEASE|releaseP56/);
- assert.match(notifications,/P55_RELEASE/);
-});
+test('P56 compila e permanece carregado depois de P55',()=>{assert.doesNotThrow(()=>new Function(js));assert.ok(index.indexOf('css/p56.css?v=1.4.56')>index.indexOf('css/p55.css?v=1.4.55'));const p56=index.indexOf('js/p56.js?v=1.4.71'),p55=index.indexOf('js/p55.js?v=1.4.55');assert.ok(p56>p55);});
+test('Perfil e Sair viram ações de conta próprias no desktop',()=>{assert.match(js,/p56-account-actions/);assert.match(js,/p56-profile-action/);assert.match(js,/Conta e aparência/);assert.match(js,/p56-logout-action/);assert.match(js,/Encerrar sessão/);assert.match(css,/@media\(min-width:621px\)/);assert.match(css,/\.home-account-bar \.p56-account-action[\s\S]*min-width:142px!important/);assert.match(css,/\.home-account-bar \.p56-logout-action[\s\S]*border-color:rgba\(248,113,113/);});
+test('Minhas Cartas possui renderer P56 consolidado para caminhos históricos',()=>{assert.match(js,/ProfessionalUI\.renderCards=\(panel,\.\.\.args\)=>Library\.render/);assert.match(js,/HomeScreen\.renderCards=\(panel,\.\.\.args\)=>Library\.render/);assert.match(js,/MetaUI\.renderCards=\(panel,\.\.\.args\)=>Library\.render/);assert.doesNotMatch(js,/Modal\.show\(/);assert.match(js,/Detail\.open\(c\)/);});
+test('rodapé P56 nasce como autoria',()=>{assert.match(js,/const creatorLabel=c=>/);assert.match(js,/o\.creatorUsername\|\|c\?\.creator_username\|\|o\.creatorName/);assert.match(js,/<small>Criado por \$\{esc\(creatorLabel\(c\)\)\}<\/small>/);assert.doesNotMatch(js,/<small>\$\{tier\(c\.materialTier\)\} · contorno/);});
+test('renderer P56 não depende de window para bindings lexicais',()=>{assert.match(js,/typeof HomeScreen===['"]undefined['"]/);assert.match(js,/typeof ProfessionalUI!==['"]undefined['"]/);assert.match(js,/typeof MetaUI!==['"]undefined['"]/);});
+test('Ficha P56 elimina overlays concorrentes e fica acima do AppPanel',()=>{assert.match(js,/p41-card-detail-overlay/);assert.match(js,/p55-card-detail-overlay/);assert.match(js,/p56-card-detail-overlay/);assert.match(css,/\.p56-card-detail-overlay[\s\S]*z-index:65000/);assert.match(js,/Ficha da carta/);assert.match(js,/Do uso ao prestígio/);assert.match(js,/Histórico da carta/);});
+test('Ficha reduz texto corrido e expõe metas e origem como dados visuais',()=>{assert.match(js,/p56-progress-metric/);assert.match(js,/\+\$\{fmt\(remaining\)\} → \$\{tier\(next\)\}/);assert.match(js,/MESAS VISITADAS/);assert.match(js,/PESSOAS QUE POSSUEM/);assert.match(js,/PRIMEIRA MESA/);assert.match(js,/CardComponent\._formatBlackText/);assert.match(css,/\.p56-origin-grid\{display:grid/);});
+test('P56 permanece no histórico após releases posteriores',()=>{assert.match(release,/APP_VERSION='v1\.4\.56'/);assert.match(version,/releaseP72/);assert.match(notifications,/releaseP72/);assert.match(notifications,/P56_RELEASE|releaseP56/);assert.match(notifications,/P55_RELEASE/);});
