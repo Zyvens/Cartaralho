@@ -1,0 +1,10 @@
+'use strict';
+(()=>{
+ if(window.CartCardCreationDomain)return;
+ CartDomains.claim('cardCreationUI','domains/cardCreationUI.js',()=>{
+  function polish(){const top=document.querySelector('.card-creation-screen > #back-btn');if(top&&/Salvar e voltar ao Lobby/i.test(top.textContent||''))top.remove();}
+  function decorateLibrary(screen){document.querySelectorAll('#library-grid .card-progression-badge').forEach(b=>{if(/DE JOGADOR/i.test(b.textContent||''))b.remove();});document.querySelectorAll('.card-creation-screen .player-library-title').forEach(h=>{const text=(h.textContent||'').trim();if(text==='Na partida')h.classList.add('player-library-title-selected');if(text.startsWith('Reutilizar Cartas de Jogador')){h.classList.add('is-reuse-title');h.innerHTML='<span>Reutilizar Cartas de Jogador:</span><span class="player-library-free-pill">grátis</span>';}});const cfg=App.state.config||{},allowOwned=cfg.playerCardsEnabled!==false,type=screen.activeTab==='black'?'blackCards':'whiteCards',all=screen.library.filter(c=>c.type===type),visible=allowOwned?all:all.filter(c=>screen.createdHere.has(screen.createdKey(type,c.text)));document.querySelectorAll('#library-grid .player-card-library-card').forEach((el,i)=>{el.classList.toggle('is-favorite',!!visible[i]?.is_favorite);if(visible[i]?.is_favorite)el.title=`★ Favorita · ${el.title||'Clique para selecionar'}`;});}
+  function install(){if(typeof CardCreationScreen==='undefined'||CardCreationScreen.__domainOwned)return;CardCreationScreen.__domainOwned=true;const render=CardCreationScreen.render.bind(CardCreationScreen),tab=CardCreationScreen.renderTabContent.bind(CardCreationScreen);CardCreationScreen.render=async function(...args){const out=await render(...args);polish();return out;};CardCreationScreen.renderTabContent=function(...args){this.library.sort((a,b)=>Number(!!b.is_favorite)-Number(!!a.is_favorite)||String(a.text||'').localeCompare(String(b.text||''),'pt-BR'));const out=tab(...args);decorateLibrary(this);return out;};}
+  install();window.CartCardCreationDomain={install,polish,decorateLibrary};
+ });
+})();
