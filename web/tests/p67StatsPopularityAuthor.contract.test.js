@@ -8,15 +8,10 @@ test('P67 e UI de progressão compilam',()=>{
  assert.doesNotThrow(()=>new Function(progressUi));
 });
 
-test('modal de Estatísticas é protegido contra qualquer extrato tardio sem afetar outros painéis',()=>{
- assert.match(js,/HomeScreen\.renderStats=renderStats/);
- assert.match(js,/MetaUI\.renderStats\(panel\)/);
- assert.match(js,/const root=panel\.querySelector\('\.home-form\.profile-panel'\)\|\|panel/);
- assert.match(js,/\.p61-stats-ledger,\.p54-stats-ledger/);
- assert.match(js,/new MutationObserver\(\(\)=>purgeStatsEconomy\(root\)\)/);
- assert.match(js,/statsObserver\.observe\(root,/);
- assert.match(js,/queueMicrotask\(\(\)=>purgeStatsEconomy\(root\)\)/);
- assert.doesNotMatch(js,/Saldo:/);
+test('P67 ficou restrito à progressão e não intercepta mais Estatísticas nem autoria',()=>{
+ assert.match(js,/function progressionTrack\(kind,c\)/);
+ assert.match(js,/D\.track=function\(kind,c\)/);
+ assert.doesNotMatch(js,/renderStats|purgeStatsEconomy|decorateLibrary|creatorLabel|MutationObserver|HomeScreen\.renderStats/);
 });
 
 test('Fundo e Borda usam a mesma régua 10 30 60 100 sem off-by-one',()=>{
@@ -39,17 +34,16 @@ test('Borda mede somente coletas por Espólio e preserva alcance global separado
  assert.match(js,/popularidade da carta/);
 });
 
-test('rodapé da carta exibe somente autoria',()=>{
- assert.match(js,/small\.textContent=`Criado por \$\{creatorLabel\(c\)\}`/);
- assert.match(js,/o\.creatorUsername\|\|o\.creatorName/);
- assert.doesNotMatch(js,/Fundo \$\{label\(c\.materialTier\)\}/);
+test('API de cartas mantém username do criador disponível ao renderer canônico',()=>{
+ assert.match(cards,/creatorUsername/);
+ assert.match(cards,/creator_username/);
 });
 
 test('P67 permanece no histórico e releases posteriores podem supersedi-lo',()=>{
- assert.ok(index.indexOf('js/p67.js?v=1.4.67')>index.indexOf('js/p66.js?v=1.4.66'));
+ assert.ok(index.indexOf('js/p67.js?v=1.4.70')>index.indexOf('js/p66.js?v=1.4.66'));
  assert.ok(index.includes('cardProgressionUI.js?v=1.4.67'));
  assert.match(release,/APP_VERSION='v1\.4\.67'/);
- assert.match(version,/releaseP(?:67|68|69)/);
+ assert.match(version,/releaseP(?:67|68|69|70)/);
  assert.match(notifications,/releaseP67/);
  assert.match(notifications,/P66_RELEASE/);
 });
