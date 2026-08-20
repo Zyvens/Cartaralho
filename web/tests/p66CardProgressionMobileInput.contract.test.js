@@ -36,10 +36,10 @@ test('campos mobile não acionam zoom de foco e admin fica ancorado',()=>{
 });
 
 test('P66 permanece no histórico e releases posteriores carregam depois',()=>{
- assert.ok(index.indexOf('js/p67.js?v=1.4.67')>index.indexOf('js/p66.js?v=1.4.66'));
+ assert.ok(index.indexOf('js/p67.js?v=1.4.71')>index.indexOf('js/p66.js?v=1.4.66'));
  assert.ok(index.includes('cardProgressionUI.js?v=1.4.67'));
  assert.match(release,/APP_VERSION='v1\.4\.66'/);
- assert.match(version,/releaseP(?:66|67|68|69)/);
+ assert.match(version,/releaseP(?:66|67|68|69|7[0-9])/);
  assert.match(notifications,/releaseP66/);
  assert.match(notifications,/P65_RELEASE/);
 });

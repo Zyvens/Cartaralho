@@ -6,8 +6,8 @@ const js=read('public/js/p55.js'),css=read('public/css/p55.css'),recycling=read(
 test('P55 compila e carrega após P54',()=>{
  assert.doesNotThrow(()=>new Function(js));
  assert.doesNotThrow(()=>new Function(recycling));
- assert.ok(index.indexOf('css/p55.css?v=1.4.55')>index.indexOf('css/p54.css?v=1.4.54'));
- assert.ok(index.indexOf('js/p55.js?v=1.4.55')>index.indexOf('js/p54.js?v=1.4.54'));
+ assert.ok(index.indexOf('css/p55.css?v=1.4.55')>index.indexOf('css/p54.css?v=1.4.71'));
+ assert.ok(index.indexOf('js/p55.js?v=1.4.55')>index.indexOf('js/p54.js?v=1.4.71'));
 });
 
 test('Reciclagem usa exatamente o formatador canônico de lacunas das Cartas Pretas',()=>{

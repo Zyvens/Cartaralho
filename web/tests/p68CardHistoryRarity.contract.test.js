@@ -49,11 +49,11 @@ test('modal recebe tema sutil por raridade',()=>{
  assert.match(css,/--p68-rarity-rgb/);
 });
 
-test('P68 permanece no histórico e P69 pode ser a versão atual',()=>{
+test('P68 permanece no histórico e P71 pode ser a versão atual',()=>{
  assert.ok(index.indexOf('css/p68.css?v=1.4.68')>index.indexOf('css/p66.css?v=1.4.66'));
- assert.ok(index.indexOf('js/p68.js?v=1.4.68')>index.indexOf('js/p67.js?v=1.4.67'));
+ assert.ok(index.indexOf('js/p68.js?v=1.4.68')>index.indexOf('js/p67.js?v=1.4.71'));
  assert.match(release,/APP_VERSION='v1\.4\.68'/);
- assert.match(version,/releaseP(?:68|69)/);
+ assert.match(version,/releaseP(?:68|69|7[0-9])/);
  assert.match(notifications,/releaseP68/);
  assert.match(notifications,/P67_RELEASE/);
 });
