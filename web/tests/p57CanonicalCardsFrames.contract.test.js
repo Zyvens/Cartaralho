@@ -6,7 +6,7 @@ const js=read('public/js/p57.js'),css=read('public/css/p57.css'),index=read('pub
 test('P57 compila e carrega depois do P56',()=>{
  assert.doesNotThrow(()=>new Function(js));
  assert.ok(index.indexOf('css/p57.css?v=1.4.57')>index.indexOf('css/p56.css?v=1.4.56'));
- assert.ok(index.indexOf('js/p57.js?v=1.4.57')>index.indexOf('js/p56.js?v=1.4.71'));
+ assert.ok(index.indexOf('js/p57.js?v=1.4.72')>index.indexOf('js/p56.js?v=1.4.71'));
 });
 
 test('Minhas Cartas e a ficha usam o CardComponent real do jogo',()=>{
@@ -19,6 +19,13 @@ test('Minhas Cartas e a ficha usam o CardComponent real do jogo',()=>{
  assert.match(js,/ProfessionalUI\.renderCards=render/);
  assert.match(js,/HomeScreen\.renderCards=render/);
  assert.match(js,/MetaUI\.renderCards=render/);
+});
+
+test('renderer final de Minhas Cartas gera autoria em vez de metadado técnico',()=>{
+ assert.match(js,/const creatorLabel=c=>/);
+ assert.match(js,/o\.creatorUsername\|\|c\?\.creator_username\|\|o\.creatorName/);
+ assert.match(js,/<small>Criado por \$\{esc\(creatorLabel\(c\)\)\}<\/small>/);
+ assert.doesNotMatch(js,/contorno \$\{label\(c\.borderTier\)\}/);
 });
 
 test('Lacunas pretas ficam canônicas também na Reciclagem',()=>{
