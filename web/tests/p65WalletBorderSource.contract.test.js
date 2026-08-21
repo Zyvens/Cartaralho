@@ -34,7 +34,7 @@ test('thresholds continuam centralizados e labels atuais são Bronze, Prata, Our
  assert.match(cardProgression,/platinum:'Platina'/);
 });
 
-test('P65 permanece como proveniência histórica e P74 é a release corrente',()=>{
+test('P65 permanece como proveniência histórica e P75 é a release corrente',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.65'/);
- assert.match(version,/releaseP74/);
+ assert.match(version,/releaseP75/);
 });
