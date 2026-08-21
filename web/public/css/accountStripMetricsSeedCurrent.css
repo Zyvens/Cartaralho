@@ -1,0 +1,48 @@
+/* Owner visual da camada P41 ainda efetiva do account strip. Refinamentos P49/P56/P74 permanecem posteriores. */
+.home-account-bar{
+  flex-wrap:nowrap!important;
+  justify-content:flex-start!important;
+  width:100%!important;
+}
+.home-account-bar .home-account-identity{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  overflow:hidden!important;
+}
+.home-account-bar .home-account-identity strong,
+.home-account-bar .home-account-identity>span,
+.home-account-bar .account-equipped-title{
+  max-width:100%!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.home-account-bar .home-account-balance{
+  min-width:92px!important;
+  max-width:128px!important;
+  padding-left:8px!important;
+  padding-right:8px!important;
+  gap:5px!important;
+}
+.home-account-bar #profile-shortcut,
+.home-account-bar #logout-btn{
+  flex:0 0 48px!important;
+  width:48px!important;
+  min-width:48px!important;
+  padding-left:8px!important;
+  padding-right:8px!important;
+}
+@media(max-width:620px){
+ .home-account-bar{gap:6px!important}
+ .home-account-bar>.user-avatar,.home-account-bar>.avatar-frame{flex:0 0 auto!important}
+ .home-account-bar .home-account-balance{height:46px!important;min-height:46px!important;min-width:82px!important;max-width:104px!important;padding:0 6px!important;gap:3px!important;font-size:1.08rem!important}
+ .home-account-bar #profile-shortcut,.home-account-bar #logout-btn{height:46px!important;min-height:46px!important;flex-basis:44px!important;width:44px!important;min-width:44px!important;padding:0 6px!important}
+ .home-account-bar .home-account-identity strong{font-size:clamp(.82rem,3.6vw,1rem)!important}
+ .home-account-bar .home-account-identity>span{font-size:.66rem!important}
+ .home-account-bar .account-equipped-title{font-size:.55rem!important}
+}
+@media(max-width:390px){
+ .home-account-bar{gap:4px!important}
+ .home-account-bar .home-account-balance{min-width:76px!important;max-width:96px!important;padding:0 4px!important;font-size:1.04rem!important}
+ .home-account-bar #profile-shortcut,.home-account-bar #logout-btn{flex-basis:42px!important;width:42px!important;min-width:42px!important;padding:0 4px!important}
+}
