@@ -11,7 +11,6 @@ const homeCss=read('public/css/homeHeroCompactCurrent.css');
 const presenceCss=read('public/css/friendsPresencePendingCurrent.css');
 const missionsCss=read('public/css/missionsTwoColumnCurrent.css');
 const recyclingCss=read('public/css/recyclingCardIdentityCurrent.css');
-const frameCss=read('public/css/profileFrameGridStaticCurrent.css');
 const social=read('public/js/domains/socialUI.js');
 const missions=read('public/js/domains/missionsUI.js');
 const room=read('public/js/domains/roomUI.js');
@@ -68,13 +67,11 @@ test('navigationUI mantém Central de Notificações acima de Histórico',()=>{
  assert.ok(n>=0&&h>n);
 });
 
-test('profileUI preserva aparência e estabilidade visual das molduras',()=>{
- assert.ok(profile.includes('P.render=function'));
- assert.ok(profile.includes('setAppearanceDraft'));
- assert.ok(profile.includes('profile-global-save'));
- assert.ok(profile.includes('CartMissionsDomain?.missionRow?.(m)'));
- assert.ok(frameCss.includes('.profile-modal-frame-grid .avatar-frame'));
- assert.ok(shim.includes('profileFrameGridStaticCurrent.css'));
+test('grid estático P53 foi supersedido pelo lifecycle live P57/P58 de profileUI',()=>{
+ assert.ok(profile.includes("grid.classList.add('p57-live-frame-grid','p58-live-frame-grid')"));
+ assert.ok(profile.includes("grid.classList.remove('profile-modal-frame-grid')"));
+ assert.ok(profile.includes("frame.classList.add('p58-genesis-preview')"));
+ assert.ok(!shim.includes('profileFrameGridStaticCurrent.css'));
 });
 
 test('entrada p53/p48 de criação foi supersedida pelo fluxo atual P54/P56/P57',()=>{
