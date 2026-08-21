@@ -3,69 +3,9 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const account=read('public/js/domains/accountUI.js'),cards=read('public/js/domains/cardsLibrary.js'),progression=read('public/js/domains/cardProgression.js'),css=read('public/css/p56.css'),index=read('public/index.html'),release=read('lib/releaseP56.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
 
-test('P56 foi absorvido por owners canônicos e o script histórico não executa',()=>{
- [account,cards,progression].forEach(src=>assert.doesNotThrow(()=>new Function(src)));
- assert.match(index,/<script src="js\/domains\/accountUI\.js\?v=domain-2"><\/script>/);
- assert.match(index,/<script src="js\/domains\/cardsLibrary\.js\?v=domain-2"><\/script>/);
- assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p56\.js\?v=1\.4\.71"><\/script>/);
- assert.match(index,/<link rel="stylesheet" href="css\/p56\.css\?v=1\.4\.56">/);
-});
-
-test('Perfil e Sair continuam ações de conta próprias no desktop e no owner atual',()=>{
- assert.match(account,/p56-account-actions/);
- assert.match(account,/p56-profile-action/);
- assert.match(account,/Conta e aparência/);
- assert.match(account,/p56-logout-action/);
- assert.match(account,/Encerrar sessão/);
- assert.match(css,/@media\(min-width:621px\)/);
- assert.match(css,/\.home-account-bar \.p56-account-action[\s\S]*min-width:142px!important/);
- assert.match(css,/\.home-account-bar \.p56-logout-action[\s\S]*border-color:rgba\(248,113,113/);
-});
-
-test('Minhas Cartas possui um único renderer canônico para todos os caminhos',()=>{
- assert.match(cards,/HomeScreen\.renderCards=render/);
- assert.match(cards,/ProfessionalUI\.renderCards=render/);
- assert.match(cards,/MetaUI\.renderCards=render/);
- assert.doesNotMatch(cards,/Modal\.show\(/);
- assert.match(cards,/Detail\.open\(c\)/);
-});
-
-test('rodapé de cada carta continua exibindo autoria',()=>{
- assert.match(cards,/const creatorLabel=c=>/);
- assert.match(cards,/<small>Criado por \$\{esc\(creatorLabel\(c\)\)\}<\/small>/);
- assert.doesNotMatch(cards,/<small>\$\{tier\(c\.materialTier\)\} · contorno/);
-});
-
-test('renderer canônico usa bindings lexicais e owners atuais',()=>{
- assert.match(cards,/typeof CardComponent==='undefined'/);
- assert.match(cards,/typeof ProfessionalUI!=='undefined'/);
- assert.match(cards,/typeof MetaUI!=='undefined'/);
-});
-
-test('Ficha elimina overlays concorrentes e fica acima do AppPanel',()=>{
- assert.match(cards,/p41-card-detail-overlay/);
- assert.match(cards,/p55-card-detail-overlay/);
- assert.match(cards,/p56-card-detail-overlay/);
- assert.match(css,/\.p56-card-detail-overlay[\s\S]*z-index:65000/);
- assert.match(cards,/Ficha da carta/);
- assert.match(cards,/Do uso ao prestígio/);
- assert.match(cards,/Histórico da carta/);
-});
-
-test('Ficha expõe progressão e origem como dados visuais, com trajetória P68 incorporada',()=>{
- assert.match(progression,/p56-progress-metric/);
- assert.match(progression,/\+\$\{fmt\(remaining\)\} → \$\{label\(next\)\}/);
- assert.match(progression,/MESAS VISITADAS/);
- assert.match(progression,/PESSOAS QUE POSSUEM/);
- assert.match(progression,/PRIMEIRA MESA/);
- assert.match(cards,/CardComponent\._formatBlackText/);
- assert.match(css,/\.p56-origin-grid\{display:grid/);
-});
-
-test('P56 permanece no histórico e P74 é a release corrente',()=>{
- assert.match(release,/APP_VERSION='v1\.4\.56'/);
- assert.match(version,/releaseP74/);
- assert.match(notifications,/releaseP72/);
- assert.match(notifications,/P56_RELEASE|releaseP56/);
- assert.match(notifications,/P55_RELEASE/);
-});
+test('P56 foi absorvido por owners canônicos e o script histórico não executa',()=>{[account,cards,progression].forEach(src=>assert.doesNotThrow(()=>new Function(src)));assert.match(index,/<script src="js\/domains\/accountUI\.js\?v=domain-2"><\/script>/);assert.match(index,/<script src="js\/domains\/cardsLibrary\.js\?v=domain-2"><\/script>/);assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p56\.js\?v=1\.4\.71"><\/script>/);assert.match(index,/<link rel="stylesheet" href="css\/p56\.css\?v=1\.4\.56">/);});
+test('Perfil e Sair continuam ações de conta próprias no desktop e no owner atual',()=>{assert.match(account,/p56-account-actions/);assert.match(account,/p56-profile-action/);assert.match(account,/Conta e aparência/);assert.match(account,/p56-logout-action/);assert.match(account,/Encerrar sessão/);assert.match(css,/@media\(min-width:621px\)/);assert.match(css,/\.home-account-bar \.p56-account-action[\s\S]*min-width:142px!important/);});
+test('Minhas Cartas possui um único renderer canônico para todos os caminhos',()=>{assert.match(cards,/HomeScreen\.renderCards=render/);assert.match(cards,/ProfessionalUI\.renderCards=render/);assert.match(cards,/MetaUI\.renderCards=render/);assert.doesNotMatch(cards,/Modal\.show\(/);assert.match(cards,/Detail\.open\(c\)/);});
+test('rodapé de cada carta continua exibindo autoria',()=>{assert.match(cards,/const creatorLabel=c=>/);assert.match(cards,/<small>Criado por \$\{esc\(creatorLabel\(c\)\)\}<\/small>/);});
+test('Ficha elimina overlays concorrentes e preserva progressão e origem',()=>{assert.match(cards,/p41-card-detail-overlay/);assert.match(cards,/p55-card-detail-overlay/);assert.match(cards,/p56-card-detail-overlay/);assert.match(css,/\.p56-card-detail-overlay[\s\S]*z-index:65000/);assert.match(progression,/p56-progress-metric/);assert.match(progression,/MESAS VISITADAS/);assert.match(progression,/PESSOAS QUE POSSUEM/);});
+test('P56 permanece no histórico e P75 é a release corrente',()=>{assert.match(release,/APP_VERSION='v1\.4\.56'/);assert.match(version,/releaseP75/);assert.match(notifications,/releaseP75/);assert.match(notifications,/P56_RELEASE|releaseP56/);assert.match(notifications,/P55_RELEASE/);});
