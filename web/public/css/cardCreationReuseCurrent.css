@@ -1,0 +1,12 @@
+/* Owner visual canônico da reutilização de Cartas de Jogador na criação, incluindo favorito e selo grátis. */
+.card-creation-screen .player-library-title{margin:32px 0 18px!important;line-height:1.25!important}
+.card-creation-screen .player-library-title.player-library-title-selected{margin-top:34px!important}
+.card-creation-screen .created-cards-grid{margin:0 0 42px!important}
+.card-creation-screen .player-card-library-grid{margin-top:0!important;padding-top:2px!important}
+.card-creation-screen .player-library-title.is-reuse-title{display:flex!important;align-items:center;gap:9px;flex-wrap:wrap}
+.player-library-free-pill{display:inline-flex;align-items:center;min-height:25px;padding:4px 10px;border-radius:999px;border:1px solid rgba(34,197,94,.36);background:rgba(34,197,94,.11);color:#86efac;font-size:.68rem;font-weight:900;letter-spacing:.035em;text-transform:uppercase;vertical-align:middle}
+.player-card-library-card.is-favorite{outline:3px solid rgba(250,204,21,.78)!important;outline-offset:4px!important;box-shadow:0 0 24px rgba(250,204,21,.18)!important}
+@media(max-width:620px){
+ .card-creation-screen .player-library-title{margin:28px 0 16px!important}
+ .card-creation-screen .created-cards-grid{margin-bottom:36px!important}
+}
