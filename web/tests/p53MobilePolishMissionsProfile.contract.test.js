@@ -6,7 +6,12 @@ const path=require('path');
 const root=path.join(__dirname,'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const history=read('public/js/p53.js');
-const css=read('public/css/p53.css');
+const shim=read('public/css/p53.css');
+const homeCss=read('public/css/homeHeroCompactCurrent.css');
+const presenceCss=read('public/css/friendsPresencePendingCurrent.css');
+const missionsCss=read('public/css/missionsTwoColumnCurrent.css');
+const recyclingCss=read('public/css/recyclingCardIdentityCurrent.css');
+const frameCss=read('public/css/profileFrameGridStaticCurrent.css');
 const social=read('public/js/domains/socialUI.js');
 const missions=read('public/js/domains/missionsUI.js');
 const room=read('public/js/domains/roomUI.js');
@@ -19,18 +24,23 @@ const release=read('lib/releaseP53.js');
 const version=read('api/version.js');
 const notifications=read('api/notifications.js');
 
-test('contador de amigos nasce com último valor conhecido no owner social',()=>{
- assert.ok(social.includes('ensureFriendPill'));
- assert.ok(social.includes('localStorage.getItem(key())'));
- assert.ok(social.includes("pill.textContent='…'"));
+test('hero compacto e presença pendente vivem em owners visuais canônicos',()=>{
+ assert.ok(homeCss.includes('height:clamp(270px,34svh,380px)!important'));
+ assert.ok(presenceCss.includes('p53-presence-pending'));
+ assert.ok(shim.includes('homeHeroCompactCurrent.css'));
+ assert.ok(shim.includes('friendsPresencePendingCurrent.css'));
+ assert.ok(social.includes("pill.className='p48-friends-online-pill p53-presence-pending'"));
+ assert.ok(social.includes("pill.classList.remove('p53-presence-pending')"));
 });
 
-test('Missões permanecem fechadas no startup e exibem recompensas em linha',()=>{
+test('Missões permanecem fechadas no startup e usam grid canônico de duas colunas',()=>{
  assert.ok(missions.includes("sessionStorage.setItem('cartaralho_missions_opened','1')"));
  assert.ok(missions.includes('MetaUI.missionOpen=false'));
  assert.ok(missions.includes('p52-mission-coin-pill'));
  assert.ok(missions.includes('mission-xp-pill'));
- assert.ok(css.includes('flex-wrap:nowrap!important'));
+ assert.ok(missionsCss.includes('grid-template-columns:minmax(0,1fr) auto!important'));
+ assert.ok(missionsCss.includes('flex-wrap:nowrap!important'));
+ assert.ok(shim.includes('missionsTwoColumnCurrent.css'));
 });
 
 test('roomUI preserva retorno do Lobby ao topo',()=>{
@@ -40,11 +50,12 @@ test('roomUI preserva retorno do Lobby ao topo',()=>{
  assert.ok(room.includes('requestAnimationFrame(resetLobbyScroll)'));
 });
 
-test('marketplaceUI preserva cores da Reciclagem e ordem Cosméticos antes de Reciclagem',()=>{
+test('Reciclagem mantém identidade preta/branca em owner visual próprio',()=>{
  assert.ok(market.includes('p53-recycle-black'));
  assert.ok(market.includes('p53-recycle-white'));
- assert.ok(css.includes('.recycling-card.p53-recycle-black'));
- assert.ok(css.includes('.recycling-card.p53-recycle-white'));
+ assert.ok(recyclingCss.includes('.recycling-card.p53-recycle-black'));
+ assert.ok(recyclingCss.includes('.recycling-card.p53-recycle-white'));
+ assert.ok(shim.includes('recyclingCardIdentityCurrent.css'));
  const c=market.indexOf('[data-market-tab="cosmetics"]');
  const r=market.indexOf('[data-market-tab="recycling"]');
  assert.ok(c>=0&&r>c);
@@ -57,26 +68,30 @@ test('navigationUI mantém Central de Notificações acima de Histórico',()=>{
  assert.ok(n>=0&&h>n);
 });
 
-test('profileUI preserva aparência em um fluxo de render e reutiliza card de Missões',()=>{
+test('profileUI preserva aparência e estabilidade visual das molduras',()=>{
  assert.ok(profile.includes('P.render=function'));
  assert.ok(profile.includes('setAppearanceDraft'));
  assert.ok(profile.includes('profile-global-save'));
  assert.ok(profile.includes('CartMissionsDomain?.missionRow?.(m)'));
- assert.ok(css.includes('.profile-modal-frame-grid .avatar-frame'));
+ assert.ok(frameCss.includes('.profile-modal-frame-grid .avatar-frame'));
+ assert.ok(shim.includes('profileFrameGridStaticCurrent.css'));
 });
 
-test('cardsLibrary preserva criação a partir de Minhas Cartas',()=>{
+test('entrada p53/p48 de criação foi supersedida pelo fluxo atual P54/P56/P57',()=>{
  assert.ok(cards.includes('library-create-entry'));
+ assert.ok(cards.includes('p54-create-card-entry p56-create-card-entry p57-create-card-entry'));
  assert.ok(cards.includes('Criar nova Carta de Jogador'));
  assert.ok(cards.includes('openCreator'));
- assert.ok(css.includes('.p53-create-card-entry'));
+ assert.ok(!shim.includes('p53-create-card-entry'));
+ assert.ok(!shim.includes('p48-create-card-entry'));
 });
 
-test('P53 é histórico não executável e P75 é a release corrente',()=>{
+test('P53 é histórico não executável, shim visual, e P75 é a release corrente',()=>{
  assert.doesNotThrow(()=>new Function(history));
  assert.ok(index.includes('css/p53.css?v=1.4.53'));
  assert.ok(index.includes('type="application/x-cartaralho-legacy" src="js/p53.js?v=1.4.53"'));
  assert.ok(!index.includes('<script src="js/p53.js'));
+ assert.ok(shim.startsWith('/* COMPAT P53'));
  assert.ok(release.includes("APP_VERSION='v1.4.53'"));
  assert.ok(version.includes('releaseP75'));
  assert.ok(notifications.includes('releaseP75'));
