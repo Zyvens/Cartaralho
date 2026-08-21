@@ -1,0 +1,9 @@
+/* Owner visual canônico da apresentação dos seletores de aparência. As cores são aplicadas por profileUI a partir da raridade atual. */
+.profile-appearance-selectors select[data-profile-draft-title],
+.profile-appearance-selectors select[data-profile-draft-frame]{
+  font-weight:850!important;
+  transition:color .15s ease,border-color .15s ease!important;
+}
+.profile-appearance-selectors select[data-rarity='celestial']{
+  text-shadow:0 0 9px rgba(103,232,249,.25)
+}
