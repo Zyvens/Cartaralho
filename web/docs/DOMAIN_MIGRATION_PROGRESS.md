@@ -8,7 +8,7 @@
 
 A porcentagem abaixo é ponderada por risco e volume funcional. Ela mede **implementação consolidada**, não quantidade de arquivos alterados. Uma etapa só recebe 100% do seu peso quando o comportamento está absorvido pelo owner canônico, o legado correspondente deixou de ser necessário em runtime e os contratos relevantes estão coerentes com a cabeça atual.
 
-**Implementação atual: 64%**
+**Implementação atual: 69%**
 
 | # | Gate | Peso | Concluído | Situação |
 |---|---|---:|---:|---|
@@ -19,18 +19,18 @@ A porcentagem abaixo é ponderada por risco e volume funcional. Ela mede **imple
 | 5 | Auth / conta / Home / perfil / créditos | 6% | 5% | Owners ativos; P73/P74/P75 reconciliados; falta fechamento CSS/browser |
 | 6 | Social / notificações / missões / Rank / Stats / histórico | 6% | 5% | Owners principais ativos e contratos recentes migrados; revisão histórica/visual final pendente |
 | 7 | Cartas / criação / progressão | 10% | 9% | Renderer, autoria, criação, raridade e progressão canônicos; falta consolidação visual/legado final |
-| 8 | Economia / mercado / cosméticos | 7% | 6% | Wallet P75, realtime, reciclagem, catálogo e cosméticos em owners; falta consolidação CSS/backend final |
+| 8 | Economia / mercado / cosméticos | 7% | 6% | Wallet P75, realtime, reciclagem, catálogo e cosméticos em owners; falta consolidação CSS e validação final |
 | 9 | Salas / Lobby | 6% | 5% | Owner absorveu sincronização principal; matriz completa de combinações ainda pendente |
 | 10 | Gameplay | 9% | 5% | Owner complementar ativo; lifecycle integral e telas-base ainda precisam consolidação |
-| 11 | BUFFs | 6% | 4% | Owner de UI ativo e engine preservado; divergências e matriz funcional ainda precisam fechamento |
+| 11 | BUFFs | 6% | 4% | Owner de UI ativo; engines preservados; Amigo de Merda auditado com redraw completo correto; matriz funcional geral ainda precisa fechamento |
 | 12 | Áudio / narrador | 3% | 2% | Owner canônico e contratos migrados; falta validação real de browser/iPhone |
 | 13 | Recompensas / loot | 5% | 3% | Owner e engine preservados; cenários de elegibilidade/Saqueador ainda pendentes |
-| 14 | Consolidação backend de runtime PXX | 5% | 0% | Próxima frente: classificar/absorver helpers de runtime com sufixo de pacote sem quebrar APIs |
+| 14 | Consolidação backend de runtime PXX | 5% | 5% | 8/8 helpers de runtime PXX possuem owner canônico sem sufixo; arquivos PXX restantes são aliases de compatibilidade sem regra duplicada |
 | 15 | Remoção de JS/wrappers históricos do runtime | 4% | 3% | P33–P74 e wrappers absorvidos estão não executáveis; módulos-base restantes ainda precisam classificação |
 | 16 | Consolidação/remoção de CSS PXX | 4% | 0% | Não iniciada |
 | 17 | Release/versionamento consolidado | 2% | 2% | P75 formalizada em `releaseP75`, `/api/version` e Central de Notificações |
 | 18 | CI final + preview + aceite interno | 5% | 0% | Preview Vercel verde não substitui CI integral e aceite desktop/mobile |
-| | **TOTAL** | **100%** | **64%** | |
+| | **TOTAL** | **100%** | **69%** | |
 
 ## Regras para subir a porcentagem
 
@@ -49,12 +49,14 @@ A porcentagem abaixo é ponderada por risco e volume funcional. Ela mede **imple
 - contratos P49–P58, P61–P68 e P71–P75 auditados/migrados para owners ou tornados future-proof; P59/P60 já aceitavam releases posteriores.
 - release P75 registrada em API de versão e Central de Notificações.
 - workflow atualizado para incluir branches `refactor/**`; preview Vercel da branch permanece verde.
+- backend PXX fechado em 8/8: `achievementBackfill`, `amigoDeMerda`, `balanceRealtime`, `cardCollectionProgress`, `creatorAdmin`, `matchStart`, `matchSubmit` e `roomConfig` são os owners canônicos; os nomes P6/P7/P19/P32/P37/P63/P64 são somente aliases de compatibilidade.
+- `Amigo de Merda` foi revalidado pela trajetória P32: devolve a mão inteira ao baralho, embaralha e compra nova mão do mesmo tamanho, com persistência transacional e idempotente.
 
 ## Próxima sequência
 
-- classificar e consolidar helpers/backend com sufixos PXX;
 - fechar matriz funcional de BUFFs e rewards/loot antes de qualquer mudança de regra;
 - decompor `app.js` somente com prova de lifecycle/estado/socket preservada;
 - consolidar CSS por domínio com comparação visual;
+- concluir auditoria dos pacotes históricos iniciais;
 - obter CI integral + preview desktop/mobile + aceite interno;
 - somente após aprovação explícita considerar merge na `main`.
