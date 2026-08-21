@@ -8,11 +8,11 @@
 
 A porcentagem abaixo é ponderada por risco e volume funcional. Ela mede **implementação consolidada**, não quantidade de arquivos alterados. Uma etapa só recebe 100% do seu peso quando o comportamento está absorvido pelo owner canônico, o legado correspondente deixou de ser necessário em runtime e os contratos relevantes estão coerentes com a cabeça atual.
 
-**Implementação atual: 69%**
+**Implementação atual: 73%**
 
 | # | Gate | Peso | Concluído | Situação |
 |---|---|---:|---:|---|
-| 1 | Sincronização P75 + baseline de CI | 3% | 2% | P75 reconciliada; preview Vercel verde; GitHub Actions ainda sem execução associada ao head |
+| 1 | Sincronização P75 + baseline de CI | 3% | 2% | P75 reconciliada; preview Vercel já validado em heads anteriores; GitHub Actions ainda sem execução associada ao head |
 | 2 | Matriz de linhagem PXX / auditoria histórica | 7% | 6% | Trajetória recente P49–P75 e wrappers críticos auditados; pacotes iniciais ainda precisam fechamento integral |
 | 3 | Core de ownership / lifecycle | 7% | 6% | Registry e writers finais ativos; `app.js` ainda concentra bootstrap/estado/socket lifecycle |
 | 4 | Design system / fundação CSS | 5% | 0% | CSS histórico continua ativo |
@@ -22,15 +22,15 @@ A porcentagem abaixo é ponderada por risco e volume funcional. Ela mede **imple
 | 8 | Economia / mercado / cosméticos | 7% | 6% | Wallet P75, realtime, reciclagem, catálogo e cosméticos em owners; falta consolidação CSS e validação final |
 | 9 | Salas / Lobby | 6% | 5% | Owner absorveu sincronização principal; matriz completa de combinações ainda pendente |
 | 10 | Gameplay | 9% | 5% | Owner complementar ativo; lifecycle integral e telas-base ainda precisam consolidação |
-| 11 | BUFFs | 6% | 4% | Owner de UI ativo; engines preservados; Amigo de Merda auditado com redraw completo correto; matriz funcional geral ainda precisa fechamento |
+| 11 | BUFFs | 6% | 6% | Matriz funcional 21/21 fechada por papel, alvo, fase e owner; engines e exceção canônica do Amigo de Merda estão protegidos por contrato |
 | 12 | Áudio / narrador | 3% | 2% | Owner canônico e contratos migrados; falta validação real de browser/iPhone |
-| 13 | Recompensas / loot | 5% | 3% | Owner e engine preservados; cenários de elegibilidade/Saqueador ainda pendentes |
+| 13 | Recompensas / loot | 5% | 5% | Matriz server-side fechada: colocação, sobrevivência, consolação, Espólio, contribuição, Saqueador e idempotência estão protegidos por cenário |
 | 14 | Consolidação backend de runtime PXX | 5% | 5% | 8/8 helpers de runtime PXX possuem owner canônico sem sufixo; arquivos PXX restantes são aliases de compatibilidade sem regra duplicada |
 | 15 | Remoção de JS/wrappers históricos do runtime | 4% | 3% | P33–P74 e wrappers absorvidos estão não executáveis; módulos-base restantes ainda precisam classificação |
 | 16 | Consolidação/remoção de CSS PXX | 4% | 0% | Não iniciada |
 | 17 | Release/versionamento consolidado | 2% | 2% | P75 formalizada em `releaseP75`, `/api/version` e Central de Notificações |
 | 18 | CI final + preview + aceite interno | 5% | 0% | Preview Vercel verde não substitui CI integral e aceite desktop/mobile |
-| | **TOTAL** | **100%** | **69%** | |
+| | **TOTAL** | **100%** | **73%** | |
 
 ## Regras para subir a porcentagem
 
@@ -48,15 +48,17 @@ A porcentagem abaixo é ponderada por risco e volume funcional. Ela mede **imple
 - confirmação autoritativa usa `/api/profile/wallet` e coalescing por Promise em voo.
 - contratos P49–P58, P61–P68 e P71–P75 auditados/migrados para owners ou tornados future-proof; P59/P60 já aceitavam releases posteriores.
 - release P75 registrada em API de versão e Central de Notificações.
-- workflow atualizado para incluir branches `refactor/**`; preview Vercel da branch permanece verde.
+- workflow atualizado para incluir branches `refactor/**`; preview Vercel da branch já passou em heads desta consolidação.
 - backend PXX fechado em 8/8: `achievementBackfill`, `amigoDeMerda`, `balanceRealtime`, `cardCollectionProgress`, `creatorAdmin`, `matchStart`, `matchSubmit` e `roomConfig` são os owners canônicos; os nomes P6/P7/P19/P32/P37/P63/P64 são somente aliases de compatibilidade.
 - `Amigo de Merda` foi revalidado pela trajetória P32: devolve a mão inteira ao baralho, embaralha e compra nova mão do mesmo tamanho, com persistência transacional e idempotente.
+- `BUFF_FUNCTIONAL_MATRIX.md` + `buffFunctionalMatrix.contract.test.js` congelam os 21 BUFFs por papel, alvo, fases e engine/owner; o ramo antigo de shuffle do Amigo nos engines genéricos não é a rota oficial.
+- `REWARD_LOOT_MATRIX.md` + `rewardLootMatrix.contract.test.js` congelam colocação, sobrevivência, consolação, Espólio, elegibilidade por contribuição, janela de 15s do Saqueador e idempotência.
 
 ## Próxima sequência
 
-- fechar matriz funcional de BUFFs e rewards/loot antes de qualquer mudança de regra;
 - decompor `app.js` somente com prova de lifecycle/estado/socket preservada;
-- consolidar CSS por domínio com comparação visual;
 - concluir auditoria dos pacotes históricos iniciais;
+- construir matriz visual e consolidar CSS por domínio com comparação desktop/mobile;
+- fechar lifecycle integral de gameplay/salas sem alterar eventos de rede;
 - obter CI integral + preview desktop/mobile + aceite interno;
 - somente após aprovação explícita considerar merge na `main`.
