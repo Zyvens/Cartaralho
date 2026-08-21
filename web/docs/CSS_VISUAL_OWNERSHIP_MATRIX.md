@@ -22,6 +22,7 @@ Somente no fechamento visual os shims podem ser removidos do `index` e os owners
 | P68 | tema de raridade composta, Super Trunfo, histórico/origem e reduced-motion | `public/css/cardRarityCurrent.css` | P68 = shim `@import` | `CURRENT` |
 | P59 | cards compactos/quadrados + base visual da lacuna contínua | `public/css/cardCompactCurrent.css` | P59 = shim `@import` | `CURRENT` |
 | P60 | refinamento tipográfico da lacuna + simetria das pills Moedas/XP em Missões | `public/css/cardTypographyMissionsCurrent.css` | P60 = shim `@import` | `CURRENT` |
+| P62 | atalho interativo/acessível da carteira para o Extrato | `public/css/accountLedgerCurrent.css` | P62 = shim `@import` | `CURRENT` |
 
 ## Invariantes da cascata migrada
 
@@ -32,6 +33,13 @@ Somente no fechamento visual os shims podem ser removidos do `index` e os owners
 - P74 importa `accountCurrent.css` exatamente onde a correção final já era aplicada.
 - ordem lógica interna é preservada: wallet `order:30`, ações `order:40`.
 - media query mobile continua em `max-width:620px`.
+
+### Wallet/Extrato P62
+
+- cursor, hover e `focus-visible` do saldo clicável vivem em `accountLedgerCurrent.css`.
+- P62 preserva apenas a posição de cascata via shim; não contém regra funcional.
+- acessibilidade por teclado permanece no owner JS `marketplaceUI`, separada da apresentação visual.
+- P63/P64/P65 não possuem stylesheet próprio e, portanto, não geram trabalho visual artificial nessa trajetória.
 
 ### Mobile forms P66
 
@@ -56,11 +64,12 @@ Somente no fechamento visual os shims podem ser removidos do `index` e os owners
 
 A ordem abaixo é de menor para maior risco, não necessariamente numérica:
 
-1. **progressão/card detail — P56/P57/P58**: grande volume e forte dependência de shell/modal; exige matriz de seletores antes de absorção;
-2. **Gênese — P26/P29/P30/P31/P32/P58**: animações e transforms; exige comparação visual e reduced-motion;
-3. **Home/top controls — P45/P46/P47/P49/P50/P51/P52/P53/P56/P73/P74**: parcialmente owned pela onda account strip, restante precisa auditoria de precedência;
-4. **Marketplace/reciclagem — P41/P44/P45/P53/P55/P58**;
-5. **design system/fundação geral — P14–P25 e folhas base**: somente depois dos resultados específicos, para evitar converter histórico em uma folha monolítica nova.
+1. **Home/top controls — P45/P46/P47**: sequência curta de alinhamento/posição; auditar como trajetória única antes de absorver.
+2. **progressão/card detail — P56/P57/P58**: grande volume e forte dependência de shell/modal; exige matriz de seletores antes de absorção;
+3. **Gênese — P26/P29/P30/P31/P32/P58**: animações e transforms; exige comparação visual e reduced-motion;
+4. **Home/top controls tardios — P49/P50/P51/P52/P53/P56/P73/P74**: parcialmente owned pela onda account strip, restante precisa auditoria de precedência;
+5. **Marketplace/reciclagem — P41/P44/P45/P53/P55/P58**;
+6. **design system/fundação geral — P14–P25 e folhas base**: somente depois dos resultados específicos, para evitar converter histórico em uma folha monolítica nova.
 
 ## Critério de conclusão de um PXX CSS
 
@@ -77,6 +86,7 @@ Um pacote visual só deixa de possuir ownership quando:
 - `tests/cssAccountOwnership.contract.test.js`
 - `tests/p73AccountStripRender.contract.test.js`
 - `tests/p74WalletPlacement.contract.test.js`
+- `tests/p62SingleLedger.contract.test.js`
 - `tests/p66CardProgressionMobileInput.contract.test.js`
 - `tests/p68CardHistoryRarity.contract.test.js`
 - `tests/p59SquareCardsContinuousGap.contract.test.js`
@@ -84,4 +94,4 @@ Um pacote visual só deixa de possuir ownership quando:
 
 ## Estado do Gate 16
 
-A consolidação CSS está **em andamento**. Cinco resultados independentes já possuem owner visual canônico e mantêm a precedência original por shim. A maior parte da cascata P14–P58/P61–P65/P67 ainda está funcionalmente distribuída em PXX. O gate só será declarado 100% quando todas as regras vigentes tiverem owner e o carregamento final for validado sem shims históricos.
+A consolidação CSS está **em andamento**. Seis resultados independentes já possuem owner visual canônico e mantêm a precedência original por shim. A maior parte da cascata P14–P58/P61/P67 ainda está funcionalmente distribuída em PXX. O gate só será declarado 100% quando todas as regras vigentes tiverem owner e o carregamento final for validado sem shims históricos.
