@@ -1,4 +1,3 @@
 /* Owner visual canônico dos metadados residuais da Reciclagem. */
 .recycling-card>small.p58-recycle-favorite{color:#facc15!important;font-size:.58rem!important;letter-spacing:.06em!important}
 .recycling-card:not(:has(>small)){padding-top:18px!important}
-.p41-recycle-card-preview>span{display:none!important}
