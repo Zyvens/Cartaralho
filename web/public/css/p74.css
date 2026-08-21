@@ -1,2 +1,2 @@
-/* HISTORICAL P74 — regras absorvidas por public/css/account.css.
-   Mantido temporariamente como marcador de proveniência até a limpeza física do index. */
+/* COMPAT P74 — mantém a posição histórica da cascata enquanto o owner visual vive em accountCurrent.css. */
+@import url('./accountCurrent.css');
