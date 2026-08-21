@@ -1,0 +1,8 @@
+/* Owner visual canônico do único fluxo de persistência visível do Perfil, originado em P23. */
+.profile-modal-savebar,
+.profile-appearance-savebar{display:none!important}
+.profile-global-footer.is-dirty{
+  border-top-color:rgba(250,204,21,.2)!important;
+  background:linear-gradient(180deg,rgba(20,18,25,.96),rgba(24,20,15,.98))!important;
+}
+.profile-global-footer.is-dirty .profile-global-footer-copy small{color:#d7bd6c!important}
