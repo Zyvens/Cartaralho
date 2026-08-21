@@ -107,7 +107,7 @@
   const host=document.getElementById('app')||document.body;if(!host)return;
   observer=new MutationObserver(records=>{
    const relevant=records.some(r=>[...(r.addedNodes||[]),...(r.removedNodes||[])].some(n=>n?.nodeType===1&&(n.matches?.('#home-account,.account-strip,.p56-account-actions,.p74-wallet-slot')||n.querySelector?.('#home-account,.account-strip,.p56-account-actions,.p74-wallet-slot'))));
-   if(relevant||document.querySelector('#home-account>.account-strip'))scheduleEnsure();
+   if(relevant)scheduleEnsure();
   });
   observer.observe(host,{childList:true,subtree:true});
  }
