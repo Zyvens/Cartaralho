@@ -20,16 +20,18 @@ test('mostrador fica como filho direto da faixa principal da conta e imediatamen
  assert.match(css,/position:static!important/);
 });
 
-test('saldo nasce imediatamente do usuário/cache e depois reconcilia com fonte autoritativa',()=>{
+test('resultado P74 é preservado e a reconciliação remota concorrente foi SUPERSEDED por P75',()=>{
  assert.match(market,/knownBalance=explicit/);
  assert.match(market,/AuthClient\?\.user\?\.dirty_balance/);
  assert.match(market,/localStorage\.getItem\(cacheKey\(\)\)/);
  assert.match(market,/mountBalance\(explicit=null\)/);
  assert.match(account,/HomeScreen\.renderAccount=function/);
  assert.match(account,/decorate\(\);queueMicrotask\(decorate\);requestAnimationFrame\(decorate\)/);
- assert.match(account,/CartMarketplaceDomain\?\.refreshBalance\?\.\('home_render'\)/);
+ assert.doesNotMatch(account,/CartMarketplaceDomain\?\.refreshBalance\?\.\('home_render'\)/);
+ assert.match(market,/walletRefreshPromise/);
+ assert.match(market,/if\(walletRefreshPromise\)return walletRefreshPromise/);
  assert.match(market,/AuthClient\.request\(`\/api\/profile\/wallet\?_fresh=\$\{Date\.now\(\)\}`\)/);
- assert.match(market,/AuthClient\.request\('\/api\/marketplace'\)/);
+ assert.doesNotMatch(market,/AuthClient\.request\('\/api\/marketplace'\)/);
  assert.match(market,/cartaralho:balance-updated/);
 });
 
@@ -43,13 +45,14 @@ test('recompensa administrativa usa saldo exato quando disponível e confirma no
  assert.match(market,/refreshBalance\('reward_megaphone_confirm'\)/);
 });
 
-test('P74 é histórico não executável e continua sendo a versão atual, preservando P73',()=>{
+test('P74 permanece histórico não executável e P75 é a versão atual',()=>{
  assert.ok(index.indexOf('css/p74.css?v=1.4.74')>index.indexOf('css/p73.css?v=1.4.73'));
  assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p73\.js\?v=1\.4\.73"><\/script>/);
  assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p74\.js\?v=1\.4\.74"><\/script>/);
  assert.doesNotMatch(index,/<script src="js\/p74\.js\?v=1\.4\.74"><\/script>/);
  assert.match(release,/APP_VERSION='v1\.4\.74'/);
- assert.match(version,/releaseP74/);
- assert.match(notifications,/releaseP74/);
+ assert.match(version,/releaseP75/);
+ assert.match(notifications,/releaseP75/);
+ assert.match(notifications,/P74_RELEASE/);
  assert.match(notifications,/P73_RELEASE/);
 });
