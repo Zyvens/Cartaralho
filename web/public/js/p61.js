@@ -17,7 +17,7 @@
  }
  async function syncDirtyBalance(){
   if(!AuthClient?.user)return null;
-  try{const d=await AuthClient.request('/api/marketplace'),v=Number(d?.dirtyBalance);if(Number.isFinite(v)){applyBalance(v,d);return v;}}catch(_){try{const d=await AuthClient.cleanCards(),v=Number(d?.inventory?.dirtyBalance);if(Number.isFinite(v)){applyBalance(v);return v;}}catch(__){ }}return null;
+  try{const d=await AuthClient.request(`/api/profile/wallet?_fresh=${Date.now()}`),v=Number(d?.dirtyBalance);if(Number.isFinite(v)){applyBalance(v);return v;}}catch(_){ }return null;
  }
  function rewardForCurrentUser(data={}){if(data.kind!=='reward')return false;const targets=Array.isArray(data.targetUserIds)?data.targetUserIds.map(Number):null;return !targets?.length||targets.includes(Number(AuthClient?.user?.id));}
  async function bindRewardSync(){try{await SocketClient._waitReady();const channel=SocketClient.pusher?.subscribe(GLOBAL_CHANNEL);if(!channel||channel.__p61WalletSync)return;channel.__p61WalletSync=true;channel.bind('admin_megaphone',data=>{if(rewardForCurrentUser(data))setTimeout(syncDirtyBalance,20);});}catch(_){ }}

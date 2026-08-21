@@ -24,12 +24,15 @@ test('cliente mantém assinatura do ping até o Pusher estar pronto',()=>{
  assert.match(js,/SocketClient\._waitReady\(\)/);
 });
 
-test('saldo recebido atualiza Home e Mercado imediatamente',()=>{
+test('saldo recebido atualiza Home e Mercado imediatamente e confirma pela carteira leve',()=>{
  assert.match(js,/CartP49\?\.setBalance\?\.\(v,\{loading:false\}\)/);
  assert.match(js,/document\.querySelectorAll\('\.account-strip \.p49-balance-value'\)/);
  assert.match(js,/MarketUI\.data\.dirtyBalance=v/);
  assert.match(js,/MarketUI\.render\(\)/);
  assert.match(js,/fetchAuthoritativeBalance/);
+ assert.match(js,/\/api\/profile\/wallet\?_fresh=/);
+ assert.doesNotMatch(js,/AuthClient\.request\('\/api\/marketplace'\)/);
+ assert.doesNotMatch(js,/AuthClient\.cleanCards\(\)/);
 });
 
 test('auto-prêmio e transações próprias atualizam pelo próprio retorno HTTP',()=>{
@@ -41,7 +44,7 @@ test('auto-prêmio e transações próprias atualizam pelo próprio retorno HTTP
 });
 
 test('P63 permanece carregado antes das camadas posteriores',()=>{
- assert.ok(index.indexOf('js/p63.js?v=1.4.63')>index.indexOf('js/p62.js?v=1.4.71'));
+ assert.ok(index.indexOf('js/p63.js?v=1.4.75')>index.indexOf('js/p62.js?v=1.4.71'));
  assert.match(release,/APP_VERSION='v1\.4\.63'/);
  assert.match(version,/releaseP\d+/);
  assert.match(notifications,/releaseP63/);

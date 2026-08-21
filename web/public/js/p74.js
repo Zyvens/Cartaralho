@@ -53,9 +53,10 @@
  }
  function syncAuthoritative(source='p74-wallet-sync'){
   if(!window.AuthClient?.user)return Promise.resolve(null);
+  if(window.CartP64?.refreshBalance)return Promise.resolve(CartP64.refreshBalance(source)).then(v=>{if(v!==null&&v!==undefined)ensureBalance(v);return v;});
   if(window.CartP63?.fetchAuthoritativeBalance)return Promise.resolve(CartP63.fetchAuthoritativeBalance(source)).then(v=>{if(v!==null&&v!==undefined)ensureBalance(v);return v;});
   if(window.CartP61?.syncDirtyBalance)return Promise.resolve(CartP61.syncDirtyBalance()).then(v=>{if(v!==null&&v!==undefined)ensureBalance(v);return v;});
-  return AuthClient.request('/api/marketplace').then(d=>{const v=Number(d?.dirtyBalance);if(Number.isFinite(v)){ensureBalance(v);return v;}return null;}).catch(()=>null);
+  return AuthClient.request(`/api/profile/wallet?_fresh=${Date.now()}`).then(d=>{const v=Number(d?.dirtyBalance);if(Number.isFinite(v)){ensureBalance(v);return v;}return null;}).catch(()=>null);
  }
  function scheduleAuthoritative(source='p74-wallet-sync',delay=0){
   if(refreshTimer)clearTimeout(refreshTimer);
@@ -84,7 +85,7 @@
   if(!window.HomeScreen||HomeScreen.__p74WalletPlacement)return;
   HomeScreen.__p74WalletPlacement=true;
   const base=HomeScreen.renderAccount.bind(HomeScreen);
-  HomeScreen.renderAccount=function(...args){const out=base(...args);ensureBalance();queueMicrotask(()=>ensureBalance());requestAnimationFrame(()=>ensureBalance());scheduleAuthoritative('p74-home-render',0);return out;};
+  HomeScreen.renderAccount=function(...args){const out=base(...args);ensureBalance();queueMicrotask(()=>ensureBalance());requestAnimationFrame(()=>ensureBalance());return out;};
  }
  function patchProfessionalUI(){
   if(!window.ProfessionalUI||ProfessionalUI.__p74WalletPlacement)return;

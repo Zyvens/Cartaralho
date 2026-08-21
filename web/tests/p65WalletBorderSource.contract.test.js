@@ -24,7 +24,7 @@ test('thresholds continuam centralizados e podem ser supersedidos por P67',()=>{
 });
 
 test('P65 permanece no histórico e pode ser supersedido por releases posteriores',()=>{
- assert.ok(index.indexOf('js/p65.js?v=1.4.65')>index.indexOf('js/p64.js?v=1.4.64'));
+ assert.ok(index.indexOf('js/p65.js?v=1.4.65')>index.indexOf('js/p64.js?v=1.4.75'));
  assert.match(release,/APP_VERSION='v1\.4\.65'/);
  assert.match(version,/releaseP(?:65|66|67|68|69|7[0-9])/);
  assert.match(notifications,/releaseP65/);

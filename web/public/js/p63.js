@@ -2,7 +2,7 @@
 (()=>{
  if(window.CartP63)return;
  const VERSION='v1.4.63',GLOBAL_CHANNEL='cartaralho-global';
- let retryTimer=null;
+ let retryTimer=null,balanceFetchPromise=null;
  const money=v=>Number(v||0).toLocaleString('pt-BR');
 
  function cacheBalance(v){
@@ -26,13 +26,15 @@
  }
  async function fetchAuthoritativeBalance(source='transaction-ping'){
   if(!AuthClient?.user)return null;
-  try{
-   const d=await AuthClient.request('/api/marketplace'),v=Number(d?.dirtyBalance);
-   if(Number.isFinite(v)){applyBalance(v,{source,marketData:d});return v;}
-  }catch(_){
-   try{const d=await AuthClient.cleanCards(),v=Number(d?.inventory?.dirtyBalance);if(Number.isFinite(v)){applyBalance(v,{source});return v;}}catch(__){ }
-  }
-  return null;
+  if(balanceFetchPromise)return balanceFetchPromise;
+  balanceFetchPromise=(async()=>{
+   try{
+    const d=await AuthClient.request(`/api/profile/wallet?_fresh=${Date.now()}`),v=Number(d?.dirtyBalance);
+    if(Number.isFinite(v)){applyBalance(v,{source});return v;}
+   }catch(_){ }
+   return null;
+  })().finally(()=>{balanceFetchPromise=null;});
+  return balanceFetchPromise;
  }
  function isForCurrentUser(data={}){
   const targets=Array.isArray(data.targetUserIds)?data.targetUserIds.map(Number):null;
@@ -41,8 +43,8 @@
  function onBalanceUpdated(data={}){
   if(!isForCurrentUser(data))return;
   const exact=Number(data.balance);
-  if(Number.isFinite(exact))applyBalance(exact,{source:data.reason||'balance_updated'});
-  /* Reconciliamos com o backend mesmo quando veio saldo exato: o evento é um gatilho, não a fonte final. */
+  if(data.balance!==null&&data.balance!==undefined&&data.balance!==''&&Number.isFinite(exact))applyBalance(exact,{source:data.reason||'balance_updated'});
+  /* O evento entrega o saldo imediatamente; a confirmação usa apenas o endpoint leve da carteira. */
   setTimeout(()=>fetchAuthoritativeBalance(data.reason||'balance_updated'),25);
  }
  async function bindBalanceChannel(){

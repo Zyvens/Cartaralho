@@ -14,13 +14,21 @@ test('mostrador fica como filho direto da tag principal da conta e antes das aç
  assert.match(css,/position:static!important/);
 });
 
-test('saldo nasce do usuário autenticado e reconcilia com fonte autoritativa',()=>{
+test('saldo nasce do usuário autenticado e a reconciliação usa a carteira leve',()=>{
  assert.match(js,/AuthClient\?\.user/);
  assert.match(js,/dirty_balance/);
+ assert.match(js,/CartP64\?\.refreshBalance/);
  assert.match(js,/CartP63\?\.fetchAuthoritativeBalance/);
  assert.match(js,/CartP61\?\.syncDirtyBalance/);
- assert.match(js,/AuthClient\.request\('\/api\/marketplace'\)/);
+ assert.match(js,/\/api\/profile\/wallet\?_fresh=/);
+ assert.doesNotMatch(js,/AuthClient\.request\('\/api\/marketplace'\)/);
  assert.match(js,/cartaralho:balance-updated/);
+});
+
+test('render da Home só posiciona o saldo e não dispara nova consulta concorrente',()=>{
+ const patch=js.match(/function patchHome\(\)[\s\S]*?function patchProfessionalUI/);assert.ok(patch);
+ assert.match(patch[0],/ensureBalance\(\)/);
+ assert.doesNotMatch(patch[0],/scheduleAuthoritative|syncAuthoritative/);
 });
 
 test('recompensa administrativa atualiza e confirma o saldo real',()=>{
@@ -31,11 +39,11 @@ test('recompensa administrativa atualiza e confirma o saldo real',()=>{
  assert.match(js,/targetUserIds/);
 });
 
-test('P74 é carregado depois de P73 e se torna a versão atual preservando P73',()=>{
+test('P74 continua histórico e é carregado após P73 com cache novo',()=>{
  assert.ok(index.indexOf('css/p74.css?v=1.4.74')>index.indexOf('css/p73.css?v=1.4.73'));
- assert.ok(index.indexOf('js/p74.js?v=1.4.74')>index.indexOf('js/p73.js?v=1.4.73'));
+ assert.ok(index.indexOf('js/p74.js?v=1.4.75')>index.indexOf('js/p73.js?v=1.4.73'));
  assert.match(release,/APP_VERSION='v1\.4\.74'/);
- assert.match(version,/releaseP74/);
+ assert.match(version,/releaseP75/);
  assert.match(notifications,/releaseP74/);
  assert.match(notifications,/P73_RELEASE/);
 });

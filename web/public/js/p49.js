@@ -4,6 +4,7 @@
  const VERSION='v1.4.49';
  const cacheKey=()=>`cartaralho_dirty_balance_${AuthClient?.user?.id||AuthClient?.user?.username||'anon'}`;
  const money=v=>Number(v||0).toLocaleString('pt-BR');
+ let hydratePromise=null;
  function identity(){return document.querySelector('.account-strip .home-account-identity')||document.querySelector('.account-strip>div:has(strong)');}
  function ensureIdentity(){
   const strip=document.querySelector('.account-strip');if(!strip||!AuthClient?.user)return null;
@@ -12,6 +13,11 @@
   return strip;
  }
  function cachedBalance(){try{const raw=localStorage.getItem(cacheKey());return raw===null?null:Number(raw);}catch(_){return null;}}
+ function knownBalance(){
+  const raw=AuthClient?.user?.dirty_balance;
+  if(raw!==null&&raw!==undefined&&raw!==''&&Number.isFinite(Number(raw)))return Number(raw);
+  const cached=cachedBalance();return cached!==null&&Number.isFinite(Number(cached))?Number(cached):null;
+ }
  function saveBalance(v){try{if(Number.isFinite(Number(v)))localStorage.setItem(cacheKey(),String(Number(v)));}catch(_){}}
  function setBalance(v,{loading=false}={}){
   const slot=document.querySelector('.account-strip .p49-balance-slot');if(!slot)return;
@@ -34,18 +40,26 @@
     if(numeric)numeric.classList.add('p49-balance-value');
    }
   }
-  const cached=cachedBalance();
-  if(cached!==null)setBalance(cached,{loading:true});else setBalance(null,{loading:true});
+  const value=knownBalance();
+  if(value!==null){AuthClient.user.dirty_balance=value;saveBalance(value);setBalance(value,{loading:false});}
+  else setBalance(null,{loading:true});
   return slot;
  }
  async function hydrateBalance(){
-  if(!AuthClient?.user)return;
+  if(!AuthClient?.user)return null;
   ensureBalanceSlot();
-  try{
-   const d=await AuthClient.cleanCards(),v=Number(d?.inventory?.dirtyBalance);
-   if(Number.isFinite(v)){saveBalance(v);setBalance(v,{loading:false});AuthClient.user.dirty_balance=v;}
-   else document.querySelector('.p49-balance-slot')?.setAttribute('data-loading','false');
-  }catch(_){document.querySelector('.p49-balance-slot')?.setAttribute('data-loading','false');}
+  if(hydratePromise)return hydratePromise;
+  hydratePromise=(async()=>{
+   try{
+    if(window.CartP64?.refreshBalance)return await CartP64.refreshBalance('p49-reconcile');
+    const d=await AuthClient.request(`/api/profile/wallet?_fresh=${Date.now()}`),v=Number(d?.dirtyBalance);
+    if(Number.isFinite(v)){AuthClient.user.dirty_balance=v;saveBalance(v);setBalance(v,{loading:false});return v;}
+   }catch(_){ }
+   finally{hydratePromise=null;}
+   document.querySelector('.p49-balance-slot')?.setAttribute('data-loading','false');
+   return null;
+  })();
+  return hydratePromise;
  }
  function settle(){ensureBalanceSlot();queueMicrotask(ensureIdentity);setTimeout(hydrateBalance,0);}
  if(window.HomeScreen&&!HomeScreen.__p49AccountHydration){
@@ -56,5 +70,5 @@
  window.addEventListener('pageshow',()=>{ensureBalanceSlot();hydrateBalance();});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)hydrateBalance();});
  settle();
- window.CartP49={VERSION,ensureIdentity,ensureBalanceSlot,hydrateBalance,setBalance};
+ window.CartP49={VERSION,ensureIdentity,ensureBalanceSlot,hydrateBalance,setBalance,knownBalance};
 })();

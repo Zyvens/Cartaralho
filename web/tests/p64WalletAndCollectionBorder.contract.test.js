@@ -5,18 +5,22 @@ const js=read('public/js/p64.js'),index=read('public/index.html'),release=read('
 
 test('P64 compila',()=>assert.doesNotThrow(()=>new Function(js)));
 
-test('saldo nasce junto com a identidade usando estado/cache local',()=>{
+test('saldo nasce junto com a identidade usando dirty_balance autenticado antes do cache',()=>{
  assert.match(js,/function primeBalance\(\)/);
- assert.match(js,/readCachedBalance\(\)/);
+ assert.match(js,/function readCachedBalance\(\)/);
+ assert.match(js,/AuthClient\?\.user\?\.dirty_balance/);
+ assert.match(js,/raw!==null&&raw!==undefined/);
  assert.match(js,/HomeScreen\.renderAccount=function/);
  assert.match(js,/primeBalance\(\);queueMicrotask/);
  assert.match(auth,/dirty_balance/);
  assert.match(login,/dirty_balance/);
 });
 
-test('wallet possui endpoint leve e reconciliação autoritativa',()=>{
+test('wallet possui endpoint leve e reconciliação autoritativa coalescida',()=>{
  assert.match(wallet,/SELECT balance,updated_at FROM dirty_coin_wallets/);
  assert.match(js,/\/api\/profile\/wallet\?_fresh=/);
+ assert.match(js,/walletRefreshPromise/);
+ assert.match(js,/if\(walletRefreshPromise\)return walletRefreshPromise/);
  assert.match(js,/applyBalance\(v,\{source\}\)/);
  assert.match(js,/MarketUI\.data\.dirtyBalance=v/);
 });
@@ -31,7 +35,7 @@ test('saldo reage a transação e mantém fallback independente',()=>{
 });
 
 test('P64 permanece no histórico após releases posteriores',()=>{
- assert.ok(index.indexOf('js/p64.js?v=1.4.64')>index.indexOf('js/p63.js?v=1.4.63'));
+ assert.ok(index.indexOf('js/p64.js?v=1.4.75')>index.indexOf('js/p63.js?v=1.4.75'));
  assert.match(release,/APP_VERSION='v1\.4\.64'/);
  assert.match(version,/releaseP\d+/);
  assert.match(notifications,/releaseP64/);

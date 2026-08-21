@@ -19,16 +19,16 @@ test('carteira é reconciliada no render síncrono e após o decorator profissio
  assert.match(js,/dirty_balance/);
  assert.match(js,/HomeScreen\.renderAccount=function/);
  assert.match(js,/ProfessionalUI\.polishHome=function/);
- assert.match(js,/reconcile\(\);[\s\S]*queueMicrotask\(\(\)=>reconcile\(\)\);[\s\S]*requestAnimationFrame\(\(\)=>reconcile\(\)\)/);
+ assert.match(js,/reconcile\(\);[\s\S]*queueMicrotask\(\(\)=>reconcile\(\)\);[\s\S]*requestAnimationFrame\(\(\)=>reconcile\(\)/);
  assert.doesNotMatch(js,/fetch\(|\/api\/wallet\/balance/);
  assert.match(js,/cartaralho:balance-updated/);
 });
 
-test('P73 permanece carregado no histórico depois do P74',()=>{
+test('P73 permanece carregado no histórico depois do P75',()=>{
  assert.ok(index.includes('css/p73.css?v=1.4.73'));
  assert.ok(index.includes('js/p73.js?v=1.4.73'));
  assert.match(release,/APP_VERSION='v1\.4\.73'/);
- assert.match(version,/releaseP74/);
+ assert.match(version,/releaseP75/);
  assert.match(notifications,/releaseP74/);
  assert.match(notifications,/P73_RELEASE/);
 });
