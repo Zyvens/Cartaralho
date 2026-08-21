@@ -3,67 +3,10 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const cards=read('public/js/domains/cardsLibrary.js'),progression=read('public/js/domains/cardProgression.js'),profile=read('public/js/domains/profileUI.js'),market=read('public/js/domains/marketplaceUI.js'),css=read('public/css/p57.css'),p53=read('public/css/p53.css'),index=read('public/index.html'),release=read('lib/releaseP57.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
 
-test('P57 foi absorvido pelos owners atuais e o script histórico não executa',()=>{
- [cards,progression,profile,market].forEach(src=>assert.doesNotThrow(()=>new Function(src)));
- assert.match(index,/<script src="js\/domains\/cardsLibrary\.js\?v=domain-2"><\/script>/);
- assert.match(index,/<script src="js\/domains\/cardProgression\.js\?v=domain-2"><\/script>/);
- assert.match(index,/<script src="js\/domains\/profileUI\.js\?v=domain-2"><\/script>/);
- assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p57\.js\?v=1\.4\.72"><\/script>/);
- assert.match(index,/<link rel="stylesheet" href="css\/p57\.css\?v=1\.4\.57">/);
-});
-
-test('Minhas Cartas e a ficha usam o CardComponent real do jogo',()=>{
- assert.match(cards,/typeof CardComponent==='undefined'/);
- assert.match(cards,/CardComponent\.createBlackCard\(value,options\)/);
- assert.match(cards,/CardComponent\.createWhiteCard\(value,options\)/);
- assert.match(cards,/p57-library-game-card/);
- assert.match(cards,/p56-card-art p57-detail-game-card/);
- assert.match(cards,/HomeScreen\.renderCards=render/);
- assert.match(cards,/ProfessionalUI\.renderCards=render/);
- assert.match(cards,/MetaUI\.renderCards=render/);
-});
-
-test('renderer final gera autoria legível e não metadado técnico',()=>{
- assert.match(cards,/const creatorLabel=c=>/);
- assert.match(cards,/<small>Criado por \$\{esc\(creatorLabel\(c\)\)\}<\/small>/);
- assert.doesNotMatch(cards,/contorno \$\{label\(c\.borderTier\)\}/);
-});
-
-test('lacunas pretas continuam canônicas inclusive na Reciclagem, com visual P58 posterior',()=>{
- assert.match(cards,/CardComponent\._formatBlackText=function\(text\)/);
- assert.match(market,/CardComponent\._formatBlackText\(c\.text\)/);
- assert.match(css,/recycling-card b \.black-card-gap/);
- assert.match(read('public/css/p58.css'),/border-bottom:0!important/);
-});
-
-test('molduras do Perfil voltam a ser previews vivos e Gênese mantém estabilização posterior',()=>{
- assert.match(p53,/profile-modal-frame-grid[\s\S]*animation:none!important/);
- assert.match(profile,/classList\.remove\('profile-modal-frame-grid'\)/);
- assert.match(profile,/classList\.add\('p57-live-frame-grid','p58-live-frame-grid'\)/);
- assert.match(profile,/p58-genesis-preview/);
- assert.match(css,/\.p57-live-frame-grid \.profile-modal-frame-item\{contain:none!important/);
-});
-
-test('progressão exibida ao jogador é Bronze, Prata, Ouro e Platina',()=>{
- assert.match(progression,/copper:'Bronze'/);
- assert.match(progression,/silver:'Prata'/);
- assert.match(progression,/gold:'Ouro'/);
- assert.match(progression,/platinum:'Platina'/);
- assert.doesNotMatch(progression,/copper:'Copper'/);
-});
-
-test('ficha canônica preserva o shell P56 e incorpora preview/progressão posteriores',()=>{
- assert.match(cards,/p56-card-detail-overlay/);
- assert.match(cards,/p56-card-detail-shell/);
- assert.match(cards,/p56-card-preview-host/);
- assert.match(cards,/p57-detail-game-card/);
- assert.match(cards,/CartCardProgression\.track\('material',c\)/);
- assert.match(cards,/CartCardProgression\.track\('border',c\)/);
-});
-
-test('P57 permanece como proveniência publicada e P74 é a release corrente',()=>{
- assert.match(release,/APP_VERSION='v1\.4\.57'/);
- assert.match(version,/releaseP74/);
- assert.ok(notifications.includes('P57_RELEASE')||notifications.includes("require('../lib/releaseP57')"));
- assert.match(notifications,/P56_RELEASE/);
-});
+test('P57 foi absorvido pelos owners atuais e o script histórico não executa',()=>{[cards,progression,profile,market].forEach(src=>assert.doesNotThrow(()=>new Function(src)));assert.match(index,/<script src="js\/domains\/cardsLibrary\.js\?v=domain-2"><\/script>/);assert.match(index,/<script src="js\/domains\/cardProgression\.js\?v=domain-2"><\/script>/);assert.match(index,/<script src="js\/domains\/profileUI\.js\?v=domain-2"><\/script>/);assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p57\.js\?v=1\.4\.72"><\/script>/);assert.match(index,/<link rel="stylesheet" href="css\/p57\.css\?v=1\.4\.57">/);});
+test('Minhas Cartas e a ficha usam o CardComponent real do jogo',()=>{assert.match(cards,/CardComponent\.createBlackCard\(value,options\)/);assert.match(cards,/CardComponent\.createWhiteCard\(value,options\)/);assert.match(cards,/HomeScreen\.renderCards=render/);assert.match(cards,/ProfessionalUI\.renderCards=render/);assert.match(cards,/MetaUI\.renderCards=render/);});
+test('renderer final gera autoria legível e não metadado técnico',()=>{assert.match(cards,/const creatorLabel=c=>/);assert.match(cards,/<small>Criado por \$\{esc\(creatorLabel\(c\)\)\}<\/small>/);assert.doesNotMatch(cards,/contorno \$\{label\(c\.borderTier\)\}/);});
+test('lacunas pretas continuam canônicas inclusive na Reciclagem',()=>{assert.match(cards,/CardComponent\._formatBlackText=function\(text\)/);assert.match(market,/CardComponent\._formatBlackText\(c\.text\)/);assert.match(css,/recycling-card b \.black-card-gap/);assert.match(read('public/css/p58.css'),/border-bottom:0!important/);});
+test('molduras do Perfil são previews vivos e Gênese mantém estabilização',()=>{assert.match(p53,/profile-modal-frame-grid[\s\S]*animation:none!important/);assert.match(profile,/classList\.remove\('profile-modal-frame-grid'\)/);assert.match(profile,/classList\.add\('p57-live-frame-grid','p58-live-frame-grid'\)/);assert.match(profile,/p58-genesis-preview/);});
+test('progressão exibida ao jogador é Bronze, Prata, Ouro e Platina',()=>{assert.match(progression,/copper:'Bronze'/);assert.match(progression,/silver:'Prata'/);assert.match(progression,/gold:'Ouro'/);assert.match(progression,/platinum:'Platina'/);});
+test('P57 permanece como proveniência publicada e P75 é a release corrente',()=>{assert.match(release,/APP_VERSION='v1\.4\.57'/);assert.match(version,/releaseP75/);assert.match(notifications,/releaseP75/);assert.ok(notifications.includes('P57_RELEASE')||notifications.includes("require('../lib/releaseP57')"));assert.match(notifications,/P56_RELEASE/);});
