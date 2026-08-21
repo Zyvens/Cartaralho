@@ -16,7 +16,7 @@ test('Perfil e Sair não herdam o marcador mobile legado que escondia seus spans
  assert.match(css,/@media\(max-width:620px\)[\s\S]*p56-account-action-copy[\s\S]*display:none!important/);
 });
 
-test('carteira aparece no render da conta antes da reconciliação HTTP e é revalidada depois',()=>{
+test('carteira aparece no primeiro render usando saldo conhecido; fetch no home_render foi SUPERSEDED por P75',()=>{
  assert.match(market,/knownBalance=explicit/);
  assert.match(market,/AuthClient\?\.user\?\.dirty_balance/);
  assert.match(market,/localStorage\.getItem\(cacheKey\(\)\)/);
@@ -24,16 +24,17 @@ test('carteira aparece no render da conta antes da reconciliação HTTP e é rev
  assert.match(account,/ProfessionalUI\?\.polishHome\?\.\(\)/);
  assert.match(account,/CartMarketplaceDomain\?\.mountBalance\?\.\(\)/);
  assert.match(account,/decorate\(\);queueMicrotask\(decorate\);requestAnimationFrame\(decorate\)/);
- assert.match(account,/setTimeout\(\(\)=>\{decorate\(\);window\.CartMarketplaceDomain\?\.refreshBalance/);
+ assert.doesNotMatch(account,/refreshBalance\?\.\('home_render'\)/);
+ assert.match(market,/walletRefreshPromise/);
  assert.match(market,/cartaralho:balance-updated/);
 });
 
-test('P73 permanece como histórico não executável depois da consolidação P74',()=>{
+test('P73 permanece histórico não executável e P75 é a cabeça atual',()=>{
  assert.ok(index.includes('css/p73.css?v=1.4.73'));
  assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p73\.js\?v=1\.4\.73"><\/script>/);
  assert.doesNotMatch(index,/<script src="js\/p73\.js\?v=1\.4\.73"><\/script>/);
  assert.match(release,/APP_VERSION='v1\.4\.73'/);
- assert.match(version,/releaseP74/);
- assert.match(notifications,/releaseP74/);
+ assert.match(version,/releaseP75/);
+ assert.match(notifications,/releaseP75/);
  assert.match(notifications,/P73_RELEASE/);
 });
