@@ -7,7 +7,7 @@ test('P74 compila',()=>assert.doesNotThrow(()=>new Function(js)));
 
 test('mostrador fica como filho direto da tag principal da conta e antes das ações',()=>{
  assert.match(js,/querySelector\(':scope > \.account-strip'\)/);
- assert.match(js,/root\.insertBefore\(slot,actions\|\|null\)/);
+ assert.match(js,/root\.insertBefore\(slot,anchor\|\|null\)/);
  assert.match(js,/p74-wallet-slot/);
  assert.match(css,/#home-account>\.account-strip\.p74-account-strip>\.p74-wallet-slot/);
  assert.match(css,/flex-wrap:nowrap!important/);
@@ -31,19 +31,27 @@ test('render da Home só posiciona o saldo e não dispara nova consulta concorre
  assert.doesNotMatch(patch[0],/scheduleAuthoritative|syncAuthoritative/);
 });
 
-test('recompensa administrativa atualiza e confirma o saldo real',()=>{
+test('recompensa administrativa atualiza pelo evento exato e confirma o saldo real',()=>{
+ assert.match(js,/channel\.bind\('balance_updated'/);
  assert.match(js,/channel\.bind\('admin_megaphone'/);
  assert.match(js,/data\.kind!==['"]reward['"]/);
+ assert.match(js,/data\?\.balance/);
  assert.match(js,/p74-admin-reward/);
- assert.match(js,/p74-admin-reward-confirm/);
  assert.match(js,/targetUserIds/);
 });
 
-test('P74 continua histórico e é carregado após P73 com cache novo',()=>{
- assert.ok(index.indexOf('css/p74.css?v=1.4.74')>index.indexOf('css/p73.css?v=1.4.73'));
- assert.ok(index.indexOf('js/p74.js?v=1.4.75')>index.indexOf('js/p73.js?v=1.4.73'));
+test('P74 se auto-recupera se outro renderer reconstruir a tag da conta',()=>{
+ assert.match(js,/new MutationObserver/);
+ assert.match(js,/observeAccount/);
+ assert.match(js,/scheduleEnsure/);
+ assert.doesNotMatch(css,/body\[data-cart-screen="home"\]/);
+});
+
+test('P74 continua histórico e recebe cache-bust do P76',()=>{
+ assert.ok(index.indexOf('css/p74.css?v=1.4.76')>index.indexOf('css/p73.css?v=1.4.73'));
+ assert.ok(index.indexOf('js/p74.js?v=1.4.76')>index.indexOf('js/p73.js?v=1.4.73'));
  assert.match(release,/APP_VERSION='v1\.4\.74'/);
- assert.match(version,/releaseP75/);
+ assert.match(version,/releaseP76/);
  assert.match(notifications,/releaseP74/);
  assert.match(notifications,/P73_RELEASE/);
 });
