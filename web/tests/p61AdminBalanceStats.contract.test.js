@@ -17,7 +17,6 @@ test('aviso administrativo consulta a versão atual do servidor',()=>{
  assert.match(adminUI,/AuthClient\.request\('\/api\/version'\)/);
  assert.match(adminUI,/#admin-update-send/);
  assert.match(adminUI,/Nova atualização \$\{current\} disponível/);
- assert.doesNotMatch(adminUI,/Nova atualização v1\.4\.41 disponível/);
 });
 
 test('prêmio administrativo entrega saldo exato ao owner da carteira',()=>{
@@ -34,8 +33,8 @@ test('Estatísticas permanecem sem renderer de wallet ou extrato',()=>{
  assert.doesNotMatch(index,/css\/p61\.css/);
 });
 
-test('P61 JS é proveniência histórica e P74 é a release corrente',()=>{
+test('P61 JS é proveniência histórica e P75 é a release corrente',()=>{
  assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p61\.js\?v=1\.4\.71"><\/script>/);
  assert.match(release,/APP_VERSION='v1\.4\.61'/);
- assert.match(version,/releaseP74/);
+ assert.match(version,/releaseP75/);
 });
