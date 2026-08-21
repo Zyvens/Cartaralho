@@ -27,9 +27,9 @@ test('atalho do saldo também funciona por teclado',()=>{
  assert.match(marketUI,/\['Enter',' '\]\.includes\(e\.key\)/);
 });
 
-test('P62 JS é apenas proveniência histórica; CSS compatível continua ativo',()=>{
+test('P62 JS é apenas proveniência histórica; CSS compatível continua ativo e P75 é corrente',()=>{
  assert.match(index,/<link rel="stylesheet" href="css\/p62\.css\?v=1\.4\.71">/);
  assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p62\.js\?v=1\.4\.71"><\/script>/);
  assert.match(release,/APP_VERSION='v1\.4\.62'/);
- assert.match(version,/releaseP74/);
+ assert.match(version,/releaseP75/);
 });
