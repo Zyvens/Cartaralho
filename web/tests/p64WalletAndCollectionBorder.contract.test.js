@@ -19,11 +19,12 @@ test('saldo nasce junto com a identidade usando estado e cache local',()=>{
  assert.match(login,/dirty_balance/);
 });
 
-test('wallet possui endpoint leve e reconciliação autoritativa',()=>{
+test('wallet possui endpoint leve, reconciliação autoritativa e coalescing P75',()=>{
  assert.match(wallet,/SELECT balance,updated_at FROM dirty_coin_wallets/);
  assert.match(marketUI,/\/api\/profile\/wallet\?_fresh=\$\{Date\.now\(\)\}/);
+ assert.match(marketUI,/walletRefreshPromise/);
+ assert.match(marketUI,/if\(walletRefreshPromise\)return walletRefreshPromise/);
  assert.match(marketUI,/applyBalance\(v,\{source\}\)/);
- assert.match(marketUI,/MarketUI\.data\.dirtyBalance=v/);
 });
 
 test('saldo reage a realtime e mantém fallback por resposta HTTP',()=>{
@@ -35,7 +36,7 @@ test('saldo reage a realtime e mantém fallback por resposta HTTP',()=>{
  assert.match(marketUI,/source:'marketplace_response'/);
 });
 
-test('P64 permanece como proveniência histórica e P74 é a release corrente',()=>{
+test('P64 permanece como proveniência histórica e P75 é a release corrente',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.64'/);
- assert.match(version,/releaseP74/);
+ assert.match(version,/releaseP75/);
 });
