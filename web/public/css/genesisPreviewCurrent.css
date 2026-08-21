@@ -1,0 +1,12 @@
+/* Owner visual canônico da órbita Gênese no grid live do Perfil. */
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview{animation:none!important;will-change:auto!important}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track{width:142%!important;height:110%!important;animation:p58GenesisPreviewOrbit 7.2s linear infinite!important;transform:translate(-50%,-50%) rotate(-28deg)!important;will-change:transform!important;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track>.genese-atom-particle{animation:none!important;opacity:.92!important;transform:translate(-50%,-50%) scale(.82)!important;will-change:auto!important}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track>.genese-atom-particle:nth-child(1){left:100%!important;top:50%!important}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track>.genese-atom-particle:nth-child(2){left:75%!important;top:6.7%!important}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track>.genese-atom-particle:nth-child(3){left:25%!important;top:6.7%!important}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track>.genese-atom-particle:nth-child(4){left:0!important;top:50%!important}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track>.genese-atom-particle:nth-child(5){left:25%!important;top:93.3%!important}
+.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track>.genese-atom-particle:nth-child(6){left:75%!important;top:93.3%!important}
+@keyframes p58GenesisPreviewOrbit{from{transform:translate(-50%,-50%) rotate(-28deg)}to{transform:translate(-50%,-50%) rotate(332deg)}}
+@media(prefers-reduced-motion:reduce){.p58-live-frame-grid .avatar-frame.frame-genese-celestial.p58-genesis-preview>.genese-atom-track{animation:none!important}}
