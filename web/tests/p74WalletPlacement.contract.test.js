@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const account=read('public/js/domains/accountUI.js'),market=read('public/js/domains/marketplaceUI.js'),admin=read('public/js/domains/adminUI.js'),history=read('public/js/p74.js'),accountCss=read('public/css/account.css'),historyCss=read('public/css/p74.css'),index=read('public/index.html'),release=read('lib/releaseP74.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
+const account=read('public/js/domains/accountUI.js'),market=read('public/js/domains/marketplaceUI.js'),admin=read('public/js/domains/adminUI.js'),history=read('public/js/p74.js'),currentCss=read('public/css/accountCurrent.css'),compatCss=read('public/css/p74.css'),index=read('public/index.html'),release=read('lib/releaseP74.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
 
 test('owners canônicos do contrato P74 compilam e o artefato histórico continua legível',()=>{
  for(const source of [account,market,admin,history])assert.doesNotThrow(()=>new Function(source));
@@ -15,16 +15,17 @@ test('mostrador fica como filho direto da faixa principal da conta e imediatamen
  assert.match(account,/wallet\.nextElementSibling!==actions/);
  assert.match(market,/root\.insertBefore\(slot,actions\|\|null\)/);
  assert.match(market,/p74-wallet-slot/);
- assert.match(accountCss,/#home-account>\.account-strip\.p74-account-strip>\.p74-wallet-slot/);
- assert.match(accountCss,/flex-wrap:nowrap!important/);
- assert.match(accountCss,/position:static!important/);
+ assert.match(currentCss,/#home-account>\.account-strip\.p74-account-strip>\.p74-wallet-slot/);
+ assert.match(currentCss,/flex-wrap:nowrap!important/);
+ assert.match(currentCss,/position:static!important/);
 });
 
-test('CSS P74 foi absorvido por account.css e o arquivo histórico não possui regras',()=>{
- assert.match(accountCss,/p74-wallet-slot[\s\S]*order:30!important/);
- assert.match(accountCss,/p56-account-actions[\s\S]*order:40!important/);
- assert.match(historyCss,/HISTORICAL P74/);
- assert.doesNotMatch(historyCss,/\{[^}]*display:/);
+test('CSS P74 vive no owner visual e o arquivo histórico é somente shim de posição da cascata',()=>{
+ assert.match(currentCss,/p74-wallet-slot[\s\S]*order:30!important/);
+ assert.match(currentCss,/p56-account-actions[\s\S]*order:40!important/);
+ assert.match(compatCss,/COMPAT P74/);
+ assert.match(compatCss,/@import url\('\.\/accountCurrent\.css'\)/);
+ assert.doesNotMatch(compatCss,/p74-wallet-slot\s*\{/);
 });
 
 test('resultado P74 é preservado e a reconciliação remota concorrente foi SUPERSEDED por P75',()=>{
