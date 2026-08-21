@@ -11,21 +11,22 @@ test('P49 alinha nome, usuário e título como uma única identidade',()=>{
  assert.match(css,/justify-content:center!important/);
 });
 
-test('saldo reserva o espaço no primeiro paint e hidrata sem remontar a Home',()=>{
+test('saldo nasce no primeiro paint do dirty_balance autenticado e não depende de Cartas Limpas',()=>{
  assert.doesNotThrow(()=>new Function(js));
- assert.match(js,/ensureBalanceSlot/);
- assert.match(js,/p49-balance-slot/);
- assert.match(js,/cachedBalance\(\)/);
- assert.match(js,/AuthClient\.cleanCards\(\)/);
+ assert.match(js,/function knownBalance\(\)/);
+ assert.match(js,/AuthClient\?\.user\?\.dirty_balance/);
+ assert.match(js,/setBalance\(value,\{loading:false\}\)/);
+ assert.match(js,/\/api\/profile\/wallet\?_fresh=/);
+ assert.doesNotMatch(js,/AuthClient\.cleanCards\(\)/);
  assert.match(js,/localStorage\.setItem\(cacheKey\(\)/);
  assert.match(js,/HomeScreen\.renderAccount=function/);
 });
 
 test('P49 permanece carregado e preservado após releases futuros',()=>{
  assert.match(index,/css\/p49\.css\?v=1\.4\.49/);
- assert.match(index,/js\/p49\.js\?v=1\.4\.49/);
+ assert.match(index,/js\/p49\.js\?v=1\.4\.75/);
  assert.ok(index.indexOf('css/p49.css?v=1.4.49')>index.indexOf('css/p48Friends.css?v=1.4.48'));
- assert.ok(index.indexOf('js/p49.js?v=1.4.49')>index.indexOf('js/p48Friends.js?v=1.4.48'));
+ assert.ok(index.indexOf('js/p49.js?v=1.4.75')>index.indexOf('js/p48Friends.js?v=1.4.48'));
  assert.match(version,/releaseP(?:49|[5-9]\d)/);
  assert.match(notifications,/releaseP(?:49|[5-9]\d)/);
  assert.match(notifications,/P49_RELEASE|releaseP49/);
