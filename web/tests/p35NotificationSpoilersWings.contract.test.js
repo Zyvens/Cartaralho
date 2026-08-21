@@ -1,42 +1,43 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const css=read('public/css/p35.css'),js=read('public/js/p35.js'),index=read('public/index.html'),notifications=read('lib/appNotifications.js');
+const history=read('public/js/p35.js'),shim=read('public/css/p35.css'),spoilerCss=read('public/css/notificationsSpoilerCurrent.css'),wingsCss=read('public/css/cosmeticWingsCurrent.css'),notificationsUI=read('public/js/domains/notificationsUI.js'),index=read('public/index.html'),version=read('api/version.js'),notifications=read('api/notifications.js'),release=read('lib/releaseP35.js');
 
-test('P35 JS crítico compila',()=>assert.doesNotThrow(()=>new Function(js)));
-
-test('Asas mantêm 45 graus e são espelhadas para fora do círculo',()=>{
- assert.match(css,/frame-cosmetic-asas::before\{transform:translateY\(-50%\) scaleX\(-1\) rotate\(45deg\)!important\}/);
- assert.match(css,/frame-cosmetic-asas::after\{transform:translateY\(-50%\) rotate\(45deg\)!important\}/);
+test('Central transforma Atualizações e Prêmios em spoilers pelo owner notificationsUI',()=>{
+ assert.doesNotThrow(()=>new Function(notificationsUI));
+ assert.ok(notificationsUI.includes("document.createElement('details')"));
+ assert.ok(notificationsUI.includes("details.className='notifications-spoiler'"));
+ assert.ok(notificationsUI.includes("document.createElement('summary')"));
+ assert.ok(notificationsUI.includes("summary.className='notifications-spoiler-summary'"));
+ assert.ok(notificationsUI.includes("details.dataset.section=index===0?'updates':'rewards'"));
 });
 
-test('Central transforma Atualizações e Prêmios em spoilers nativos',()=>{
- assert.match(js,/document\.createElement\('details'\)/);
- assert.match(js,/document\.createElement\('summary'\)/);
- assert.match(js,/notifications-spoiler/);
- assert.match(js,/notifications-spoiler-summary/);
- assert.match(js,/dataSection|dataset\.section/);
- assert.match(js,/querySelectorAll\(':scope > section'\)/);
+test('aparência-base dos spoilers vive em owner visual canônico',()=>{
+ assert.ok(spoilerCss.includes('.notifications-spoiler-summary'));
+ assert.ok(spoilerCss.includes('.notifications-spoiler-meta small'));
+ assert.ok(spoilerCss.includes('.notifications-spoiler-chevron'));
+ assert.ok(spoilerCss.includes('.notifications-spoiler[open] .notifications-spoiler-chevron'));
+ assert.ok(spoilerCss.includes('.notifications-spoiler-content{padding:12px!important}'));
+ assert.ok(shim.includes('notificationsSpoilerCurrent.css'));
 });
 
-test('Spoilers têm cabeçalho, contagem, seta e conteúdo abaixo',()=>{
- assert.match(css,/\.notifications-spoiler-summary\{/);
- assert.match(css,/\.notifications-spoiler-meta small\{/);
- assert.match(css,/\.notifications-spoiler-chevron\{/);
- assert.match(css,/\.notifications-spoiler\[open\] \.notifications-spoiler-chevron\{transform:rotate\(180deg\)/);
- assert.match(css,/\.notifications-spoiler-content\{padding:12px!important\}/);
+test('transformações de Asas P35 foram supersedidas pela geometria final P36',()=>{
+ assert.ok(!shim.includes('frame-cosmetic-asas'));
+ assert.ok(!spoilerCss.includes('frame-cosmetic-asas'));
+ assert.ok(wingsCss.includes('bottom:-10px!important'));
+ assert.ok(wingsCss.includes('transform:scaleX(-1) rotate(45deg)!important'));
+ assert.ok(wingsCss.includes('transform:rotate(45deg)!important'));
+ assert.ok(!wingsCss.includes('translateY(-50%)'));
 });
 
-test('P35 permanece carregado após P34 com cache-busting próprio',()=>{
- assert.match(index,/css\/p35\.css\?v=1\.4\.35/);
- assert.match(index,/js\/p35\.js\?v=1\.4\.35/);
- assert.match(index,/js\/notificationsUI\.js\?v=1\.4\.35/);
- assert.ok(index.indexOf('css/p35.css?v=1.4.35')>index.indexOf('css/p34.css?v=1.4.34'));
- assert.ok(index.indexOf('js/p35.js?v=1.4.35')>index.indexOf('js/p34.js?v=1.4.34'));
-});
-
-test('Central mantém o release P35 e o histórico recente',()=>{
- assert.match(notifications,/release:p35/);
- assert.match(notifications,/release:p34/);
- assert.match(notifications,/release:p33/);
+test('P35 é histórico não executável, shim visual, e P75 é a release corrente',()=>{
+ assert.doesNotThrow(()=>new Function(history));
+ assert.ok(index.includes('css/p35.css?v=1.4.35'));
+ assert.ok(index.includes('type="application/x-cartaralho-legacy" src="js/p35.js?v=1.4.35"'));
+ assert.ok(!index.includes('<script src="js/p35.js'));
+ assert.ok(shim.startsWith('/* COMPAT P35'));
+ assert.ok(release.includes("APP_VERSION='v1.4.35'"));
+ assert.ok(version.includes('releaseP75'));
+ assert.ok(notifications.includes('releaseP75'));
+ assert.ok(notifications.includes('P35_RELEASE')||notifications.includes('releaseP35'));
 });
