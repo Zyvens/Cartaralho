@@ -1,24 +1,27 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const p41=read('public/js/p41.js'),css=read('public/css/p44.css'),recycling=read('lib/cardRecycling.js'),index=read('public/index.html'),version=read('api/version.js'),notifications=read('api/notifications.js'),release=read('lib/releaseP44.js');
+const legacyCss=read('public/css/p44.css'),cards=read('public/js/domains/cardsLibrary.js'),admin=read('public/js/domains/adminUI.js'),topBase=read('public/css/topControlsBaseCurrent.css'),topNav=read('public/css/topNavigationCurrent.css'),topPixel=read('public/css/topControlsPixelCurrent.css'),detail=read('public/css/cardDetailCurrent.css'),recycling=read('lib/cardRecycling.js'),index=read('public/index.html'),version=read('api/version.js'),notifications=read('api/notifications.js'),release=read('lib/releaseP44.js');
 
-test('Admin não cria loop de MutationObserver ao abrir',()=>{
- assert.match(p41,/eyebrow&&eyebrow\.textContent!==adminLabel/);
- assert.match(p41,/security&&security\.textContent!==securityCopy/);
+test('Admin atual não depende do MutationObserver histórico P41',()=>{
+ assert.match(admin,/CartDomains\.claim\('adminUI'/);
+ assert.doesNotMatch(admin,/MutationObserver/);
+ assert.match(admin,/function ensure\(\)/);
+ assert.match(admin,/creator-admin-fab/);
 });
 
-test('detalhe de Minhas Cartas fica acima do modal de perfil e tem layout dedicado',()=>{
- assert.match(css,/\.p41-card-detail-overlay\{[\s\S]*z-index:42000!important/);
- assert.match(css,/grid-template-areas:"preview progression" "preview origin"/);
- assert.match(css,/\.p41-origin-section\{/);
+test('detalhe P41 foi supersedido pela ficha P56 e é removido antes da abertura',()=>{
+ assert.match(cards,/document\.getElementById\('p41-card-detail-overlay'\)\?\.remove\(\)/);
+ assert.match(cards,/overlay\.className='p56-card-detail-overlay'/);
+ assert.match(detail,/\.p56-card-detail-overlay[\s\S]*z-index:65000/);
+ assert.match(legacyCss,/^\/\* HISTORICAL P44/);
 });
 
-test('Missões e Voltar compartilham exatamente o mesmo eixo e altura',()=>{
- assert.match(css,/\.mission-fab,[\s\S]*#back-play\.p42-home-back\{[\s\S]*top:calc\(env\(safe-area-inset-top,0px\) \+ 12px\)!important/);
- assert.match(css,/height:44px!important/);
- assert.match(css,/\.mission-fab\{right:12px!important;left:auto!important\}/);
- assert.match(css,/#back-play\.p42-home-back\{left:12px!important;right:auto!important\}/);
+test('navegação superior P44 foi supersedida pela trajetória P45→P47',()=>{
+ assert.match(topBase,/height:44px!important/);
+ assert.match(topNav,/height:40px!important/);
+ assert.match(topPixel,/transform:none!important/);
+ assert.match(topPixel,/#app\.screen-enter:has\(button\.back-button\)/);
 });
 
 test('reciclagem tipa parâmetros usados em jsonb_build_object',()=>{
@@ -26,10 +29,11 @@ test('reciclagem tipa parâmetros usados em jsonb_build_object',()=>{
  assert.match(recycling,/\$\{reward\}::int/);
 });
 
-test('P44 permanece publicado e preservado após releases futuros',()=>{
+test('P44 permanece como proveniência sem CSS funcional e P75 é corrente',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.44'/);
  assert.match(notifications,/releaseP44/);
  assert.match(index,/css\/p44\.css\?v=1\.4\.44/);
- assert.match(index,/js\/p41\.js\?v=1\.4\.44/);
- assert.match(version,/releaseP\d+/);
+ assert.match(legacyCss,/HISTORICAL P44/);
+ assert.doesNotMatch(legacyCss,/\{[^*]/);
+ assert.match(version,/releaseP75/);
 });
