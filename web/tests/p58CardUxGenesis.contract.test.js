@@ -1,54 +1,63 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const js=read('public/js/p58.js'),css=read('public/css/p58.css'),card=read('public/js/components/card.js'),index=read('public/index.html'),release=read('lib/releaseP58.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
+const cards=read('public/js/domains/cardsLibrary.js'),market=read('public/js/domains/marketplaceUI.js'),profile=read('public/js/domains/profileUI.js'),genesis=read('public/js/domains/genesisFrameUI.js'),css=read('public/css/p58.css'),card=read('public/js/components/card.js'),index=read('public/index.html'),release=read('lib/releaseP58.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
 
-test('P58 compila e carrega depois de P57',()=>{
- assert.doesNotThrow(()=>new Function(js));
- assert.ok(index.indexOf('css/p58.css?v=1.4.58')>index.indexOf('css/p57.css?v=1.4.57'));
- assert.ok(index.indexOf('js/p58.js?v=1.4.58')>index.indexOf('js/p57.js?v=1.4.72'));
- assert.match(index,/js\/components\/card\.js\?v=1\.4\.58/);
+test('owners canônicos preservam a trajetória P58 e o script histórico não executa',()=>{
+ assert.doesNotThrow(()=>new Function(cards));
+ assert.doesNotThrow(()=>new Function(market));
+ assert.doesNotThrow(()=>new Function(profile));
+ assert.doesNotThrow(()=>new Function(genesis));
+ assert.match(index,/<script src="js\/domains\/cardsLibrary\.js\?v=domain-2"><\/script>/);
+ assert.match(index,/<script src="js\/domains\/marketplaceUI\.js\?v=domain-2"><\/script>/);
+ assert.match(index,/<script src="js\/domains\/profileUI\.js\?v=domain-2"><\/script>/);
+ assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p58\.js\?v=1\.4\.58"><\/script>/);
+ assert.match(index,/<link rel="stylesheet" href="css\/p58\.css\?v=1\.4\.58">/);
 });
 
 test('lacuna canônica é underline textual ___ rosa/roxo e não barra contínua',()=>{
  assert.match(card,/black-card-gap[^>]*>___<\/span>/);
- assert.match(js,/black-card-gap[^>]*>___<\/span>/);
+ assert.match(cards,/black-card-gap[^>]*>___<\/span>/);
  assert.match(css,/\.black-card-gap[\s\S]*color:#d946ef!important/);
  assert.match(css,/border-bottom:0!important/);
 });
 
-test('Minhas Cartas usa proporção real de baralho e esconde badge redundante sobre a carta',()=>{
+test('Minhas Cartas mantém proporção real de baralho e esconde badge redundante',()=>{
+ assert.match(cards,/p57-library-game-card/);
+ assert.match(cards,/p56-card-art p57-detail-game-card/);
  assert.match(css,/\.p57-library-game-card[\s\S]*aspect-ratio:5\/7!important/);
  assert.match(css,/\.p56-card-preview-host \.p57-detail-game-card[\s\S]*aspect-ratio:5\/7!important/);
  assert.match(css,/\.p57-library-game-card \.card-progression-badge[\s\S]*display:none!important/);
 });
 
 test('Reciclagem remove rótulos redundantes de cor e preserva favorito',()=>{
- assert.match(js,/meta\.remove\(\)/);
- assert.match(js,/meta\.textContent='⭐ FAVORITA'/);
- assert.match(js,/cleanRecycleConfirm/);
+ assert.match(market,/p58-recycle-favorite/);
+ assert.match(market,/CardComponent\._formatBlackText\(c\.text\)/);
+ assert.match(market,/p41-recycle-card-preview/);
  assert.match(css,/p41-recycle-card-preview>span\{display:none!important\}/);
 });
 
 test('criador de Minhas Cartas reutiliza linguagem visual do criador da partida',()=>{
- assert.match(js,/card-creation-screen/);
- assert.match(js,/card-type-tabs/);
- assert.match(js,/clean-stack-grid/);
- assert.match(js,/creation-instruction/);
- assert.match(js,/creation-input-row/);
- assert.match(js,/CartP48\.openLibraryCreator=openLibraryCreator/);
+ assert.match(cards,/p58-library-creator card-creation-screen/);
+ assert.match(cards,/card-type-tabs/);
+ assert.match(cards,/clean-stack-grid/);
+ assert.match(cards,/creation-instruction/);
+ assert.match(cards,/creation-input-row/);
+ assert.match(cards,/async function openCreator/);
 });
 
-test('Gênese no Perfil usa órbita de transform único para estabilidade no scroll',()=>{
- assert.match(js,/p58-genesis-preview/);
+test('Gênese no Perfil preserva a órbita estável de transform único',()=>{
+ assert.match(profile,/classList\.add\('p57-live-frame-grid','p58-live-frame-grid'\)/);
+ assert.match(profile,/frame\.classList\.add\('p58-genesis-preview'\)/);
+ assert.match(genesis,/STAR_COUNT=6/);
  assert.match(css,/p58GenesisPreviewOrbit/);
  assert.match(css,/genese-atom-particle[\s\S]*animation:none!important/);
  assert.match(css,/genese-atom-track[\s\S]*will-change:transform!important/);
 });
 
-test('P58 permanece publicado e preservado na Central após releases posteriores',()=>{
+test('P58 permanece como proveniência publicada e P74 é a release corrente',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.58'/);
- assert.match(version,/releaseP\d+/);
+ assert.match(version,/releaseP74/);
  assert.match(notifications,/releaseP58/);
  assert.match(notifications,/P58_RELEASE/);
  assert.match(notifications,/P57_RELEASE/);
