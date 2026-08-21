@@ -1,0 +1,8 @@
+/* Owner visual canônico do alinhamento final de @usuário e título com o nome na faixa da conta. */
+.home-account-bar .home-account-identity>span,
+.home-account-bar .home-account-identity>.account-equipped-title{
+  text-align:left!important;
+}
+.home-account-bar .home-account-identity>.account-equipped-title{
+  align-self:flex-start!important;
+}
