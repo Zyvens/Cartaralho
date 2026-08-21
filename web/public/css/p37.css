@@ -1,30 +1,6 @@
-/* P37 — seleção de Cartas de Jogador, megafone global e ferramentas do Criador. */
-
-/* Seleção: mais respiro entre o título e as cartas. */
-.card-creation-screen .player-library-title{margin:32px 0 18px!important;line-height:1.25!important}
-.card-creation-screen .player-library-title.player-library-title-selected{margin-top:34px!important}
-.card-creation-screen .created-cards-grid{margin:0 0 42px!important}
-.card-creation-screen .player-card-library-grid{margin-top:0!important;padding-top:2px!important}
-.card-creation-screen .player-library-title.is-reuse-title{display:flex!important;align-items:center;gap:9px;flex-wrap:wrap}
-.player-library-free-pill{display:inline-flex;align-items:center;min-height:25px;padding:4px 10px;border-radius:999px;border:1px solid rgba(34,197,94,.36);background:rgba(34,197,94,.11);color:#86efac;font-size:.68rem;font-weight:900;letter-spacing:.035em;text-transform:uppercase;vertical-align:middle}
-.player-card-library-card.is-favorite{outline:3px solid rgba(250,204,21,.78)!important;outline-offset:4px!important;box-shadow:0 0 24px rgba(250,204,21,.18)!important}
-
-/* Megafone usa o toast existente, com identidade própria e duração maior. */
-.toast.megaphone{border-color:rgba(250,204,21,.34)!important;background:linear-gradient(135deg,rgba(35,30,17,.97),rgba(20,18,27,.98))!important;box-shadow:0 12px 34px rgba(0,0,0,.42),0 0 24px rgba(250,204,21,.09)!important}
-.toast.megaphone .toast-icon{font-size:1.25rem}.toast.megaphone .toast-message{line-height:1.38}.toast-megaphone-reward{display:block;margin-top:3px;color:#fde68a;font-weight:900}
-
-/* O acesso administrativo legado da Home deixa de ser uma superfície pública. */
-#home-admin-btn{display:none!important}
-
-/* Ferramentas exclusivas do user_id 1. */
-.creator-admin-fab{position:fixed;left:12px;top:calc(env(safe-area-inset-top,0px) + 12px);z-index:9700;display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(250,204,21,.3);background:rgba(22,22,33,.96);color:#fff;border-radius:999px;padding:9px 13px;box-shadow:0 8px 30px rgba(0,0,0,.38),0 0 18px rgba(250,204,21,.08);backdrop-filter:blur(12px);font:800 .78rem/1 var(--font-display);cursor:pointer}
-.creator-admin-fab:hover{border-color:rgba(250,204,21,.6);background:#1d1b20}
-.creator-admin-active .create-room-screen>.back-button{left:118px!important}
-.creator-admin-active .card-creation-screen>.back-button{margin-left:112px!important;max-width:calc(100% - 112px)!important}
-.creator-admin-overlay{position:fixed;inset:0;z-index:13000;display:grid;place-items:center;padding:calc(env(safe-area-inset-top,0px) + 18px) 14px calc(env(safe-area-inset-bottom,0px) + 18px);background:rgba(4,4,8,.72);backdrop-filter:blur(14px)}
-.creator-admin-shell{width:min(760px,100%);max-height:min(88vh,860px);overflow:auto;border:1px solid rgba(250,204,21,.2);border-radius:22px;background:#11111b;box-shadow:0 24px 70px rgba(0,0,0,.62)}
-.creator-admin-head{position:sticky;top:0;z-index:2;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:18px 18px 15px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(17,17,27,.96);backdrop-filter:blur(12px)}
-.creator-admin-head small{display:block;color:#facc15;font-weight:900;letter-spacing:.1em}.creator-admin-head h2{margin:4px 0 3px;font-size:1.45rem}.creator-admin-head p{margin:0;color:var(--text-muted);font-size:.76rem}.creator-admin-close{display:grid;place-items:center;width:38px;height:38px;flex:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.035);color:#fff;font-size:1.05rem;cursor:pointer}
-.creator-admin-body{display:grid;gap:14px;padding:16px}.creator-admin-card{padding:15px;border:1px solid rgba(255,255,255,.085);border-radius:17px;background:rgba(255,255,255,.028)}.creator-admin-card h3{margin:0 0 5px;font-size:1.05rem}.creator-admin-card>p{margin:0 0 13px;color:var(--text-muted);font-size:.74rem;line-height:1.45}.creator-admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.creator-admin-field{display:grid;gap:5px}.creator-admin-field.full{grid-column:1/-1}.creator-admin-field>span{color:#b9b3c8;font-size:.68rem;font-weight:800}.creator-admin-field textarea{min-height:88px;resize:vertical}.creator-admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.creator-admin-actions .btn{flex:1;min-width:180px}.creator-admin-subcard{margin-top:11px;padding:12px;border:1px solid rgba(255,255,255,.07);border-radius:13px;background:rgba(0,0,0,.13)}.creator-admin-subcard h4{margin:0 0 10px}.creator-admin-security{color:#9ca3af;font-size:.67rem;line-height:1.45}
-
-@media(max-width:620px){.card-creation-screen .player-library-title{margin:28px 0 16px!important}.card-creation-screen .created-cards-grid{margin-bottom:36px!important}.creator-admin-fab{left:8px;top:calc(env(safe-area-inset-top,0px) + 8px);padding:8px 11px}.creator-admin-active .create-room-screen>.back-button{left:108px!important}.creator-admin-active .card-creation-screen>.back-button{margin-left:102px!important;max-width:calc(100% - 102px)!important}.creator-admin-overlay{place-items:end center;padding-left:8px;padding-right:8px}.creator-admin-shell{max-height:88vh;border-radius:20px 20px 14px 14px}.creator-admin-grid{grid-template-columns:1fr}.creator-admin-field.full{grid-column:auto}.creator-admin-actions{flex-direction:column}.creator-admin-actions .btn{width:100%;min-width:0}}
+/* COMPAT P37 — preserva responsabilidades vigentes na posição histórica da cascata.
+   CURRENT: reutilização/favoritos na criação, Megafone e Ferramentas do Criador.
+   Refinamentos posteriores de FAB/cabeçalho continuam em P41/P45/P46. */
+@import url('./cardCreationReuseCurrent.css');
+@import url('./adminMegaphoneCurrent.css');
+@import url('./creatorAdminCurrent.css');
