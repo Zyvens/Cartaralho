@@ -9,7 +9,7 @@ test('Perfil e Sair continuam ações de conta próprias no desktop e no owner v
 
 test('botão de criação mantém refinamento P56 sobre a base P54',()=>{assert.match(cards,/p54-create-card-entry p56-create-card-entry p57-create-card-entry/);assert.match(createCss,/\.p56-create-card-entry/);assert.match(createCss,/border-radius:13px!important/);});
 
-test('classes de biblioteca P56 antigas foram supersedidas pelo renderer P57',()=>{assert.doesNotMatch(cards,/p56-library-card-text/);assert.doesNotMatch(cards,/className=.*p56-library-card/);assert.doesNotMatch(shim,/p56-library-card/);assert.match(cards,/p57-library-card-shell/);assert.match(cards,/p57-library-game-card/);});
+test('classes de biblioteca P56 antigas foram supersedidas pelo renderer P57',()=>{assert.doesNotMatch(cards,/p56-library-card-text/);assert.doesNotMatch(cards,/className=.*p56-library-card/);assert.match(shim,/SUPERSEDED: \.p56-library-card\/\.p56-library-card-text/);assert.match(cards,/p57-library-card-shell/);assert.match(cards,/p57-library-game-card/);});
 
 test('Minhas Cartas possui um único renderer canônico para todos os caminhos',()=>{assert.match(cards,/HomeScreen\.renderCards=render/);assert.match(cards,/ProfessionalUI\.renderCards=render/);assert.match(cards,/MetaUI\.renderCards=render/);assert.doesNotMatch(cards,/Modal\.show\(/);assert.match(cards,/Detail\.open\(c\)/);});
 
