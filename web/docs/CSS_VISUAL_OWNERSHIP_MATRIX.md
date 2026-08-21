@@ -8,90 +8,116 @@
 
 O CSS histórico foi publicado em camadas PXX sucessivas. Remover ou antecipar uma regra pode mudar especificidade/ordem mesmo quando o texto da regra é idêntico. Por isso a migração ocorre em duas fases:
 
-1. **ownership funcional:** regra sai do arquivo PXX e passa para uma folha canônica nomeada pelo resultado/domínio;
+1. **ownership funcional:** regra vigente sai do arquivo PXX e passa para uma folha canônica nomeada pelo resultado/domínio;
 2. **preservação de cascata:** o PXX fica temporariamente como shim `@import` na mesma posição histórica do `index.html`.
 
-Somente no fechamento visual os shims podem ser removidos do `index` e os owners canônicos reordenados de forma explícita, com comparação desktop/mobile. Um shim não possui regra funcional; ele é `COMPAT` de ordem de carregamento.
+Uma regra comprovadamente substituída pela trajetória atual é marcada `SUPERSEDED` e **não** ganha owner novo. Somente no fechamento visual os shims podem ser removidos do `index` e os owners canônicos reordenados de forma explícita, com comparação desktop/mobile.
 
 ## Ondas já migradas
 
 | Trajetória | Resultado visual vigente | Owner canônico | PXX após migração | Estado |
 |---|---|---|---|---|
-| P73 + P74 | faixa principal da conta, ícones Perfil/Sair, carteira e comportamento mobile | `public/css/accountCurrent.css` | P73 = marcador `HISTORICAL`; P74 = shim `@import` | `CURRENT` |
-| P66 | inputs de 16px em iOS/touch e painel Admin estável com teclado virtual | `public/css/mobileFormsCurrent.css` | P66 = shim `@import` | `CURRENT` |
-| P68 | tema de raridade composta, Super Trunfo, histórico/origem e reduced-motion | `public/css/cardRarityCurrent.css` | P68 = shim `@import` | `CURRENT` |
-| P59 | cards compactos/quadrados + base visual da lacuna contínua | `public/css/cardCompactCurrent.css` | P59 = shim `@import` | `CURRENT` |
-| P60 | refinamento tipográfico da lacuna + simetria das pills Moedas/XP em Missões | `public/css/cardTypographyMissionsCurrent.css` | P60 = shim `@import` | `CURRENT` |
-| P62 | atalho interativo/acessível da carteira para o Extrato | `public/css/accountLedgerCurrent.css` | P62 = shim `@import` | `CURRENT` |
+| P45 | geometria-base dos controles superiores | `public/css/topControlsBaseCurrent.css` | shim `@import` | `CURRENT` |
+| P46 | navegação superior em 40px + posição do painel de Missões | `public/css/topNavigationCurrent.css` | shim `@import` | `CURRENT` |
+| P47 | alinhamento pixel-perfect / containing block das transições | `public/css/topControlsPixelCurrent.css` | shim `@import` | `CURRENT` |
+| P49 | composição-base da identidade + slot de saldo sem layout shift | `accountIdentityBaseCurrent.css` + `walletLoadingCurrent.css` | shim com 2 imports | `CURRENT` |
+| P50 | fluxo/hero intermediário da Home + indicador de amigos | `homeHeroFlowCurrent.css` + `friendsIndicatorCurrent.css` | shim com 2 imports | `CURRENT` |
+| P51 | alinhamento final da identidade + resumo compacto da Central | `accountIdentityAlignmentCurrent.css` + `notificationsSummaryCurrent.css` | shim com 2 imports | `CURRENT` |
+| P52 | cabeçalho/hero final intermediário + aparência residual da pill de Moedas | `homeHeaderLayoutCurrent.css` + `missionsCoinVisualCurrent.css` | shim com 2 imports | `CURRENT` |
+| P53 | hero compacto, presença pendente, grid de Missões, Reciclagem e estabilidade de thumbnails | `homeHeroCompactCurrent.css`, `friendsPresencePendingCurrent.css`, `missionsTwoColumnCurrent.css`, `recyclingCardIdentityCurrent.css`, `profileFrameGridStaticCurrent.css` | shim com 5 imports | `CURRENT` |
+| P59 | cards compactos/quadrados + base visual da lacuna contínua | `public/css/cardCompactCurrent.css` | shim `@import` | `CURRENT` |
+| P60 | refinamento tipográfico da lacuna + simetria das pills Moedas/XP | `public/css/cardTypographyMissionsCurrent.css` | shim `@import` | `CURRENT` |
+| P62 | atalho interativo/acessível da carteira para o Extrato | `public/css/accountLedgerCurrent.css` | shim `@import` | `CURRENT` |
+| P66 | inputs 16px em iOS/touch + painel Admin estável com teclado virtual | `public/css/mobileFormsCurrent.css` | shim `@import` | `CURRENT` |
+| P68 | raridade composta, Super Trunfo, histórico/origem e reduced-motion | `public/css/cardRarityCurrent.css` | shim `@import` | `CURRENT` |
+| P73 + P74 | faixa principal da conta, ícones Perfil/Sair, carteira e comportamento mobile | `public/css/accountCurrent.css` | P73 = `HISTORICAL`; P74 = shim | `CURRENT` |
 
-## Invariantes da cascata migrada
+## Regras históricas descartadas por trajetória
 
-### Account strip P73/P74
+| Origem | Regra antiga | Motivo | Owner atual |
+|---|---|---|---|
+| P50 | `.p48-create-card-entry` | botão atual é emitido como P54/P56/P57 por `cardsLibrary` | `cardsLibrary` + CSS P54/P56/P57 ainda a consolidar |
+| P51 | `.p51-mission-coin-pill` | markup atual usa `p52-mission-coin-pill` | `missionsUI` + owners P52/P53/P60 |
+| P52 | `order` em `.profile-actions` | competia com a ordem canônica e colocava Histórico antes de Notificações | `navigationUI` é o único owner da ordem |
+| P52 | `display:block`/container antigo de recompensas | supersedido pelo grid P53 e refinamentos P60 | `missionsTwoColumnCurrent.css` + `cardTypographyMissionsCurrent.css` |
+| P52 | `.p48-create-card-entry` | markup atual não usa a classe | `cardsLibrary` |
+| P53 | `.p53-create-card-entry,.p48-create-card-entry` | markup atual usa P54/P56/P57 | `cardsLibrary` |
 
-- `account.css` permanece na camada base original; não recebe overrides tardios.
-- P73 deixa de ter regra própria.
-- P74 importa `accountCurrent.css` exatamente onde a correção final já era aplicada.
-- ordem lógica interna é preservada: wallet `order:30`, ações `order:40`.
-- media query mobile continua em `max-width:620px`.
+## Invariantes importantes
+
+### P45 → P47 — controles superiores
+
+- P45 continua representando a geometria-base de 44px.
+- P46 permanece posterior e altera o resultado para 40px, incluindo `button.back-button` e `mission-card`.
+- P47 permanece por último e remove `transform/translate` residuais, inclusive nas transições de `#app`.
+- a trajetória 44px → 40px → pixel-perfect não foi achatada artificialmente.
+
+### P49 → P53 — Home/conta/social/missões
+
+- P49 mantém identidade-base e slot da carteira; P51 alinha `@usuário`/título à esquerda.
+- P50 é o estágio de hero de fluxo natural; P52 reposiciona o subtítulo no cabeçalho; P53 compacta apenas a altura final do logo.
+- `navigationUI` é o único owner da ordem dos botões; CSS P52 não contém mais `order` concorrente.
+- presença pendente continua ligada à classe realmente emitida por `socialUI`: `p48-friends-online-pill p53-presence-pending`.
+- Missões usam `p52-mission-coin-pill` no markup, grid P53 e geometria final P60.
+- Reciclagem preta/branca permanece ligada às classes realmente emitidas por `marketplaceUI`.
+- regras de criação P48/P53 não foram recanonizadas porque o markup atual usa P54/P56/P57.
 
 ### Wallet/Extrato P62
 
 - cursor, hover e `focus-visible` do saldo clicável vivem em `accountLedgerCurrent.css`.
-- P62 preserva apenas a posição de cascata via shim; não contém regra funcional.
-- acessibilidade por teclado permanece no owner JS `marketplaceUI`, separada da apresentação visual.
-- P63/P64/P65 não possuem stylesheet próprio e, portanto, não geram trabalho visual artificial nessa trajetória.
+- acessibilidade por teclado permanece no owner JS `marketplaceUI`.
+- P63/P64/P65 não possuem stylesheet próprio.
 
-### Mobile forms P66
+### Cards P59/P60/P68
 
-- `@supports (-webkit-touch-callout:none)` permanece na posição P66.
-- inputs/textarea/select continuam em 16px para impedir zoom automático no iOS.
-- o shell Admin continua ancorado no topo em touchscreen/teclado virtual.
+- P59 permanece a base do desenho contínuo da lacuna e cards 1:1.
+- P60 refina depois altura/posição/espessura da lacuna e equaliza pills.
+- P68 mantém custom properties de raridade e `prefers-reduced-motion`.
 
-### Card rarity P68
+### Account strip P73/P74
 
-- todas as custom properties `--p68-rarity-*`, temas Common→Legendary/Super Trunfo e animação permanecem juntas.
-- `prefers-reduced-motion:reduce` continua desligando a animação do Super Trunfo.
-- o owner é carregado exatamente na posição histórica P68 via shim.
+- `account.css` permanece na camada-base original.
+- P73 não possui regra funcional.
+- P74 importa `accountCurrent.css` exatamente na posição da correção final.
+- wallet continua `order:30` e ações `order:40`.
 
-### Cards compactos e lacuna P59/P60
+## Próximos agrupamentos
 
-- P59 permanece a camada-base do desenho contínuo da lacuna: largura `1.72em`, linha magenta e cards 1:1 de 200px/220px.
-- P60 permanece posterior e refina apenas altura/posição/espessura da lacuna, além de normalizar a altura das pills de Missões.
-- os dois owners são separados e carregados nas posições P59 e P60, portanto o override causal original é preservado.
-- a semântica `___` continua no DOM; apenas a apresentação visual é alterada.
-
-## Próximos agrupamentos candidatos
-
-A ordem abaixo é de menor para maior risco, não necessariamente numérica:
-
-1. **Home/top controls — P45/P46/P47**: sequência curta de alinhamento/posição; auditar como trajetória única antes de absorver.
-2. **progressão/card detail — P56/P57/P58**: grande volume e forte dependência de shell/modal; exige matriz de seletores antes de absorção;
-3. **Gênese — P26/P29/P30/P31/P32/P58**: animações e transforms; exige comparação visual e reduced-motion;
-4. **Home/top controls tardios — P49/P50/P51/P52/P53/P56/P73/P74**: parcialmente owned pela onda account strip, restante precisa auditoria de precedência;
-5. **Marketplace/reciclagem — P41/P44/P45/P53/P55/P58**;
-6. **design system/fundação geral — P14–P25 e folhas base**: somente depois dos resultados específicos, para evitar converter histórico em uma folha monolítica nova.
+1. **P54/P56/P57/P58 — biblioteca, detalhe e criação de cartas:** maior bloco visual recente ainda executável; precisa separar regras vigentes de P55/P56/P57/P58 que se substituem.
+2. **Gênese — P26/P29/P30/P31/P32/P54/P57/P58:** transforms/animações e reduced-motion; exige comparação visual.
+3. **Marketplace/reciclagem — P41/P44/P55/P58:** P53 já está owned, mas detalhe/preview e metadados posteriores ainda não.
+4. **P14–P44 — fundação/design system e revisões antigas:** somente após os resultados recentes, evitando criar uma nova folha monolítica.
 
 ## Critério de conclusão de um PXX CSS
 
-Um pacote visual só deixa de possuir ownership quando:
+Um pacote visual deixa de possuir ownership quando:
 
-- cada regra funcional foi movida para owner canônico;
-- o arquivo PXX contém no máximo comentário + `@import` de compatibilidade, ou está vazio/histórico;
-- contratos apontam para o owner, não para a implementação histórica;
-- a posição de cascata permanece equivalente enquanto o shim existir;
-- qualquer mudança de posição posterior é validada visualmente.
+- cada regra funcional vigente foi movida para owner canônico;
+- toda regra substituída foi classificada `SUPERSEDED`, em vez de copiada;
+- o PXX contém no máximo comentário + `@import`, ou marcador histórico;
+- contratos apontam para owners atuais;
+- a posição da cascata permanece equivalente enquanto houver shim;
+- mudança posterior de posição é validada visualmente.
 
 ## Evidência atual
 
-- `tests/cssAccountOwnership.contract.test.js`
-- `tests/p73AccountStripRender.contract.test.js`
-- `tests/p74WalletPlacement.contract.test.js`
+- `tests/p45TopControlsAlignment.contract.test.js`
+- `tests/p46TopNavigation.contract.test.js`
+- `tests/p47TopControlsPixelAlign.contract.test.js`
+- `tests/p49AccountIdentityBalance.contract.test.js`
+- `tests/p50HomeStability.contract.test.js`
+- `tests/p51AccountNotifications.contract.test.js`
+- `tests/p52RegressionStability.contract.test.js`
+- `tests/p53MobilePolishMissionsProfile.contract.test.js`
+- `tests/p59SquareCardsContinuousGap.contract.test.js`
+- `tests/p60CardIdentityGapMission.contract.test.js`
 - `tests/p62SingleLedger.contract.test.js`
 - `tests/p66CardProgressionMobileInput.contract.test.js`
 - `tests/p68CardHistoryRarity.contract.test.js`
-- `tests/p59SquareCardsContinuousGap.contract.test.js`
-- `tests/p60CardIdentityGapMission.contract.test.js`
+- `tests/cssAccountOwnership.contract.test.js`
+- `tests/p73AccountStripRender.contract.test.js`
+- `tests/p74WalletPlacement.contract.test.js`
 
 ## Estado do Gate 16
 
-A consolidação CSS está **em andamento**. Seis resultados independentes já possuem owner visual canônico e mantêm a precedência original por shim. A maior parte da cascata P14–P58/P61/P67 ainda está funcionalmente distribuída em PXX. O gate só será declarado 100% quando todas as regras vigentes tiverem owner e o carregamento final for validado sem shims históricos.
+A consolidação CSS está **em andamento**. O bloco recente P45–P53 e as ondas P59/P60/P62/P66/P68/P73/P74 já perderam ownership funcional para folhas canônicas ou tiveram regras mortas explicitamente descartadas. O maior débito visual restante está em P54–P58 e na fundação P14–P44. O gate só será 100% quando todas as regras vigentes tiverem owner e o carregamento final for validado sem shims históricos.
