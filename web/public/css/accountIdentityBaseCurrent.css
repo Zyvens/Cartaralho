@@ -1,0 +1,67 @@
+/* Owner visual canônico da identidade-base da faixa da conta, preservando a composição introduzida antes dos refinamentos posteriores. */
+.home-account-bar{
+  align-items:center!important;
+}
+.home-account-bar .home-account-identity{
+  min-width:0!important;
+  align-self:stretch!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  align-items:stretch!important;
+  padding:7px 0!important;
+  margin-left:7px!important;
+  gap:0!important;
+  box-sizing:border-box!important;
+}
+.home-account-bar .home-account-identity>strong{
+  display:block!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  text-align:left!important;
+  font-size:1rem!important;
+  line-height:1.08!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.home-account-bar .home-account-identity>span{
+  display:block!important;
+  width:100%!important;
+  margin:3px 0 0!important;
+  padding:0!important;
+  text-align:right!important;
+  font-size:.72rem!important;
+  line-height:1.1!important;
+  color:var(--text-muted)!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.home-account-bar .home-account-identity>.account-equipped-title{
+  display:block!important;
+  align-self:stretch!important;
+  width:100%!important;
+  max-width:none!important;
+  margin:7px 0 0!important;
+  padding:0!important;
+  text-align:right!important;
+  font-size:.64rem!important;
+  line-height:1.1!important;
+  font-weight:900!important;
+  letter-spacing:.01em!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+@media(max-width:620px){
+  .home-account-bar .home-account-identity{
+    margin-left:5px!important;
+    padding:6px 0!important;
+  }
+  .home-account-bar .home-account-identity>strong{font-size:.94rem!important}
+  .home-account-bar .home-account-identity>span{margin-top:2px!important;font-size:.68rem!important}
+  .home-account-bar .home-account-identity>.account-equipped-title{margin-top:6px!important;font-size:.59rem!important}
+}
