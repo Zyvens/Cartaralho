@@ -1,7 +1,6 @@
 /* COMPAT P53 — preserva a posição histórica da cascata para os resultados ainda vigentes.
-   SUPERSEDED: a antiga entrada p53/p48 de criação; o fluxo atual usa P54/P56/P57. */
+   SUPERSEDED: entrada p53/p48 de criação e grid estático de molduras; profileUI converte o grid para p57/p58 live antes do estado final. */
 @import url('./homeHeroCompactCurrent.css');
 @import url('./friendsPresencePendingCurrent.css');
 @import url('./missionsTwoColumnCurrent.css');
 @import url('./recyclingCardIdentityCurrent.css');
-@import url('./profileFrameGridStaticCurrent.css');
