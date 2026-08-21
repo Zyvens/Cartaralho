@@ -1,8 +1,8 @@
 'use strict';
 const{withErrors,ok,fail,getBody}=require('../../lib/http');
-const admin=require('../../lib/creatorAdminP37');
+const admin=require('../../lib/creatorAdmin');
 const{broadcastGlobal}=require('../../lib/pusherServer');
-const{notifyBalanceUpdated}=require('../../lib/balanceRealtimeP63');
+const{notifyBalanceUpdated}=require('../../lib/balanceRealtime');
 
 function scopeOf(v){return String(v||'global')==='individual'?'individual':'global';}
 function targetIds(scope,user){return scope==='individual'?[Number(user.id)]:null;}
