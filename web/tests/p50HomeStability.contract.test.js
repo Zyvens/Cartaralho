@@ -7,7 +7,6 @@ const root=path.join(__dirname,'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const heroCss=read('public/css/homeHeroFlowCurrent.css');
 const friendsCss=read('public/css/friendsIndicatorCurrent.css');
-const createCss=read('public/css/cardsCreateEntryBaseCurrent.css');
 const shim=read('public/css/p50.css');
 const history=read('public/js/p50.js');
 const nav=read('public/js/domains/navigationUI.js');
@@ -18,14 +17,20 @@ const release=read('lib/releaseP50.js');
 const version=read('api/version.js');
 const notifications=read('api/notifications.js');
 
-test('Home hero, Amigos e criação vivem em owners visuais separados',()=>{
+test('Home hero e indicador de Amigos vivem em owners visuais separados',()=>{
  assert.ok(heroCss.includes('.home-subtitle'));
  assert.ok(heroCss.includes('.home-logo'));
  assert.ok(friendsCss.includes('p48-friends-online-pill'));
- assert.ok(createCss.includes('.p48-create-card-entry'));
  assert.ok(shim.includes('homeHeroFlowCurrent.css'));
  assert.ok(shim.includes('friendsIndicatorCurrent.css'));
- assert.ok(shim.includes('cardsCreateEntryBaseCurrent.css'));
+ assert.ok(!shim.includes('cardsCreateEntryBaseCurrent.css'));
+});
+
+test('entrada p48 de criação foi supersedida pelo fluxo atual P54/P56/P57',()=>{
+ assert.ok(cards.includes('library-create-entry'));
+ assert.ok(cards.includes('p54-create-card-entry p56-create-card-entry p57-create-card-entry'));
+ assert.ok(cards.includes('Criar nova Carta de Jogador'));
+ assert.ok(cards.includes('openCreator'));
 });
 
 test('navigationUI preserva a ordem Notificações antes de Histórico',()=>{
@@ -33,12 +38,6 @@ test('navigationUI preserva a ordem Notificações antes de Histórico',()=>{
  const h=nav.indexOf('[data-panel="history"]');
  assert.ok(n>=0&&h>n);
  assert.ok(nav.includes('function orderMenu()'));
-});
-
-test('cardsLibrary preserva a entrada de criação',()=>{
- assert.ok(cards.includes('library-create-entry'));
- assert.ok(cards.includes('Criar nova Carta de Jogador'));
- assert.ok(cards.includes('openCreator'));
 });
 
 test('socialUI preserva presença fora do ciclo de render',()=>{
