@@ -1,9 +1,35 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const js=read('public/js/p62.js'),css=read('public/css/p62.css'),index=read('public/index.html'),release=read('lib/releaseP62.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
-test('P62 compila',()=>assert.doesNotThrow(()=>new Function(js)));
-test('P62 não tenta mais corrigir Estatísticas por pós-processamento de DOM',()=>{assert.doesNotMatch(js,/renderStats|stripStatsEconomy|installStatsRenderer|p61-stats-ledger|p54-stats-ledger|MutationObserver/);assert.doesNotMatch(css,/p61-stats-ledger|p54-stats-ledger|stats-economy|economy-history|economy-ledger/);});
-test('mostrador de moedas abre Mercado Paralelo diretamente no Extrato',()=>{assert.match(js,/BALANCE_SELECTOR=['"]\.account-strip \.p49-balance-slot,\.account-strip \.home-account-balance['"]/);assert.match(js,/MarketUI\.open\('ledger'\)/);assert.match(js,/e\.stopImmediatePropagation\(\)/);assert.match(js,/document\.addEventListener\('click',[\s\S]*,true\)/);assert.match(js,/Abrir extrato de Moedas Sujas no Mercado Paralelo/);});
-test('atalho do saldo também funciona por teclado',()=>{assert.match(js,/document\.addEventListener\('keydown'/);assert.match(js,/\['Enter',' '\]\.includes\(e\.key\)/);assert.match(js,/role','button/);assert.match(js,/tabindex','0/);});
-test('P62 permanece carregado e versionado após releases posteriores',()=>{assert.ok(index.indexOf('css/p62.css?v=1.4.71')>index.indexOf('css/p60.css?v=1.4.60'));assert.ok(index.indexOf('js/p62.js?v=1.4.71')>index.indexOf('js/p61.js?v=1.4.71'));assert.match(release,/APP_VERSION='v1\.4\.62'/);assert.match(version,/releaseP74/);assert.match(notifications,/releaseP62/);assert.match(notifications,/P61_RELEASE/);});
+const marketUI=read('public/js/domains/marketplaceUI.js'),css=read('public/css/p62.css'),index=read('public/index.html'),release=read('lib/releaseP62.js'),version=read('api/version.js');
+
+test('owner canônico do Mercado compila e está executável',()=>{
+ assert.doesNotThrow(()=>new Function(marketUI));
+ assert.match(marketUI,/CartDomains\.claim\('marketplaceUI','domains\/marketplaceUI\.js'/);
+ assert.match(index,/<script src="js\/domains\/marketplaceUI\.js\?v=domain-2"><\/script>/);
+});
+
+test('P62 não volta a misturar Estatísticas com economia',()=>{
+ assert.doesNotMatch(marketUI,/renderStats|stripStatsEconomy|installStatsRenderer|p61-stats-ledger|p54-stats-ledger/);
+ assert.doesNotMatch(css,/p61-stats-ledger|p54-stats-ledger|stats-economy|economy-history|economy-ledger/);
+});
+
+test('mostrador de moedas abre Mercado Paralelo diretamente no Extrato',()=>{
+ assert.match(marketUI,/openLedger\(\)/);
+ assert.match(marketUI,/MarketUI\.open\('ledger'\)/);
+ assert.match(marketUI,/Abrir extrato de Moedas Sujas no Mercado Paralelo/);
+ assert.match(marketUI,/p62-market-ledger-shortcut/);
+});
+
+test('atalho do saldo também funciona por teclado',()=>{
+ assert.match(marketUI,/slot\.setAttribute\('role','button'\)/);
+ assert.match(marketUI,/slot\.setAttribute\('tabindex','0'\)/);
+ assert.match(marketUI,/\['Enter',' '\]\.includes\(e\.key\)/);
+});
+
+test('P62 JS é apenas proveniência histórica; CSS compatível continua ativo',()=>{
+ assert.match(index,/<link rel="stylesheet" href="css\/p62\.css\?v=1\.4\.71">/);
+ assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p62\.js\?v=1\.4\.71"><\/script>/);
+ assert.match(release,/APP_VERSION='v1\.4\.62'/);
+ assert.match(version,/releaseP74/);
+});
