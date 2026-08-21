@@ -35,7 +35,7 @@ test('respostas de transações próprias atualizam o saldo sem esperar realtime
  assert.match(marketUI,/marketplace_response/);
 });
 
-test('P63 permanece como proveniência histórica e P74 é a release corrente',()=>{
+test('P63 permanece como proveniência histórica e P75 é a release corrente',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.63'/);
- assert.match(version,/releaseP74/);
+ assert.match(version,/releaseP75/);
 });
