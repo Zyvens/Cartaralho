@@ -1,0 +1,14 @@
+/* Owner visual canônico do skeleton da Reciclagem introduzido em P28. */
+.market-body.recycling-loading{min-height:min(540px,62dvh)}
+.recycling-skeleton-hero,.recycling-skeleton-toolbar,.recycling-skeleton-line,.recycling-skeleton-grid>span{position:relative;overflow:hidden}
+.recycling-skeleton-hero::after,.recycling-skeleton-toolbar::after,.recycling-skeleton-line::after,.recycling-skeleton-grid>span::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 20%,rgba(255,255,255,.055) 45%,transparent 70%);
+  transform:translateX(-100%);animation:p28RecycleSkeleton 1.15s ease-in-out infinite;
+}
+.recycling-skeleton-grid>span{display:block;min-height:112px;border:1px solid rgba(255,255,255,.07);border-radius:14px;background:rgba(255,255,255,.025)}
+.recycling-skeleton-rate b{color:rgba(255,255,255,.62)}
+.recycling-load-error{min-height:260px;display:grid;place-items:center}
+@keyframes p28RecycleSkeleton{to{transform:translateX(100%)}}
+@media(max-width:520px){.market-body.recycling-loading{min-height:min(520px,64dvh)}}
+@media(prefers-reduced-motion:reduce){.recycling-skeleton-hero::after,.recycling-skeleton-toolbar::after,.recycling-skeleton-line::after,.recycling-skeleton-grid>span::after{animation:none}}
