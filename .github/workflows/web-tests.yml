@@ -3,7 +3,7 @@ on:
   pull_request:
     paths: ['web/**','.github/workflows/web-tests.yml']
   push:
-    branches: [main]
+    branches: [main, 'refactor/**']
     paths: ['web/**','.github/workflows/web-tests.yml']
 permissions:
   contents: read
