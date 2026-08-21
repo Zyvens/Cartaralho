@@ -1,14 +1,2 @@
-/* P27/P53 — Ordem estável da Home + órbita simétrica da Gênese. */
-.profile-actions > #marketplace-menu-btn{order:1!important}
-.profile-actions > #friends-menu-btn{order:2!important}
-.profile-actions > [data-panel="cards"]{order:3!important}
-.profile-actions > [data-panel="rank"]{order:4!important}
-.profile-actions > #notifications-menu-btn{order:5!important}
-.profile-actions > [data-panel="history"]{order:6!important}
-.profile-actions > [data-panel="stats"]{order:7!important}
-.profile-actions > #audio-settings-menu-btn{order:8!important}
-.profile-actions > [data-panel="credits"]{order:9!important}
-.avatar-frame.frame-genese-celestial::after{content:'';position:absolute;z-index:4;inset-block:-7px;inset-inline:-12px;border:1px solid rgba(165,243,252,.24);border-radius:50%;pointer-events:none;background-image:radial-gradient(circle,#fff 0 14%,#d8fbff 18% 28%,rgba(103,232,249,.9) 34% 43%,rgba(167,139,250,.48) 51%,transparent 70%);background-repeat:no-repeat;background-size:11px 11px;background-position:100% 50%;box-shadow:inset 0 0 9px rgba(125,211,252,.035);filter:drop-shadow(0 0 5px rgba(125,211,252,.58));transform:none!important;animation:p27GenesisOrbitalGlint 5.2s linear infinite!important}
-@keyframes p27GenesisOrbitalGlint{0%{background-position:100% 50%;background-size:11px 11px;opacity:.82}12.5%{background-position:85.35% 14.65%;background-size:14px 14px;opacity:.94}25%{background-position:50% 0%;background-size:17px 17px;opacity:1}37.5%{background-position:14.65% 14.65%;background-size:14px 14px;opacity:.94}50%{background-position:0% 50%;background-size:11px 11px;opacity:.82}62.5%{background-position:14.65% 85.35%;background-size:14px 14px;opacity:.94}75%{background-position:50% 100%;background-size:17px 17px;opacity:1}87.5%{background-position:85.35% 85.35%;background-size:14px 14px;opacity:.94}100%{background-position:100% 50%;background-size:11px 11px;opacity:.82}}
-@media(max-width:520px){.avatar-frame.frame-genese-celestial::after{inset-block:-6px;inset-inline:-10px}}
-@media(prefers-reduced-motion:reduce){.avatar-frame.frame-genese-celestial::after{animation:none!important;background-position:100% 50%;background-size:11px 11px}}
+/* HISTORICAL P27 — nenhuma regra funcional vigente.
+   SUPERSEDED: ordem da Home por navigationUI; órbita Gênese por P28 e definitivamente P29→P31. */
