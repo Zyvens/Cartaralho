@@ -1,4 +1,3 @@
-/* COMPAT P50 — preserva a posição histórica da cascata enquanto Home, Amigos e criação possuem owners visuais separados. */
+/* COMPAT P50 — preserva a posição histórica da cascata para Home e Amigos; a antiga regra p48-create-card-entry foi SUPERSEDED pelo fluxo atual P54/P56/P57. */
 @import url('./homeHeroFlowCurrent.css');
 @import url('./friendsIndicatorCurrent.css');
-@import url('./cardsCreateEntryBaseCurrent.css');
