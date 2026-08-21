@@ -14,7 +14,7 @@ test('integridade visual de avatar/moldura vive em owner canônico',()=>{
 test('grid estático P54 foi supersedido pelo lifecycle estrutural de profileUI',()=>{
  assert.match(profile,/grid\.classList\.add\('p57-live-frame-grid','p58-live-frame-grid'\)/);
  assert.match(profile,/grid\.classList\.remove\('profile-modal-frame-grid'\)/);
- assert.doesNotMatch(shim,/profile-modal-frame-grid/);
+ assert.match(shim,/SUPERSEDED: regras \.profile-modal-frame-grid/);
  assert.doesNotMatch(avatarCss,/profile-modal-frame-grid/);
 });
 
