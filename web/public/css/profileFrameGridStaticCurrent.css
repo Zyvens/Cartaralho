@@ -1,9 +1,0 @@
-/* Owner visual canônico da estabilidade de thumbnails de molduras no perfil; refinamentos P54/P57/P58 continuam posteriores. */
-.profile-modal-frame-grid .profile-modal-frame-item{contain:layout paint!important}
-.profile-modal-frame-grid .avatar-frame,
-.profile-modal-frame-grid .avatar-frame::before,
-.profile-modal-frame-grid .avatar-frame::after,
-.profile-modal-frame-grid .avatar-frame img{
- animation:none!important;transition:none!important;
-}
-.profile-modal-frame-grid .avatar-frame img{backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:translateZ(0)}
