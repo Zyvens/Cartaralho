@@ -1,0 +1,27 @@
+/* Owner visual canônico — correção pixel-perfect/containing-block; posição preservada via shim P47. */
+#app.screen-enter:has(button.back-button),
+#app.screen-exit:has(button.back-button),
+#app.screen-enter:has(#back-play.p42-home-back),
+#app.screen-exit:has(#back-play.p42-home-back){
+  transform:none!important;
+}
+.mission-fab,
+.creator-admin-fab,
+#back-play.p42-home-back,
+button.back-button{
+  top:calc(env(safe-area-inset-top,0px) + 12px)!important;
+  height:40px!important;
+  min-height:40px!important;
+  margin:0!important;
+  transform:none!important;
+  translate:none!important;
+  vertical-align:top!important;
+}
+.mission-fab{right:12px!important;left:auto!important}
+.creator-admin-fab,
+#back-play.p42-home-back,
+button.back-button{left:12px!important;right:auto!important}
+.mission-card{
+  top:calc(env(safe-area-inset-top,0px) + 64px)!important;
+  bottom:auto!important;
+}
