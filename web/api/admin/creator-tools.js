@@ -37,8 +37,10 @@ module.exports=withErrors(async(req,res)=>{
    reason:'admin_reward'
   });
 
+  const rewardPayload={kind:'reward',message,amount,targetUserIds:targetIds(scope,target),sentByUserId:Number(actor.id)};
+  if(scope==='individual'&&balance!==null&&balance!==undefined&&Number.isFinite(Number(balance)))rewardPayload.balance=Number(balance);
   let eventId=null,megaphoneDelivered=true;
-  try{eventId=await broadcastGlobal('admin_megaphone',{kind:'reward',message,amount,targetUserIds:targetIds(scope,target),sentByUserId:Number(actor.id)});}catch(_){megaphoneDelivered=false;}
+  try{eventId=await broadcastGlobal('admin_megaphone',rewardPayload);}catch(_){megaphoneDelivered=false;}
   return ok(res,{scope,amount,credited,balance,balanceEventId,eventId,megaphoneDelivered,target:target?{id:Number(target.id),username:target.username,displayName:target.display_name}:null});
  }
  return fail(res,400,'Ação administrativa inválida.');
