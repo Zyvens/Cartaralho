@@ -1,0 +1,5 @@
+/* Owner visual canônico da integridade de avatar/moldura no perfil e perfil público. */
+.avatar-frame.public-avatar-frame>.user-avatar,
+.avatar-frame.public-avatar-frame>img.user-avatar{border:0!important;background:transparent!important;box-shadow:none!important}
+.profile-modal-avatar[class*="frame-"]{box-sizing:content-box!important}
+.profile-modal-avatar[class*="frame-"]>img{border:0!important;background:transparent!important;box-shadow:none!important}
