@@ -43,10 +43,11 @@ test('P74 fica responsável por posição e não cria fetch extra no render da H
  assert.doesNotMatch(patch[0],/scheduleAuthoritative|syncAuthoritative/);
 });
 
-test('assets corrigidos recebem cache-bust P75 e release é atual',()=>{
- for(const asset of ['js/p49.js','js/p61.js','js/p63.js','js/p64.js','js/p74.js'])assert.ok(index.includes(`${asset}?v=1.4.75`),asset);
+test('P75 permanece preservado após o reforço estrutural P76',()=>{
+ for(const asset of ['js/p49.js','js/p61.js','js/p63.js','js/p64.js'])assert.ok(index.includes(`${asset}?v=1.4.75`),asset);
+ assert.ok(index.includes('js/p74.js?v=1.4.76'));
  assert.match(release,/APP_VERSION='v1\.4\.75'/);
- assert.match(version,/releaseP75/);
- assert.match(notifications,/releaseP75/);
+ assert.match(version,/releaseP76/);
+ assert.match(notifications,/P75_RELEASE/);
  assert.match(notifications,/P74_RELEASE/);
 });
