@@ -54,12 +54,12 @@ Cada trajetória fechada deve responder:
 ### 1. Saldo da Home / carteira
 
 - **Contrato atual:** saldo de Moedas Sujas nasce junto da identidade no primeiro render, não “salta” depois; Perfil/Sair permanecem íntegros no mobile; atualizações por transação/admin/realtime reconciliam com saldo autoritativo.
-- **Trajetória causal:** P61 introduz exposição de saldo → P63 adiciona realtime → P64 adiciona endpoint/cache e reconciliação autoritativa → P65 elimina duplicidade do mostrador → P73 corrige primeiro render e integridade dos controles → P74 torna a carteira filha direta da barra da conta.
-- **Preservado:** realtime, cache imediato, refresh autoritativo, um único mostrador, integridade dos botões.
-- **Substituído:** estruturas duplicadas/intermediárias de saldo.
-- **Owner:** `accountUI` + `marketplaceUI`.
-- **Evidência:** contratos P61–P65, P73 e P74 migrados para owners; CSS/preview ainda pendentes.
-- **Estado:** `CURRENT`; JS fechado, visual final ainda precisa gate de preview.
+- **Trajetória causal:** P49 introduz slot/cache → P61 reforça exposição e prêmio administrativo → P63 adiciona realtime → P64 adiciona `dirty_balance` autenticado e endpoint leve → P65 elimina duplicidade do mostrador → P73 corrige primeiro render e integridade dos controles → P74 torna a carteira filha direta da barra da conta → **P75 elimina fetch concorrente no render inicial e coalesce confirmações autoritativas**.
+- **Preservado:** realtime, cache imediato, endpoint leve, atualização transacional imediata, um único mostrador, integridade dos botões e posição P74.
+- **Substituído:** estruturas duplicadas/intermediárias, hidratação por Cartas Limpas/Marketplace e fetch remoto disparado por `HomeScreen.renderAccount`.
+- **Owner:** `accountUI` + `marketplaceUI` + backend `balanceRealtime`.
+- **Evidência:** contratos P49, P61–P65, P73–P75 e `P75_WALLET_TRAJECTORY_AUDIT.md`.
+- **Estado:** `CURRENT` em P75; JS/backend fechados, visual final ainda precisa gate de preview.
 
 ### 2. Estatísticas vs. carteira/extrato
 
@@ -107,7 +107,7 @@ Cada trajetória fechada deve responder:
 ### 7. Criação / pilha de Carta Limpa
 
 - **Contrato atual:** somente a pilha da cor ativa aparece nos criadores; compra/consumo/saldo continuam respeitando as regras econômicas.
-- **Trajetória causal:** UX P54–P60 → correção de pilhas após P72 → baseline P73/P74.
+- **Trajetória causal:** UX P54–P60 → correção de pilhas após P72 → baseline P73/P74 → P75 preserva a economia e apenas otimiza a hidratação da carteira.
 - **Preservado:** seleção ativa, reuso favorito e regras econômicas.
 - **Substituído:** múltiplas pilhas simultâneas e correções DOM concorrentes.
 - **Owner:** `cardCreationUI`.
@@ -143,9 +143,9 @@ Cada trajetória fechada deve responder:
 ### 11. Admin
 
 - **Contrato atual:** ferramentas administrativas permanecem protegidas por autoridade do servidor e aparecem somente no contexto permitido da Home; megafone/recompensas sincronizam UI e saldo.
-- **Trajetória causal:** P37 ferramentas/megafone → P38 restringe visual à Home → P39+ integra navegação → `adminUI` assume ownership.
-- **Preservado:** autorização e restrição visual.
-- **Owner:** `adminUI`.
+- **Trajetória causal:** P37 ferramentas/megafone → P38 restringe visual à Home → P39+ integra navegação → `adminUI` assume ownership → backend P37 migra para `creatorAdmin` e `balanceRealtime`, mantendo aliases apenas `COMPAT`.
+- **Preservado:** autorização, idempotência, transação, restrição visual e sincronização do saldo.
+- **Owner:** `adminUI` + `creatorAdmin` + `balanceRealtime`.
 - **Estado:** `CURRENT`.
 
 ### 12. Reciclagem
@@ -167,12 +167,13 @@ Cada trajetória fechada deve responder:
 
 ### 14. Gameplay / Amigo de Merda
 
-- **Contrato pretendido pela especificação histórica:** alvo elegível devolve a mão inteira ao pool e recebe nova mão do mesmo tamanho antes da submissão, com decisão autoritativa no servidor.
-- **Trajetória causal:** base/P19 → P32 descreve redraw autoritativo → engine atual ainda contém implementação divergente que apenas embaralha a mão existente.
-- **Preservado:** autoridade server-side e alvo elegível.
-- **Divergência aberta:** definição histórica e engine atual não coincidem; **não alterar silenciosamente** durante a migração.
-- **Owner:** `gameplayUI` + buff engine server-side.
-- **Estado:** `OPEN PRODUCT DECISION`; bloqueia declarar matriz dos 21 BUFFs como fechada.
+- **Contrato atual:** antes da submissão do alvo elegível, a mão inteira dele retorna ao `whiteDeck`, o baralho é embaralhado e ele compra uma nova mão do mesmo tamanho; a resolução é autoritativa, transacional e idempotente no servidor.
+- **Trajetória causal:** especificação/base → P32 formaliza redraw autoritativo → implementação P32 persiste redraw completo → refatoração move a regra sem alteração para o owner backend `amigoDeMerda`, mantendo `amigoDeMerdaP32` somente como alias `COMPAT`.
+- **Preservado:** elegibilidade do alvo, redraw completo, tamanho da mão, limpeza de `temporaryPossessions`, consumo de inventário, `buff_activations`, ledger e `Serializable`.
+- **Substituído:** ownership pelo nome de pacote P32; **não** a regra funcional.
+- **Owner:** `amigoDeMerda` no servidor + `buffsUI`/engines de BUFF para apresentação/orquestração.
+- **Evidência:** `p32PolishAudioAmigo.contract.test.js` e `backendRuntimeOwnership.contract.test.js`.
+- **Estado:** `CURRENT`; não há divergência aberta neste BUFF.
 
 ### 15. Rank + identidade
 
@@ -181,22 +182,31 @@ Cada trajetória fechada deve responder:
 - **Owner:** `rankUI` + `identityUI`.
 - **Estado:** `CURRENT`.
 
+### 16. Helpers backend com sufixos PXX
+
+- **Contrato atual:** regra de runtime backend vive em módulos canônicos sem referência a pacote de release; nomes históricos permanecem apenas como aliases de compatibilidade quando necessário.
+- **Trajetória causal:** P6/P7/P19/P32/P37/P63/P64 introduzem helpers incrementais → refatoração cria owners sem sufixo preservando byte a byte/semanticamente as regras → arquivos PXX tornam-se reexports `COMPAT`.
+- **Owners:** `matchStart`, `matchSubmit`, `roomConfig`, `achievementBackfill`, `amigoDeMerda`, `creatorAdmin`, `balanceRealtime`, `cardCollectionProgress`.
+- **Compatibilidade:** `matchStartP6`, `matchSubmitP6`, `roomConfigP7`, `achievementBackfillP19`, `amigoDeMerdaP32`, `creatorAdminP37`, `balanceRealtimeP63`, `cardCollectionProgressP64`.
+- **Evidência:** `backendRuntimeOwnership.contract.test.js` e contratos P7/P19/P32/P37/P63.
+- **Estado:** `CURRENT`; matriz 8/8 fechada.
+
 ## Índice secundário — legado já não executável
 
 Os arquivos abaixo permanecem apenas como evidência histórica `application/x-cartaralho-legacy` durante a auditoria e **não devem voltar a executar**:
 
 `gameplayP19.js`, `roomP14Sync.js`, `profileAppearanceP19.js`, `revisionConsolidated.js`, `refinementP13.js`, `audioIntegrationP13.js`, `musicRecoveryP28.js`, `cleanCardStacksFix.js`, `cosmeticUI.js`, `identityP20.js`, `profileAppearanceP20.js`, `playerShowcaseP20.js`, `homeMenuP24.js`, `uiP25.js`, `homeMenuP27.js`, `genesisFrameP29.js`.
 
-Os PXX numéricos P33–P68 e P73–P74 já absorvidos permanecem não executáveis na branch de migração. P69–P72 devem continuar tratados como linhagem de hotfix/release mesmo quando não há um `pXX.js` cliente correspondente.
+Os PXX numéricos P33–P68 e P73–P74 já absorvidos permanecem não executáveis na branch de migração. P69–P72 continuam tratados como linhagem de hotfix/release mesmo quando não há um `pXX.js` cliente correspondente. P75 é o baseline funcional corrente e sua semântica foi absorvida diretamente pelos owners de conta/carteira, sem `p75.js` cliente executável.
 
 ## Pendências de auditoria
 
-- fechar trajetórias P1–P12 e P13–P32 que ainda não possuem registro completo por resultado;
+- fechar trajetórias P1–P12 e demais resultados de P13–P32 que ainda não possuem registro completo por resultado;
 - classificar módulos-base executáveis atuais (`meta`, `professionalUI`, `profileModal`, `marketplace*`, `lootUI`, `finalRewardUI`, `achievementUI`, `prestigeUI`, `uiRefinement2`, etc.) como `BASE CANÔNICA`, `COMPAT` ou `PATCH A ABSORVER`;
 - construir matriz visual separada `regra CSS → resultado atual → owner visual` antes de qualquer exclusão de PXX CSS;
-- auditar helpers backend com sufixos PXX como runtime canônico, facade de compatibilidade ou histórico;
-- reconciliar a branch com releases posteriores ao baseline P74 somente após reconstruir a trajetória desses resultados; nunca copiar P75+ cegamente;
-- fechar preview desktop/mobile e matriz dos 21 BUFFs.
+- fechar a matriz funcional integral dos BUFFs e rewards/loot, embora `Amigo de Merda` já esteja reconciliado;
+- decompor o lifecycle/estado/socket ainda concentrado em `app.js` somente após contrato de não regressão;
+- fechar preview desktop/mobile e CI integral.
 
 ## Gate de desativação/remoção histórica
 
