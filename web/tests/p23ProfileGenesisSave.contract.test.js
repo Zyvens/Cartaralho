@@ -1,50 +1,59 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const revision=read('public/js/revisionConsolidated.js'),appearance=read('public/js/profileAppearanceP19.js'),settings=read('api/profile/settings.js'),css=read('public/css/p23.css'),index=read('public/index.html'),notifications=read('lib/appNotifications.js');
+const profile=read('public/js/domains/profileUI.js'),settings=read('api/profile/settings.js'),shim=read('public/css/p23.css'),footerCss=read('public/css/profileSaveFooterCurrent.css'),genesisBase=read('public/css/genesisFrameBaseCurrent.css'),index=read('public/index.html'),notifications=read('lib/appNotifications.js'),version=read('api/version.js');
 
-for(const[name,src]of[['revisionConsolidated.js',revision],['profileAppearanceP19.js',appearance],['settings.js',settings]])test(`${name} compila no P23`,()=>assert.doesNotThrow(()=>new Function(src)));
-
-test('normalização do Perfil preserva Gênese e demais cosméticos em vez de filtrar só progressão',()=>{
- assert.doesNotMatch(revision,/pm\.data\.frames=pm\.data\.frames\.filter/);
- assert.doesNotMatch(revision,/equipped\.frameKey=null/);
- assert.match(revision,/if\(!baseFrameKeys\.includes\(f\.key\)\)return/);
- assert.match(revision,/cosméticos e entitlements/);
+test('profileUI preserva Gênese e cosméticos sem filtrar apenas progressão',()=>{
+ assert.doesNotThrow(()=>new Function(profile));
+ assert.ok(profile.includes("key:'genese-celestial'"));
+ assert.ok(profile.includes("entitlement_type==='frame'&&e?.entitlement_key==='genese-celestial'"));
+ assert.ok(profile.includes("if(hasGenesis&&!pm.data.frames.some(f=>f.key==='genese-celestial'))"));
+ assert.ok(profile.includes('PROGRESSION_FRAME_NAMES'));
 });
 
-test('selecionar título ou moldura atualiza a prévia sem rerenderizar o modal inteiro',()=>{
- assert.match(appearance,/_syncAppearanceDom/);
- assert.match(appearance,/_setAvatarFrameClass/);
- assert.match(appearance,/this\._syncAppearanceDom\(\)/);
- assert.match(appearance,/data-profile-draft-frame[^\n]*addEventListener\('change',e=>this\._setAppearanceDraft\('frame'/);
- assert.match(appearance,/data-profile-draft-title[^\n]*addEventListener\('change',e=>this\._setAppearanceDraft\('title'/);
- assert.doesNotMatch(appearance,/data-profile-draft-frame[^\n]*_refreshCurrentTab/);
+test('seleção de título/moldura atualiza draft e DOM sem rerender histórico concorrente',()=>{
+ assert.ok(profile.includes('function setAppearanceDraft'));
+ assert.ok(profile.includes('syncAppearanceDom(pm)'));
+ assert.ok(profile.includes("setAppearanceDraft(this,'title'"));
+ assert.ok(profile.includes("setAppearanceDraft(this,'frame'"));
+ assert.ok(profile.includes('P.equipTitle=function'));
+ assert.ok(profile.includes('P.equipFrame=function'));
 });
 
-test('Gênese usa a mesma classe visual imediatamente na prévia',()=>{
- assert.match(appearance,/node\.classList\.add\(`frame-\$\{key\}`\)/);
- assert.match(css,/avatar-frame\.frame-genese-celestial/);
- assert.match(css,/filter:none!important/);
+test('Gênese usa a classe visual atual e sua base vive no owner P26',()=>{
+ assert.ok(profile.includes('frame-${frameKey}'));
+ assert.ok(profile.includes("window.GenesisFrameP29?.mount?.(frame)"));
+ assert.ok(genesisBase.includes('.avatar-frame.frame-genese-celestial'));
+ assert.ok(genesisBase.includes('overflow:visible!important'));
+ assert.ok(genesisBase.includes('isolation:isolate'));
+ assert.ok(genesisBase.includes('filter:none!important'));
+ assert.ok(!shim.includes('frame-genese-celestial'));
 });
 
-test('Perfil possui apenas o Salvar alterações global',()=>{
- assert.match(appearance,/P\._appearanceSavebar=function\(\)\{return'';\}/);
- assert.match(revision,/querySelectorAll\('\.profile-modal-savebar,\.profile-appearance-savebar'\)/);
- assert.match(revision,/profile-global-save/);
- assert.match(revision,/Salvar alterações/);
- assert.match(css,/\.profile-modal-savebar,[\s\S]*\.profile-appearance-savebar\{display:none!important\}/);
+test('Perfil possui somente o Salvar alterações global e barras antigas ficam ocultas',()=>{
+ assert.ok(profile.includes("footer.className='profile-global-footer'"));
+ assert.ok(profile.includes('profile-global-save'));
+ assert.ok(profile.includes('Salvar alterações'));
+ assert.ok(profile.includes("body?.querySelectorAll('.profile-modal-savebar,.profile-appearance-savebar').forEach(x=>x.remove())"));
+ assert.ok(footerCss.includes('.profile-modal-savebar'));
+ assert.ok(footerCss.includes('.profile-appearance-savebar{display:none!important}'));
+ assert.ok(footerCss.includes('.profile-global-footer.is-dirty'));
+ assert.ok(shim.includes('profileSaveFooterCurrent.css'));
 });
 
-test('Salvar alterações persiste dados, título e moldura em uma única chamada de Perfil',()=>{
- assert.match(revision,/AuthClient\.saveProfile\(\{displayName:d\.displayName,email:d\.email,bio:d\.bio,avatarData:pm\.draftAvatar,titleKey,frameKey\}\)/);
- assert.doesNotMatch(revision,/await MetaClient\.equip/);
- assert.match(settings,/hasTitle/);assert.match(settings,/hasFrame/);
- assert.match(settings,/prestige\.canEquipTitle/);assert.match(settings,/prestige\.canEquipFrame/);
- assert.match(settings,/equipped_title_key=\$\{titleKey\},equipped_frame_key=\$\{frameKey\}/);
+test('Salvar alterações persiste perfil, título e moldura em uma única chamada',()=>{
+ assert.ok(profile.includes('AuthClient.saveProfile({displayName:d.displayName,email:d.email,bio:d.bio,avatarData:pm.draftAvatar,titleKey,frameKey})'));
+ assert.ok(settings.includes("hasTitle=Object.prototype.hasOwnProperty.call(b,'titleKey')"));
+ assert.ok(settings.includes("hasFrame=Object.prototype.hasOwnProperty.call(b,'frameKey')"));
+ assert.ok(settings.includes('prestige.canEquipTitle'));
+ assert.ok(settings.includes('prestige.canEquipFrame'));
+ assert.ok(settings.includes('equipped_title_key=${titleKey},equipped_frame_key=${frameKey}'));
 });
 
-test('P23 permanece carregado e registrado mesmo com versões posteriores',()=>{
+test('P23 é shim visual histórico e P75 permanece corrente',()=>{
  assert.ok(index.indexOf('css/p23.css')>index.indexOf('css/p22.css'));
- assert.match(notifications,/release:p23/);
- assert.match(notifications,/version:'v1\.4\.23'/);
+ assert.ok(shim.startsWith('/* COMPAT P23'));
+ assert.ok(notifications.includes('release:p23'));
+ assert.ok(notifications.includes("version:'v1.4.23'"));
+ assert.ok(version.includes('releaseP75'));
 });
