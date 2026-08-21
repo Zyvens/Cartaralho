@@ -6,7 +6,7 @@ const cardIdentity=require('../lib/cardIdentity');
 const{GAME_STATES}=require('../lib/constants');
 const defs=require('../lib/achievementDefinitions');
 
-const rewardUI=read('public/js/rewardPreviewUI.js'),previewApi=read('api/rooms/preview.js'),authClient=read('public/js/auth.js'),socket=read('public/js/socket.js'),http=read('lib/http.js'),lobby=read('public/js/screens/lobby.js'),cardCreation=read('public/js/screens/cardCreation.js'),stackLegacy=read('public/js/cleanCardStacksFix.js'),host=read('public/js/screens/host.js'),round=read('public/js/screens/round.js'),result=read('public/js/screens/result.js'),gameplay=read('public/js/gameplayP19.js'),narrator=read('public/js/narrator.js'),playApi=read('api/game/play.js'),handApi=read('api/game/hand.js'),advancedBuff=read('lib/advancedBuffEngine.js'),profileAppearance=read('public/js/profileAppearanceP19.js'),p19css=read('public/css/p19.css'),index=read('public/index.html'),backfill=read('lib/achievementBackfillP19.js'),metagameApi=read('api/profile/metagame.js'),statsApi=read('api/profile/stats.js'),pickWinner=read('api/game/pick-winner.js'),progression=read('lib/cardProgressionService.js');
+const rewardUI=read('public/js/rewardPreviewUI.js'),previewApi=read('api/rooms/preview.js'),authClient=read('public/js/auth.js'),socket=read('public/js/socket.js'),http=read('lib/http.js'),lobby=read('public/js/screens/lobby.js'),cardCreation=read('public/js/screens/cardCreation.js'),stackLegacy=read('public/js/cleanCardStacksFix.js'),host=read('public/js/screens/host.js'),round=read('public/js/screens/round.js'),result=read('public/js/screens/result.js'),gameplay=read('public/js/gameplayP19.js'),narrator=read('public/js/narrator.js'),playApi=read('api/game/play.js'),handApi=read('api/game/hand.js'),advancedBuff=read('lib/advancedBuffEngine.js'),profileAppearance=read('public/js/profileAppearanceP19.js'),p19css=read('public/css/p19.css'),index=read('public/index.html'),backfill=read('lib/achievementBackfill.js'),backfillCompat=read('lib/achievementBackfillP19.js'),metagameApi=read('api/profile/metagame.js'),statsApi=read('api/profile/stats.js'),pickWinner=read('api/game/pick-winner.js'),progression=read('lib/cardProgressionService.js');
 
 for(const[name,src]of[['rewardPreviewUI',rewardUI],['authClient',authClient],['socket',socket],['lobby',lobby],['cardCreation',cardCreation],['host',host],['round',round],['result',result],['gameplayP19',gameplay],['narrator',narrator],['profileAppearanceP19',profileAppearance]])test(`${name} compila`,()=>assert.doesNotThrow(()=>new Function(src)));
 
@@ -88,6 +88,7 @@ test('novas badges/títulos cobrem estatísticas recentes e seguem Comum → Len
  assert.deepEqual([...new Set(selected.map(a=>rank[a.rarity]))].sort((a,b)=>a-b),[1,2,3,4,5]);
  assert.ok(selected.every(a=>a.title?.key));
  assert.match(backfill,/marketplace_purchase/);assert.match(backfill,/card_recycling/);assert.match(backfill,/double_gap_win/);assert.match(backfill,/generate_series\(1,b\.card_count\)/);assert.match(backfill,/regexp_count/);
+ assert.match(backfillCompat,/module\.exports=require\('\.\/achievementBackfill'\)/);assert.doesNotMatch(backfillCompat,/marketplace_purchase/);
  assert.match(metagameApi,/titles\.sort\(byRarity\)/);assert.match(metagameApi,/achievements\.sort\(byRarity\)/);assert.match(statsApi,/sortedTitles/);
 });
 
