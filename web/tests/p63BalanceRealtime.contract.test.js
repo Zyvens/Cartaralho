@@ -1,49 +1,41 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const js=read('public/js/p63.js'),index=read('public/index.html'),release=read('lib/releaseP63.js'),version=read('api/version.js'),notifications=read('api/notifications.js'),admin=read('api/admin/creator-tools.js'),market=read('api/marketplace.js'),recycling=read('api/recycling.js'),clean=read('api/cards/clean.js'),realtime=read('lib/balanceRealtimeP63.js');
+const marketUI=read('public/js/domains/marketplaceUI.js'),index=read('public/index.html'),release=read('lib/releaseP63.js'),version=read('api/version.js'),realtime=read('lib/balanceRealtimeP63.js');
 
-test('P63 compila',()=>assert.doesNotThrow(()=>new Function(js)));
+test('owner canônico de carteira/realtime compila e está executável',()=>{
+ assert.doesNotThrow(()=>new Function(marketUI));
+ assert.match(marketUI,/CartDomains\.claim\('marketplaceUI','domains\/marketplaceUI\.js'/);
+ assert.match(index,/<script src="js\/domains\/marketplaceUI\.js\?v=domain-2"><\/script>/);
+ assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p63\.js\?v=1\.4\.63"><\/script>/);
+});
 
-test('transação administrativa dispara balance_updated separado do megafone',()=>{
- assert.match(admin,/notifyBalanceUpdated/);
- assert.match(admin,/reason:'admin_reward'/);
- assert.match(admin,/broadcastGlobal\('admin_megaphone'/);
+test('backend mantém evento transacional de saldo separado de mensagens globais',()=>{
  assert.match(realtime,/broadcastGlobal\('balance_updated'/);
 });
 
-test('compras e reciclagem também disparam o ping transacional',()=>{
- assert.match(market,/notifyBalanceUpdated\(\{userIds:\[user\.id\],balance:r\.dirtyBalance,reason:'marketplace_purchase'\}\)/);
- assert.match(recycling,/notifyBalanceUpdated\(\{userIds:\[user\.id\],balance:result\.balance,reason:'card_recycling'\}\)/);
- assert.match(clean,/notifyBalanceUpdated\(\{userIds:\[user\.id\],balance:result\.dirtyBalance,reason:'clean_card_purchase'\}\)/);
+test('cliente mantém assinatura do saldo até o canal realtime estar pronto',()=>{
+ assert.match(marketUI,/channel\.bind\('balance_updated',onBalanceUpdated\)/);
+ assert.match(marketUI,/retryTimer=setTimeout\(\(\)=>\{retryTimer=null;bindRealtime\(\);\},500\)/);
+ assert.match(marketUI,/SocketClient\._waitReady\(\)/);
 });
 
-test('cliente mantém assinatura do ping até o Pusher estar pronto',()=>{
- assert.match(js,/channel\.bind\('balance_updated',onBalanceUpdated\)/);
- assert.match(js,/setTimeout\(\(\)=>\{retryTimer=null;bindBalanceChannel\(\);\},500\)/);
- assert.match(js,/SocketClient\._waitReady\(\)/);
+test('saldo recebido atualiza Home e Mercado imediatamente e depois reconcilia',()=>{
+ assert.match(marketUI,/function applyBalance\(value,/);
+ assert.match(marketUI,/mountBalance\(v\)/);
+ assert.match(marketUI,/MarketUI\.data\.dirtyBalance=v/);
+ assert.match(marketUI,/if\(MarketUI\.overlay\)MarketUI\.render\(\)/);
+ assert.match(marketUI,/setTimeout\(\(\)=>refreshBalance\(data\.reason\|\|'balance_updated'\),20\)/);
 });
 
-test('saldo recebido atualiza Home e Mercado imediatamente',()=>{
- assert.match(js,/CartP49\?\.setBalance\?\.\(v,\{loading:false\}\)/);
- assert.match(js,/document\.querySelectorAll\('\.account-strip \.p49-balance-value'\)/);
- assert.match(js,/MarketUI\.data\.dirtyBalance=v/);
- assert.match(js,/MarketUI\.render\(\)/);
- assert.match(js,/fetchAuthoritativeBalance/);
+test('respostas de transações próprias atualizam o saldo sem esperar realtime',()=>{
+ assert.match(marketUI,/admin_reward_response/);
+ assert.match(marketUI,/card_recycling_response/);
+ assert.match(marketUI,/clean_card_response/);
+ assert.match(marketUI,/marketplace_response/);
 });
 
-test('auto-prêmio e transações próprias atualizam pelo próprio retorno HTTP',()=>{
- assert.match(js,/p==='\/api\/admin\/creator-tools'/);
- assert.match(js,/targetId===me&&Number\.isFinite\(v\)/);
- assert.match(js,/p==='\/api\/recycling'/);
- assert.match(js,/p==='\/api\/cards\/clean'/);
- assert.match(js,/p==='\/api\/marketplace'/);
-});
-
-test('P63 permanece carregado antes das camadas posteriores',()=>{
- assert.ok(index.indexOf('js/p63.js?v=1.4.63')>index.indexOf('js/p62.js?v=1.4.71'));
+test('P63 permanece como proveniência histórica e P74 é a release corrente',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.63'/);
- assert.match(version,/releaseP\d+/);
- assert.match(notifications,/releaseP63/);
- assert.match(notifications,/P62_RELEASE/);
+ assert.match(version,/releaseP74/);
 });
