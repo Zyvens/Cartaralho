@@ -1,1 +1,76 @@
 .account-card h3,.profile-panel h3{text-align:center;margin-bottom:16px}.account-strip{display:flex;align-items:center;gap:10px;justify-content:center;margin:0 auto 14px;color:var(--text-secondary);font-size:.9rem}.account-strip strong{color:var(--text-primary);display:block}.account-strip span{display:block;font-size:.72rem}.account-strip .btn{margin-left:auto}.account-strip .btn+.btn{margin-left:0}.profile-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.profile-actions .btn{font-size:.84rem;padding:10px 6px}.profile-panel{position:relative;margin-top:12px;max-height:58vh;overflow:auto}.panel-close{position:absolute;right:12px;top:10px;border:0;background:transparent;color:var(--text-secondary);font-size:1.1rem;cursor:pointer}.user-avatar{border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.18);flex:0 0 auto;background:#20202d}.avatar-fallback{display:flex;align-items:center;justify-content:center;font-size:1.25rem}.auth-secondary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.match-identity{display:flex;gap:12px;align-items:center;margin:4px 0 14px}.match-identity small,.rejoin-hint{color:var(--text-muted);font-size:.7rem;line-height:1.35}.ghost-back{border:none!important;padding:0!important;margin-bottom:12px!important;background:transparent!important}.profile-avatar-editor{display:flex;gap:9px;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:16px}.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.stats-grid>div{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:12px;text-align:center}.stats-grid b{display:block;font-size:1.35rem}.stats-grid span{font-size:.72rem;color:var(--text-muted)}.stat-line{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)}.stat-line span{color:var(--text-muted);font-size:.8rem}.rank-list{display:grid;gap:5px;margin:10px 0}.rank-player{width:100%;display:flex;align-items:center;gap:10px;padding:9px;border:1px solid rgba(255,255,255,.08);border-radius:11px;background:rgba(255,255,255,.035);color:var(--text-primary);text-align:left;cursor:pointer}.rank-player:hover{background:rgba(255,255,255,.08)}.rank-player span{display:block}.rank-player small{display:block;color:var(--text-muted);margin-top:2px}.recent-matches>div{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:.76rem}.recent-matches span{color:var(--text-muted)}.public-profile-head{display:flex;align-items:center;justify-content:center;gap:14px;margin:14px 0}.public-profile-head h3{margin:0;text-align:left}.public-profile-head span{color:var(--text-muted);font-size:.8rem}.badge-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.badge-card{position:relative;display:grid;grid-template-columns:auto 1fr;gap:3px 8px;padding:10px;border-radius:11px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035)}.badge-card>span{font-size:1.3rem;grid-row:1/4}.badge-card b{font-size:.8rem}.badge-card small{font-size:.64rem;color:var(--text-muted)}.badge-card em{font-size:.6rem;color:var(--text-secondary);font-style:normal}.badge-card.locked{opacity:.42;filter:grayscale(.8)}.badge-card.unlocked{box-shadow:inset 0 0 16px rgba(255,255,255,.035)}.card-tools{display:grid;grid-template-columns:1fr .75fr;gap:7px;margin-bottom:10px}.mini-card-list{display:grid;gap:9px}.profile-card{position:relative;border:2px solid #343442;border-radius:12px;padding:11px 38px 11px 12px;background:#15151f;display:grid;grid-template-columns:auto 1fr;gap:4px 9px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.025);cursor:pointer}.profile-card b{font-size:.86rem}.profile-card small{grid-column:2;color:var(--text-muted);font-size:.67rem}.favorite-card{position:absolute;right:9px;top:8px;border:0;background:transparent;color:var(--text-muted);font-size:1.3rem;cursor:pointer}.favorite-card.on{color:#facc15}.history-list details{border:1px solid rgba(255,255,255,.08);border-radius:10px;margin:8px 0;padding:9px;background:rgba(255,255,255,.025)}.history-list summary{display:flex;justify-content:space-between;gap:10px;cursor:pointer;font-size:.82rem}.history-list summary span{color:var(--text-muted)}.history-list p{font-size:.75rem;color:var(--text-secondary)}.history-rank{font-size:.72rem;padding:3px 0}.tier-copper{background-image:linear-gradient(135deg,rgba(184,115,51,.32),rgba(79,44,21,.12))!important}.tier-silver{background-image:linear-gradient(135deg,rgba(192,192,192,.30),rgba(92,98,112,.10))!important}.tier-gold{background-image:linear-gradient(135deg,rgba(212,175,55,.34),rgba(102,75,10,.12))!important}.tier-platinum{background-image:linear-gradient(135deg,rgba(229,228,226,.38),rgba(123,132,160,.14))!important;box-shadow:inset 0 0 18px rgba(220,225,255,.12)}.border-copper{border-color:#b87333!important}.border-silver{border-color:#c0c0c0!important}.border-gold{border-color:#d4af37!important}.border-platinum{border-color:#e5e4e2!important;box-shadow:0 0 10px rgba(229,228,226,.28),inset 0 0 10px rgba(255,255,255,.08)!important}.card-progression-badge{position:absolute;top:7px;right:8px;z-index:3;max-width:75%;padding:3px 6px;border-radius:999px;background:rgba(0,0,0,.62);color:#fff;font-size:.54rem;font-weight:800;letter-spacing:.045em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.game-card.white .card-progression-badge{background:rgba(20,20,25,.78);color:#fff}.text-muted{color:var(--text-muted);font-size:.75rem}@media(max-width:520px){.profile-actions,.badge-grid{grid-template-columns:1fr 1fr}.account-strip{flex-wrap:wrap}.account-strip .btn{margin-left:0}.card-progression-badge{font-size:.48rem;max-width:68%}.card-tools{grid-template-columns:1fr}.recent-matches>div{flex-direction:column}.history-list summary{flex-direction:column;gap:2px}}
+
+/* Account strip canônico — absorve P73/P74 sem alterar a cascata observável. */
+.home-account-bar .home-account-balance,
+.account-strip .home-account-balance{
+  display:inline-flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+.home-account-bar .p56-account-action .p56-account-action-icon,
+.home-account-bar .home-header-button.p56-account-action .p56-account-action-icon{
+  display:grid!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip{
+  display:flex!important;
+  align-items:center!important;
+  flex-wrap:nowrap!important;
+  overflow:visible!important;
+}
+body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.home-account-identity{
+  flex:1 1 auto!important;
+  min-width:0!important;
+}
+body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.p74-wallet-slot{
+  position:static!important;
+  inset:auto!important;
+  transform:none!important;
+  flex:0 0 auto!important;
+  order:30!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  visibility:visible!important;
+  opacity:1!important;
+  margin-left:8px!important;
+}
+body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.p56-account-actions{
+  position:static!important;
+  flex:0 0 auto!important;
+  order:40!important;
+  margin-left:8px!important;
+}
+body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.p74-wallet-slot .p65-balance-icon,
+body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.p74-wallet-slot .p49-balance-value{
+  display:inline-block!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+@media(max-width:620px){
+  .home-account-bar .p56-account-action{
+    grid-template-columns:1fr!important;
+    place-items:center!important;
+    gap:0!important;
+    overflow:hidden!important;
+  }
+  .home-account-bar .p56-account-action .p56-account-action-copy,
+  .home-account-bar .home-header-button.p56-account-action .p56-account-action-copy{
+    display:none!important;
+  }
+  .home-account-bar .p56-account-action .p56-account-action-icon{
+    width:28px!important;
+    height:28px!important;
+    margin:0!important;
+  }
+  body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip{
+    gap:6px!important;
+  }
+  body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.p74-wallet-slot{
+    margin-left:4px!important;
+  }
+  body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.p56-account-actions{
+    margin-left:0!important;
+  }
+}
