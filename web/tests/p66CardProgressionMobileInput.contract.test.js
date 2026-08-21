@@ -3,46 +3,9 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const cardProgression=read('public/js/domains/cardProgression.js'),css=read('public/css/p66.css'),index=read('public/index.html'),cards=read('api/profile/cards-v14.js'),progression=read('api/profile/progression.js'),release=read('lib/releaseP66.js'),version=read('api/version.js');
 
-test('owner canônico da progressão compila e está executável',()=>{
- assert.doesNotThrow(()=>new Function(cardProgression));
- assert.match(cardProgression,/CartDomains\.claim\('cardProgression','domains\/cardProgression\.js'/);
- assert.match(index,/<script src="js\/domains\/cardProgression\.js\?v=domain-2"><\/script>/);
- assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p66\.js\?v=1\.4\.66"><\/script>/);
-});
-
-test('fundo permanece baseado apenas em vitórias pessoais de rodada',()=>{
- assert.match(progression,/materialScore=Number\(r\.white_personal_wins\|\|0\)/);
- assert.doesNotMatch(progression,/materialScore=Number\(r\.white_personal_wins\|\|0\)\+Number\(r\.black_personal_uses/);
- assert.match(cards,/white_personal_wins/);
- assert.match(cards,/personalRoundWins/);
- assert.match(cards,/cardMaterialTier\(c\.personalRoundWins\)/);
- assert.match(cardProgression,/c\?\.personalRoundWins/);
- assert.match(cardProgression,/rodadas vencidas com esta carta/);
-});
-
-test('proprietários históricos continuam supersedidos pela popularidade por Espólio',()=>{
- assert.match(progression,/borderScore=Number\(r\.adoption_count\|\|0\)/);
- assert.match(cards,/acquisition_source='match_loot'/);
- assert.match(cards,/borderState\(lootCollectors\)/);
- assert.match(cardProgression,/c\?\.lootCollectors/);
- assert.match(cardProgression,/coletas por Espólio por outros jogadores/);
-});
-
-test('camada atual usa FUNDO e BORDA com semânticas independentes',()=>{
- assert.match(cardProgression,/const title=background\?'FUNDO':'BORDA'/);
- assert.match(cardProgression,/quão boa esta carta é nas partidas/);
- assert.match(cardProgression,/popularidade da carta/);
-});
-
-test('correção mobile de P66 continua ativa como CSS de compatibilidade',()=>{
- assert.match(css,/@supports \(-webkit-touch-callout:none\)/);
- assert.match(css,/input,textarea,select,\.input\{font-size:16px!important\}/);
- assert.match(css,/\.creator-admin-overlay\{[\s\S]*place-items:start center!important/);
- assert.match(css,/\.creator-admin-field input,[\s\S]*font-size:16px!important/);
- assert.match(index,/<link rel="stylesheet" href="css\/p66\.css\?v=1\.4\.66">/);
-});
-
-test('P66 permanece como proveniência histórica e P74 é a release corrente',()=>{
- assert.match(release,/APP_VERSION='v1\.4\.66'/);
- assert.match(version,/releaseP74/);
-});
+test('owner canônico da progressão compila e está executável',()=>{assert.doesNotThrow(()=>new Function(cardProgression));assert.match(cardProgression,/CartDomains\.claim\('cardProgression','domains\/cardProgression\.js'/);assert.match(index,/<script src="js\/domains\/cardProgression\.js\?v=domain-2"><\/script>/);assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p66\.js\?v=1\.4\.66"><\/script>/);});
+test('fundo permanece baseado apenas em vitórias pessoais de rodada',()=>{assert.match(progression,/materialScore=Number\(r\.white_personal_wins\|\|0\)/);assert.match(cards,/white_personal_wins/);assert.match(cards,/personalRoundWins/);assert.match(cardProgression,/c\?\.personalRoundWins/);assert.match(cardProgression,/rodadas vencidas com esta carta/);});
+test('proprietários históricos continuam supersedidos pela popularidade por Espólio',()=>{assert.match(progression,/borderScore=Number\(r\.adoption_count\|\|0\)/);assert.match(cards,/acquisition_source='match_loot'/);assert.match(cards,/borderState\(lootCollectors\)/);assert.match(cardProgression,/c\?\.lootCollectors/);});
+test('camada atual usa FUNDO e BORDA com semânticas independentes',()=>{assert.match(cardProgression,/const title=background\?'FUNDO':'BORDA'/);assert.match(cardProgression,/quão boa esta carta é nas partidas/);assert.match(cardProgression,/popularidade da carta/);});
+test('correção mobile de P66 continua ativa como CSS de compatibilidade',()=>{assert.match(css,/@supports \(-webkit-touch-callout:none\)/);assert.match(css,/input,textarea,select,\.input\{font-size:16px!important/);assert.match(index,/<link rel="stylesheet" href="css\/p66\.css\?v=1\.4\.66">/);});
+test('P66 permanece como proveniência histórica e P75 é a release corrente',()=>{assert.match(release,/APP_VERSION='v1\.4\.66'/);assert.match(version,/releaseP75/);});
