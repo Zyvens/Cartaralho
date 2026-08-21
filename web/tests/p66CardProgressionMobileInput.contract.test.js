@@ -1,9 +1,14 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const js=read('public/js/p66.js'),p67=read('public/js/p67.js'),css=read('public/css/p66.css'),index=read('public/index.html'),cards=read('api/profile/cards-v14.js'),progression=read('api/profile/progression.js'),release=read('lib/releaseP66.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
+const cardProgression=read('public/js/domains/cardProgression.js'),css=read('public/css/p66.css'),index=read('public/index.html'),cards=read('api/profile/cards-v14.js'),progression=read('api/profile/progression.js'),release=read('lib/releaseP66.js'),version=read('api/version.js');
 
-test('P66 compila',()=>assert.doesNotThrow(()=>new Function(js)));
+test('owner canônico da progressão compila e está executável',()=>{
+ assert.doesNotThrow(()=>new Function(cardProgression));
+ assert.match(cardProgression,/CartDomains\.claim\('cardProgression','domains\/cardProgression\.js'/);
+ assert.match(index,/<script src="js\/domains\/cardProgression\.js\?v=domain-2"><\/script>/);
+ assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p66\.js\?v=1\.4\.66"><\/script>/);
+});
 
 test('fundo permanece baseado apenas em vitórias pessoais de rodada',()=>{
  assert.match(progression,/materialScore=Number\(r\.white_personal_wins\|\|0\)/);
@@ -11,35 +16,33 @@ test('fundo permanece baseado apenas em vitórias pessoais de rodada',()=>{
  assert.match(cards,/white_personal_wins/);
  assert.match(cards,/personalRoundWins/);
  assert.match(cards,/cardMaterialTier\(c\.personalRoundWins\)/);
- assert.match(p67,/rodadas vencidas com esta carta/);
+ assert.match(cardProgression,/c\?\.personalRoundWins/);
+ assert.match(cardProgression,/rodadas vencidas com esta carta/);
 });
 
-test('P66 histórico de proprietários é supersedido pela popularidade por Espólio do P67',()=>{
- assert.match(js,/worldHolders/);
+test('proprietários históricos continuam supersedidos pela popularidade por Espólio',()=>{
  assert.match(progression,/borderScore=Number\(r\.adoption_count\|\|0\)/);
  assert.match(cards,/acquisition_source='match_loot'/);
  assert.match(cards,/borderState\(lootCollectors\)/);
- assert.match(p67,/coletas por Espólio por outros jogadores/);
+ assert.match(cardProgression,/c\?\.lootCollectors/);
+ assert.match(cardProgression,/coletas por Espólio por outros jogadores/);
 });
 
 test('camada atual usa FUNDO e BORDA com semânticas independentes',()=>{
- assert.match(p67,/const title=background\?'FUNDO':'BORDA'/);
- assert.match(p67,/quão boa esta carta é/);
- assert.match(p67,/popularidade da carta/);
+ assert.match(cardProgression,/const title=background\?'FUNDO':'BORDA'/);
+ assert.match(cardProgression,/quão boa esta carta é nas partidas/);
+ assert.match(cardProgression,/popularidade da carta/);
 });
 
-test('campos mobile não acionam zoom de foco e admin fica ancorado',()=>{
+test('correção mobile de P66 continua ativa como CSS de compatibilidade',()=>{
  assert.match(css,/@supports \(-webkit-touch-callout:none\)/);
  assert.match(css,/input,textarea,select,\.input\{font-size:16px!important\}/);
  assert.match(css,/\.creator-admin-overlay\{[\s\S]*place-items:start center!important/);
  assert.match(css,/\.creator-admin-field input,[\s\S]*font-size:16px!important/);
+ assert.match(index,/<link rel="stylesheet" href="css\/p66\.css\?v=1\.4\.66">/);
 });
 
-test('P66 permanece no histórico e releases posteriores carregam depois',()=>{
- assert.ok(index.indexOf('js/p67.js?v=1.4.71')>index.indexOf('js/p66.js?v=1.4.66'));
- assert.ok(index.includes('cardProgressionUI.js?v=1.4.67'));
+test('P66 permanece como proveniência histórica e P74 é a release corrente',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.66'/);
- assert.match(version,/releaseP(?:66|67|68|69|7[0-9])/);
- assert.match(notifications,/releaseP66/);
- assert.match(notifications,/P65_RELEASE/);
+ assert.match(version,/releaseP74/);
 });
