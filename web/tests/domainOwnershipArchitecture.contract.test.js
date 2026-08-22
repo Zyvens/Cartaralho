@@ -3,6 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const index=read('public/index.html'),domainDir=path.join(root,'public/js/domains');
 const domainFiles=fs.readdirSync(domainDir).filter(x=>x.endsWith('.js')).sort(),sources=Object.fromEntries(domainFiles.map(name=>[name,read(`public/js/domains/${name}`)]));
+const publicProfileBridge=read('public/js/metaFixes.js');
 const requiredOwners={
  'accountUI.js':'accountUI','adminUI.js':'adminUI','achievementsUI.js':'achievementsUI','audioUI.js':'audioUI','buffsUI.js':'buffsUI','cardCreationUI.js':'cardCreationUI','cardProgression.js':'cardProgression','cardsLibrary.js':'cardsLibrary','cosmeticsUI.js':'cosmeticsUI','gameplayUI.js':'gameplayUI','genesisFrameUI.js':'genesisFrameUI','identityUI.js':'identityUI','marketplaceCatalogUI.js':'marketplaceCatalogUI','marketplaceUI.js':'marketplaceUI','missionsUI.js':'missionsUI','navigationUI.js':'navigationUI','notificationsUI.js':'notificationsUI','profileUI.js':'profileUI','rankUI.js':'rankUI','rewardsUI.js':'rewardsUI','roomUI.js':'roomUI','showcaseUI.js':'showcaseUI','socialUI.js':'socialUI','statsUI.js':'statsUI','uiPolishUI.js':'uiPolishUI'
 };
@@ -40,14 +41,26 @@ test('patches históricos nomeados absorvidos também não executam',()=>{
  }
 });
 
-test('renderAccount e App.showScreen possuem um único escritor final entre os owners',()=>{
- const account=Object.entries(sources).filter(([,s])=>/HomeScreen\.renderAccount\s*=/.test(s)).map(([n])=>n);
+test('writers finais críticos de HomeScreen e App são únicos entre os owners',()=>{
+ const contracts={
+  renderAccount:['accountUI.js'],renderCards:['cardsLibrary.js'],renderStats:['statsUI.js'],renderHistory:['historyUI.js'],openPanel:['appPanelUI.js'],register:['registrationUI.js']
+ };
+ for(const [method,expected] of Object.entries(contracts)){
+  const re=new RegExp(`HomeScreen\\.${method}\\s*=`),writers=Object.entries(sources).filter(([,s])=>re.test(s)).map(([n])=>n);
+  assert.deepEqual(writers,expected,`${method} deve ter writer único`);
+ }
  const navigation=Object.entries(sources).filter(([,s])=>/App\.showScreen\s*=/.test(s)).map(([n])=>n);
- assert.deepEqual(account,['accountUI.js']);
  assert.deepEqual(navigation,['navigationUI.js']);
  assert.match(sources['navigationUI.js'],/interceptNavigation/);
  assert.match(sources['showcaseUI.js'],/interceptNavigation\(name,data/);
  assert.doesNotMatch(sources['showcaseUI.js'],/App\.showScreen\s*=/);
+});
+
+test('Perfil Público possui um único writer no bridge explícito e nenhum domain o reembrulha',()=>{
+ assert.match(publicProfileBridge,/HomeScreen\.renderPublicProfile=render/);
+ const domainWriters=Object.entries(sources).filter(([,s])=>/HomeScreen\.renderPublicProfile\s*=/.test(s)).map(([n])=>n);
+ assert.deepEqual(domainWriters,[]);
+ assert.match(sources['identityUI.js'],/decoratePublicProfile\(panel,userId\)/);
 });
 
 test('P73/P74 pertencem agora a account e marketplace',()=>{
