@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const canonical=read('public/js/canonicalCardBadge.js'),progression=read('public/js/cardProgressionUI.js'),rewards=read('public/js/domains/rewardsUI.js'),stats=read('public/js/domains/statsUI.js'),cards=read('public/js/domains/cardsLibrary.js'),credits=read('public/js/creditsPolish.js'),polish=read('public/js/domains/uiPolishUI.js'),missionLegacy=read('public/js/missionLayoutSafe.js'),missions=read('public/js/domains/missionsUI.js'),grace=read('public/js/minimumPlayersGrace.js'),gameplay=read('public/js/domains/gameplayUI.js');
+const canonical=read('public/js/canonicalCardBadge.js'),progression=read('public/js/cardProgressionUI.js'),rewards=read('public/js/domains/rewardsUI.js'),stats=read('public/js/domains/statsUI.js'),cards=read('public/js/domains/cardsLibrary.js'),credits=read('public/js/creditsPolish.js'),polish=read('public/js/domains/uiPolishUI.js'),missionLegacy=read('public/js/missionLayoutSafe.js'),missions=read('public/js/domains/missionsUI.js'),grace=read('public/js/minimumPlayersGrace.js'),gameplay=read('public/js/domains/gameplayUI.js'),refinement=read('public/js/uiRefinement2.js'),prestige=read('public/js/prestigeUI.js'),identity=read('public/js/domains/identityUI.js'),profile=read('public/js/domains/profileUI.js');
 
 test('canonicalCardBadge é owner apenas da autoria original',()=>{
  assert.match(canonical,/CARTA ORIGINAL/);
@@ -59,4 +59,23 @@ test('minimum player grace mantém UI sem listeners e gameplay owns os bindings 
  for(const event of ['insufficient_players_started','insufficient_players_cancelled','minimum_players_sync'])assert.match(gameplay,new RegExp(`SocketClient\\.on\\('${event}'`));
  for(const event of ['game_over','room_closed','room_cancelled'])assert.match(gameplay,new RegExp(`'${event}'`));
  assert.match(gameplay,/__domainMinimumPlayersGrace/);
+});
+
+test('uiRefinement2 foi supersedido sem perder copy/identidade e sem renderer concorrente de Cartas',()=>{
+ assert.match(refinement,/status:'SUPERSEDED'/);
+ assert.doesNotMatch(refinement,/ProfessionalUI\.renderCards\s*=/);
+ assert.match(polish,/polishHomeCopy/);
+ assert.match(polish,/Abra uma mesa/);
+ assert.match(polish,/polishPlayIdentity/);
+ assert.match(polish,/APELIDO DA PARTIDA/);
+ assert.match(cards,/HomeScreen\.renderCards=render/);
+});
+
+test('prestigeUI foi absorvido por identidade/perfil',()=>{
+ assert.match(prestige,/status:'SUPERSEDED'/);
+ for(const key of ['cliente-preferencial','lavador-de-moedinhas','patrocinador-do-caos','dinheiro-nao-compra-talento','herdeiro-do-cartaralho','patrimonio-inexplicavel','o-criador','betinha'])assert.match(identity,new RegExp(key));
+ assert.match(identity,/celestial/);
+ assert.match(profile,/rarity-celestial/);
+ assert.doesNotMatch(prestige,/MetaUI\.titleName\s*=/);
+ assert.doesNotMatch(prestige,/ProfileModal\.rarityLegend\s*=/);
 });
