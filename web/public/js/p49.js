@@ -62,7 +62,7 @@
   return hydratePromise;
  }
  function settle(){ensureBalanceSlot();queueMicrotask(ensureIdentity);setTimeout(hydrateBalance,0);}
- if(window.HomeScreen&&!HomeScreen.__p49AccountHydration){
+ if(typeof HomeScreen!=='undefined'&&!HomeScreen.__p49AccountHydration){
   HomeScreen.__p49AccountHydration=true;
   const base=HomeScreen.renderAccount.bind(HomeScreen);
   HomeScreen.renderAccount=function(...args){const out=base(...args);ensureBalanceSlot();queueMicrotask(()=>{ensureIdentity();hydrateBalance();});return out;};
