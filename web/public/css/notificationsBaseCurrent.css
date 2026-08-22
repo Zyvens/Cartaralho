@@ -1,0 +1,33 @@
+/* Owner visual canônico da base da Central de Notificações, originada em P18.
+   Spoilers e scroll interno são refinados posteriormente por P35/P36. */
+.notifications-home-card{position:relative}
+.notification-home-badge{position:absolute;right:31px;top:50%;transform:translateY(-50%);display:grid;place-items:center;min-width:23px;height:23px;padding:0 6px;border-radius:999px;background:#ef4444;color:#fff;font:900 .67rem/1 var(--font-display);box-shadow:0 0 0 3px rgba(239,68,68,.12)}
+.notification-home-badge[hidden]{display:none!important}
+.notifications-overlay{position:fixed;inset:0;z-index:19000;display:grid;place-items:center;padding:24px;background:rgba(5,5,11,.76);backdrop-filter:blur(14px)}
+.notifications-shell{width:min(900px,96vw);max-height:min(820px,90vh);overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.1);border-radius:22px;background:linear-gradient(155deg,#171624,#0d0d16 60%,#090a11);box-shadow:0 32px 90px rgba(0,0,0,.58)}
+.notifications-head{display:flex;justify-content:space-between;gap:20px;padding:20px 22px 16px;border-bottom:1px solid rgba(255,255,255,.07)}
+.notifications-head small{color:#a78bfa;font-size:.63rem;font-weight:900;letter-spacing:.13em}
+.notifications-head h2{margin:4px 0 3px;font-size:1.35rem}
+.notifications-head p{margin:0;color:var(--text-muted);font-size:.76rem}
+.notifications-close{width:38px;height:38px;border-radius:11px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);color:#fff;cursor:pointer;font-size:1rem}
+.notifications-version{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:16px 22px 0;padding:13px 15px;border:1px solid rgba(103,232,249,.16);border-radius:15px;background:linear-gradient(135deg,rgba(103,232,249,.07),rgba(167,139,250,.06))}
+.notifications-version small,.notifications-version b{display:block}
+.notifications-version small{color:#9bdcf0;font-size:.6rem;font-weight:900;letter-spacing:.1em}
+.notifications-version b{margin-top:2px;font-size:1.05rem}
+.notifications-version>span{color:var(--text-muted);font-size:.7rem;text-align:right}
+.notifications-body{overflow:auto;padding:16px 22px 22px;display:grid;gap:20px}
+.notifications-section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.notifications-section-title h3{font-size:.96rem}
+.notifications-section-title small{color:var(--text-muted);font-size:.64rem}
+.notifications-list{display:grid;gap:8px}
+.notification-item{display:grid;grid-template-columns:auto minmax(0,1fr);gap:11px;padding:12px 13px;border:1px solid rgba(255,255,255,.07);border-radius:13px;background:rgba(255,255,255,.027)}
+.notification-item.update{border-color:rgba(139,92,246,.12)}
+.notification-item.reward{border-color:rgba(250,204,21,.11)}
+.notification-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.045);font-size:1rem}
+.notification-title{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.notification-title b{font-size:.78rem}
+.notification-title span{color:#c4b5fd;font:800 .58rem/1 var(--font-display);letter-spacing:.04em}
+.notification-copy p{margin:3px 0;color:#b0a9bd;font-size:.69rem;line-height:1.42}
+.notification-copy>small{color:#625d70;font-size:.59rem}
+.notification-empty{padding:18px;text-align:center;color:var(--text-muted);font-size:.72rem;border:1px dashed rgba(255,255,255,.08);border-radius:12px}
+@media(max-width:620px){.notifications-overlay{padding:12px}.notifications-shell{max-height:94vh}.notifications-head{padding:17px}.notifications-version{margin:13px 17px 0;align-items:flex-start;flex-direction:column}.notifications-version>span{text-align:left}.notifications-body{padding:14px 17px 18px}}
