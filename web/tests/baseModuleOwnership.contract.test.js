@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const canonical=read('public/js/canonicalCardBadge.js'),progression=read('public/js/cardProgressionUI.js'),rewards=read('public/js/domains/rewardsUI.js'),stats=read('public/js/domains/statsUI.js'),cards=read('public/js/domains/cardsLibrary.js'),credits=read('public/js/creditsPolish.js'),polish=read('public/js/domains/uiPolishUI.js'),missionLegacy=read('public/js/missionLayoutSafe.js'),missions=read('public/js/domains/missionsUI.js'),grace=read('public/js/minimumPlayersGrace.js'),gameplay=read('public/js/domains/gameplayUI.js'),refinement=read('public/js/uiRefinement2.js'),prestige=read('public/js/prestigeUI.js'),identity=read('public/js/domains/identityUI.js'),profile=read('public/js/domains/profileUI.js');
+const canonical=read('public/js/canonicalCardBadge.js'),progression=read('public/js/cardProgressionUI.js'),rewards=read('public/js/domains/rewardsUI.js'),stats=read('public/js/domains/statsUI.js'),cards=read('public/js/domains/cardsLibrary.js'),credits=read('public/js/creditsPolish.js'),polish=read('public/js/domains/uiPolishUI.js'),missionLegacy=read('public/js/missionLayoutSafe.js'),missions=read('public/js/domains/missionsUI.js'),grace=read('public/js/minimumPlayersGrace.js'),gameplay=read('public/js/domains/gameplayUI.js'),refinement=read('public/js/uiRefinement2.js'),prestige=read('public/js/prestigeUI.js'),identity=read('public/js/domains/identityUI.js'),profile=read('public/js/domains/profileUI.js'),market=read('public/js/domains/marketplaceUI.js'),recycling=read('public/js/marketplaceRecycling.js');
 
 test('canonicalCardBadge é owner apenas da autoria original',()=>{
  assert.match(canonical,/CARTA ORIGINAL/);
@@ -78,4 +78,15 @@ test('prestigeUI foi absorvido por identidade/perfil',()=>{
  assert.match(profile,/rarity-celestial/);
  assert.doesNotMatch(prestige,/MetaUI\.titleName\s*=/);
  assert.doesNotMatch(prestige,/ProfileModal\.rarityLegend\s*=/);
+});
+
+test('reciclagem não pode achatar o markup canônico da carteira após pagamento',()=>{
+ assert.match(recycling,/this\.syncBalances\(m\)/,'recycle ainda delega a sincronização');
+ assert.match(market,/R\.syncBalances=function\(m\)/,'domain substitui o sincronizador histórico');
+ assert.match(market,/applyBalance\(v,\{source:'recycling_sync'/);
+ assert.match(market,/cartaralho:wallet-updated/);
+ const owned=market.match(/R\.syncBalances=function\(m\)[\s\S]*?return ok;\};/i)?.[0]||'';
+ assert.doesNotMatch(owned,/\.textContent\s*=\s*`?🪙/);
+ assert.match(market,/p65-balance-icon/);
+ assert.match(market,/p49-balance-value/);
 });
