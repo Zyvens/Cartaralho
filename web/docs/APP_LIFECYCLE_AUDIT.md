@@ -143,14 +143,19 @@ Invariantes preservados:
 
 `tests/appLifecycle.contract.test.js` exige que os **20 eventos core** apareçam exatamente uma vez no conjunto dos owners runtime de socket.
 
+## Gate Core/lifecycle — FECHADO EM RUNTIME
+
+O contrato final do split de sockets (`55e72ec9e9a0cb02385b391332f7189e338c334a`) e o checkpoint documental subsequente chegaram a preview Vercel **READY**. Portanto, para fins de ownership runtime, o Gate Core/lifecycle está fechado.
+
+Isso **não** autoriza ainda a exclusão física dos fallbacks de `app.js`. Eles permanecem até a classificação dos módulos-base JS e o gate de limpeza mecânica, evitando regressão por acoplamentos não identificados.
+
 ## Próxima etapa
 
-1. aguardar/confirmar preview verde do contrato de socket lifecycle;
-2. considerar o Gate Core/lifecycle fechado em runtime;
-3. classificar módulos-base JS restantes;
-4. consolidar gameplay/telas-base além do lifecycle;
-5. só depois remover fisicamente os fallbacks de `app.js` e outros wrappers históricos;
-6. executar CI integral + aceite desktop/mobile/iPhone/PWA/multiplayer antes de merge.
+1. classificar módulos-base JS restantes por `CURRENT`, `DELEGATE/WRAPPER`, `SUPERSEDED` e `HISTORICAL`;
+2. consolidar gameplay/telas-base além do lifecycle;
+3. remover fisicamente fallbacks de `app.js` e wrappers históricos somente depois da classificação completa;
+4. comparar visualmente desktop/mobile antes de retirar shims CSS;
+5. executar CI integral + aceite desktop/mobile/iPhone/PWA/multiplayer antes de merge.
 
 ## Evidência
 
@@ -163,4 +168,4 @@ Invariantes preservados:
 - `public/js/core/socketLifecycle.js`
 - `public/js/core/appBootstrap.js`
 
-Owners/ativação anteriores chegaram a preview Vercel **READY**; o contrato final do split de sockets é o gate de fechamento desta onda.
+Todos os owners/ativação e o contrato final desta onda chegaram a preview Vercel **READY**.
