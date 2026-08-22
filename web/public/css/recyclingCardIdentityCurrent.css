@@ -1,0 +1,6 @@
+/* Owner visual canônico da identidade preta/branca das cartas na Reciclagem. */
+.recycling-card.p53-recycle-black{background:#0d0d15!important;color:#fff!important;border-color:#38384b!important}
+.recycling-card.p53-recycle-black small,.recycling-card.p53-recycle-black>span:not(.recycling-check){color:#b7b4c2!important}
+.recycling-card.p53-recycle-white{background:#f5f5f0!important;color:#17171b!important;border-color:#deded7!important}
+.recycling-card.p53-recycle-white small,.recycling-card.p53-recycle-white>span:not(.recycling-check){color:#66636d!important}
+.recycling-card.p53-recycle-white.is-selected,.recycling-card.p53-recycle-black.is-selected{outline:2px solid #d946ef!important;outline-offset:2px}

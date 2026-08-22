@@ -1,0 +1,20 @@
+/* Owner visual canônico da superfície translúcida da Home originada em P20.
+   Mantém o baralho animado respirando atrás do bloco de ações. */
+#mode-selection.home-form{
+  background:rgba(9,8,16,.18)!important;
+  border-color:rgba(255,255,255,.035)!important;
+  box-shadow:none!important;
+  backdrop-filter:blur(2px)!important;
+  -webkit-backdrop-filter:blur(2px)!important;
+}
+#mode-selection .profile-actions{background:transparent!important}
+@media(max-width:720px){
+  #mode-selection.home-form{
+    background:rgba(8,8,14,.07)!important;
+    border-color:transparent!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    padding-left:4px!important;
+    padding-right:4px!important;
+  }
+}

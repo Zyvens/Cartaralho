@@ -1,0 +1,4 @@
+/* Owner visual canônico do indicador de presença no botão Amigos. */
+#friends-menu-btn{padding-right:92px!important}
+#friends-menu-btn .home-action-arrow{position:absolute!important;right:20px!important;top:50%!important;transform:translateY(-50%)!important}
+#friends-menu-btn .p48-friends-online-pill{right:48px!important;top:50%!important;transform:translateY(-50%)!important}

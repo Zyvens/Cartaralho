@@ -1,0 +1,7 @@
+/* Owner visual canônico dos refinamentos semânticos P22 na criação de cartas. */
+.card-creation-screen .card-tab-heart{font-size:0!important;line-height:1!important;-webkit-text-stroke:0!important;text-shadow:none!important;color:inherit!important}
+.card-creation-screen .card-type-tab-black .card-tab-heart::before{content:'🖤';font-size:1.2rem}
+.card-creation-screen .card-type-tab-white .card-tab-heart::before{content:'🤍';font-size:1.2rem}
+.card-creation-screen .card-type-tab-black.active .card-tab-heart::before{filter:drop-shadow(0 0 1px rgba(255,255,255,.65))}
+.card-creation-screen .card-type-tab-white.active .card-tab-heart::before{filter:drop-shadow(0 0 1px rgba(0,0,0,.45))}
+@media(max-width:760px){.card-creation-screen .clean-stack-depth{display:none!important}}

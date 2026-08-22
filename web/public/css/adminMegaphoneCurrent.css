@@ -1,0 +1,5 @@
+/* Owner visual canônico do Megafone administrativo sobre o sistema de toast existente. */
+.toast.megaphone{border-color:rgba(250,204,21,.34)!important;background:linear-gradient(135deg,rgba(35,30,17,.97),rgba(20,18,27,.98))!important;box-shadow:0 12px 34px rgba(0,0,0,.42),0 0 24px rgba(250,204,21,.09)!important}
+.toast.megaphone .toast-icon{font-size:1.25rem}
+.toast.megaphone .toast-message{line-height:1.38}
+.toast-megaphone-reward{display:block;margin-top:3px;color:#fde68a;font-weight:900}

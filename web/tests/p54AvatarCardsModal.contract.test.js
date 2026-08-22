@@ -1,12 +1,48 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const css=read('public/css/p54.css'),js=read('public/js/p54.js'),index=read('public/index.html'),release=read('lib/releaseP54.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
+const avatarCss=read('public/css/profileAvatarFrameIntegrityCurrent.css'),createCss=read('public/css/cardsCreateEntryCurrent.css'),shim=read('public/css/p54.css'),history=read('public/js/p54.js'),cards=read('public/js/domains/cardsLibrary.js'),profile=read('public/js/domains/profileUI.js'),stats=read('public/js/domains/statsUI.js'),index=read('public/index.html'),release=read('lib/releaseP54.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
 
-test('P54 compila e permanece carregado depois de P53',()=>{assert.doesNotThrow(()=>new Function(js));assert.ok(index.indexOf('css/p54.css?v=1.4.71')>index.indexOf('css/p53.css?v=1.4.53'));const p54=index.indexOf('js/p54.js?v=1.4.71'),p53=index.indexOf('js/p53.js?v=1.4.53');assert.ok(p54>p53);});
-test('avatar com moldura remove a borda cinza legada da foto',()=>{assert.match(css,/avatar-frame\.public-avatar-frame>\.user-avatar/);assert.match(css,/border:0!important/);assert.match(css,/background:transparent!important/);});
-test('Perfil preserva o diâmetro da foto e deixa o padding da moldura crescer para fora',()=>assert.match(css,/profile-modal-avatar\[class\*="frame-"\][\s\S]*box-sizing:content-box!important/));
-test('grid de Molduras desfaz paint containment e camada GPU que piscavam no iOS',()=>{assert.match(css,/profile-modal-frame-item[\s\S]*contain:layout!important/);assert.doesNotMatch(css,/contain:layout paint!important/);assert.match(css,/avatar-frame img[\s\S]*transform:none!important/);assert.doesNotMatch(css,/translateZ\(0\)/);assert.match(css,/genese-atom-track[\s\S]*animation:none!important/);});
-test('Minhas Cartas monta criação no renderer profissional realmente usado pelo modal',()=>{assert.match(js,/ProfessionalUI\.__p54NativeCardCreator/);assert.match(js,/cards-library/);assert.match(js,/cards-library-toolbar/);assert.match(js,/p54-create-card-entry/);assert.match(js,/Criar nova Carta de Jogador/);assert.match(js,/root\.insertBefore\(btn,anchor\)/);assert.match(js,/CartP48\?\.openLibraryCreator/);});
-test('P54 não contém mais implementação de extrato dentro de Estatísticas',()=>{assert.doesNotMatch(js,/p54-stats-ledger|mountStatsLedger|ledgerHtml|transaction_type|latestStatsPayload|patchStats/);assert.doesNotMatch(css,/p54-stats-ledger|ledger-row|ledger-body/);});
-test('P54 permanece preservado quando versões posteriores são publicadas',()=>{assert.match(release,/APP_VERSION='v1\.4\.54'/);assert.match(version,/releaseP77/);assert.match(notifications,/releaseP72/);assert.match(notifications,/P54_RELEASE|releaseP54/);assert.match(notifications,/P53_RELEASE/);});
+test('integridade visual de avatar/moldura vive em owner canônico',()=>{
+ assert.match(avatarCss,/avatar-frame\.public-avatar-frame>\.user-avatar/);
+ assert.match(avatarCss,/border:0!important/);
+ assert.match(avatarCss,/background:transparent!important/);
+ assert.match(avatarCss,/profile-modal-avatar\[class\*="frame-"\][\s\S]*box-sizing:content-box!important/);
+ assert.match(shim,/profileAvatarFrameIntegrityCurrent\.css/);
+});
+
+test('grid estático P54 foi supersedido pelo lifecycle estrutural de profileUI',()=>{
+ assert.match(profile,/grid\.classList\.add\('p57-live-frame-grid','p58-live-frame-grid'\)/);
+ assert.match(profile,/grid\.classList\.remove\('profile-modal-frame-grid'\)/);
+ assert.match(shim,/SUPERSEDED: regras \.profile-modal-frame-grid/);
+ assert.doesNotMatch(avatarCss,/profile-modal-frame-grid/);
+});
+
+test('cardsLibrary é owner da criação e CSS base vive em cardsCreateEntryCurrent',()=>{
+ assert.match(cards,/cards-library/);
+ assert.match(cards,/p54-create-card-entry p56-create-card-entry p57-create-card-entry/);
+ assert.match(cards,/Criar nova Carta de Jogador/);
+ assert.match(cards,/openCreator/);
+ assert.match(createCss,/\.cards-library>\.p54-create-card-entry/);
+ assert.match(shim,/cardsCreateEntryCurrent\.css/);
+});
+
+test('statsUI permanece sem extrato ou renderer de carteira',()=>{
+ assert.match(stats,/HomeScreen\.renderStats=render/);
+ assert.doesNotMatch(stats,/dirtyBalance|wallet|ledger|transaction_type|TRANSACTION_LABELS/);
+ assert.doesNotMatch(avatarCss,/p54-stats-ledger|ledger-row|ledger-body/);
+ assert.doesNotMatch(createCss,/p54-stats-ledger|ledger-row|ledger-body/);
+});
+
+test('P54 é histórico não executável, shim visual, e P75 é a release corrente',()=>{
+ assert.doesNotThrow(()=>new Function(history));
+ assert.match(index,/css\/p54\.css\?v=1\.4\.71/);
+ assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p54\.js\?v=1\.4\.71"><\/script>/);
+ assert.doesNotMatch(index,/<script src="js\/p54\.js/);
+ assert.match(shim,/^\/\* COMPAT P54/);
+ assert.match(release,/APP_VERSION='v1\.4\.54'/);
+ assert.match(version,/releaseP75/);
+ assert.match(notifications,/releaseP75/);
+ assert.match(notifications,/P54_RELEASE|releaseP54/);
+ assert.match(notifications,/P53_RELEASE/);
+});

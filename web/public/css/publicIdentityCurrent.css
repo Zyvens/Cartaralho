@@ -1,0 +1,15 @@
+/* Owner visual canônico da identidade pública introduzida em P20. */
+.avatar-frame.public-avatar-frame{position:relative;display:inline-grid;place-items:center;flex:0 0 auto;border-radius:50%;vertical-align:middle;isolation:isolate;overflow:visible}
+.avatar-frame.public-avatar-frame>img,.avatar-frame.public-avatar-frame>.user-avatar{position:relative;z-index:2;display:block;border-radius:50%;object-fit:cover;filter:none}
+.identity-avatar-fallback{position:relative;z-index:2;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,#2b2840,#171522);color:#fff;font-weight:900}
+.account-strip>.avatar-frame{margin-right:1px}
+.account-equipped-title{display:block!important;margin-top:2px;color:#c4b5fd;font:800 .64rem/1.2 var(--font-display)}
+.public-equipped-title{font-weight:800}
+.match-identity .avatar-frame{margin:5px}
+.profile-appearance-live-preview{display:flex;align-items:center;gap:17px;margin:14px 0 17px;padding:15px 16px;border:1px solid rgba(167,139,250,.16);border-radius:17px;background:radial-gradient(circle at 10% 20%,rgba(124,58,237,.12),transparent 42%),rgba(255,255,255,.022);overflow:visible}
+.profile-appearance-live-preview>div{min-width:0;display:grid;gap:3px}
+.profile-appearance-live-preview small{color:#a78bfa;font:900 .58rem/1 var(--font-display);letter-spacing:.12em}
+.profile-appearance-live-preview b{font-size:1.05rem}
+.profile-appearance-live-preview .equipped-title{font-size:.76rem}
+.profile-appearance-live-preview em,.profile-appearance-no-title{color:#817b8c;font-size:.65rem;font-style:normal}
+@media(max-width:720px){.profile-appearance-live-preview{gap:14px;padding:14px}}

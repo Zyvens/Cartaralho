@@ -1,0 +1,44 @@
+/* Owner visual canônico do envelope genérico de navegação Voltar introduzido em P39.
+   Controles superiores específicos são refinados posteriormente por P45→P47. */
+button.back-button,
+button.ghost-back,
+button[id^='back-']{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  width:max-content!important;
+  min-width:0!important;
+  min-height:40px!important;
+  padding:10px 14px!important;
+  border:1px solid rgba(255,255,255,.15)!important;
+  border-radius:999px!important;
+  background:#161621!important;
+  color:#fff!important;
+  box-shadow:0 8px 30px rgba(0,0,0,.35)!important;
+  font:700 .9rem/1 var(--font-display)!important;
+  white-space:nowrap!important;
+  text-decoration:none!important;
+}
+#play-form>#back-play{
+  position:fixed!important;
+  top:calc(env(safe-area-inset-top,0px) + 12px)!important;
+  left:12px!important;
+  right:auto!important;
+  bottom:auto!important;
+  margin:0!important;
+  z-index:9600!important;
+}
+@media(max-width:620px){
+  button.back-button,
+  button.ghost-back,
+  button[id^='back-']{
+    min-height:40px!important;
+    padding:10px 14px!important;
+    font-size:.9rem!important;
+  }
+  #play-form>#back-play{
+    top:calc(env(safe-area-inset-top,0px) + 9px)!important;
+    left:10px!important;
+  }
+}

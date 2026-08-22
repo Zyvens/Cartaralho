@@ -1,0 +1,45 @@
+/* Owner visual canônico do cabeçalho/hero da Home após a estabilização de P52; o ajuste final de altura permanece em camada posterior. */
+body[data-cart-screen="home"] .home-content{
+  position:relative!important;
+  padding-top:calc(env(safe-area-inset-top,0px) + 58px)!important;
+}
+body[data-cart-screen="home"] .home-subtitle{
+  position:absolute!important;
+  top:calc(env(safe-area-inset-top,0px) + 12px)!important;
+  left:50%!important;
+  right:auto!important;
+  transform:translateX(-50%)!important;
+  z-index:1!important;
+  width:max-content!important;
+  max-width:34vw!important;
+  height:40px!important;
+  margin:0!important;
+  padding:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  pointer-events:none!important;
+}
+body[data-cart-screen="home"] .home-logo{
+  min-height:0!important;
+  height:clamp(300px,38svh,430px)!important;
+  padding:0!important;
+  margin:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+body[data-cart-screen="home"] .home-logo .logo-image{
+  width:min(88vw,590px)!important;
+  max-width:590px!important;
+  transform:scale(1.08)!important;
+}
+body[data-cart-screen="home"] #home-account{margin-top:0!important}
+@media(max-width:620px){
+  body[data-cart-screen="home"] .home-content{padding-top:calc(env(safe-area-inset-top,0px) + 56px)!important}
+  body[data-cart-screen="home"] .home-subtitle{font-size:.6rem!important;letter-spacing:.13em!important;max-width:32vw!important}
+  body[data-cart-screen="home"] .home-logo{height:clamp(260px,34svh,330px)!important}
+  body[data-cart-screen="home"] .home-logo .logo-image{width:min(91vw,540px)!important;transform:scale(1.05)!important}
+}

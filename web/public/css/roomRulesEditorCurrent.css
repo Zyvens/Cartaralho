@@ -1,0 +1,10 @@
+/* Owner visual canônico do editor modal de regras, originado em P15. */
+.room-rules-editor-overlay{position:fixed;inset:0;z-index:24000;display:grid;place-items:center;padding:20px;background:rgba(4,4,9,.74);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px)}
+.room-rules-editor-shell{width:min(680px,100%);max-height:min(90vh,900px);display:flex;flex-direction:column;border:1px solid rgba(139,92,246,.32);border-radius:22px;background:linear-gradient(145deg,#151522,#0d0d16);box-shadow:0 30px 90px rgba(0,0,0,.58);overflow:hidden}
+.room-rules-editor-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.07)}
+.room-rules-editor-head small{font-size:.65rem;font-weight:900;letter-spacing:.12em;color:#a78bfa}.room-rules-editor-head h2{margin:4px 0 3px;font-size:1.25rem}.room-rules-editor-head p{margin:0;color:var(--text-muted);font-size:.78rem}
+.room-rules-editor-close{width:38px;height:38px;display:grid;place-items:center;flex:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.04);color:#fff;cursor:pointer}
+.room-rules-editor-body{padding:16px 20px;overflow:auto}.room-rules-editor-body>.room-rules-card{box-shadow:none}.room-rules-editor-body .room-rules-edit-pill{display:none}
+.room-rules-editor-actions{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid rgba(255,255,255,.07);background:rgba(7,7,13,.6)}
+@media(max-width:760px){.room-rules-editor-overlay{padding:10px}.room-rules-editor-shell{max-height:94vh}}
+@media(max-width:520px){.room-rules-editor-body{padding:12px}.room-rules-editor-actions{padding:12px;flex-direction:column-reverse}.room-rules-editor-actions .btn{width:100%}}

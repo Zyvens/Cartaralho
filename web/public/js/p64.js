@@ -2,15 +2,15 @@
 (()=>{
  if(window.CartP64)return;
  const VERSION='v1.4.64',GLOBAL_CHANNEL='cartaralho-global';
- let channel=null,retryTimer=null,toastObserver=null,walletRefreshPromise=null;
+ let channel=null,retryTimer=null,toastObserver=null;
  const money=v=>Number(v||0).toLocaleString('pt-BR');
  const userId=()=>AuthClient?.user?.id||AuthClient?.user?.username||null;
  const cacheKey=()=>`cartaralho_dirty_balance_${userId()||'anon'}`;
 
  function readCachedBalance(){
-  const raw=AuthClient?.user?.dirty_balance;
-  if(raw!==null&&raw!==undefined&&raw!==''&&Number.isFinite(Number(raw)))return Number(raw);
-  try{const cached=localStorage.getItem(cacheKey());if(cached!==null){const v=Number(cached);if(Number.isFinite(v))return v;}}catch(_){ }
+  const fromUser=Number(AuthClient?.user?.dirty_balance);
+  if(Number.isFinite(fromUser))return fromUser;
+  try{const raw=localStorage.getItem(cacheKey());if(raw!==null){const v=Number(raw);if(Number.isFinite(v))return v;}}catch(_){ }
   return null;
  }
  function writeCachedBalance(v){
@@ -65,15 +65,11 @@
  }
  async function refreshBalance(source='wallet-refresh'){
   if(!AuthClient?.user)return null;
-  if(walletRefreshPromise)return walletRefreshPromise;
-  walletRefreshPromise=(async()=>{
-   try{
-    const d=await AuthClient.request(`/api/profile/wallet?_fresh=${Date.now()}`),v=Number(d?.dirtyBalance);
-    if(Number.isFinite(v)){applyBalance(v,{source});return v;}
-   }catch(_){ }
-   return null;
-  })().finally(()=>{walletRefreshPromise=null;});
-  return walletRefreshPromise;
+  try{
+   const d=await AuthClient.request(`/api/profile/wallet?_fresh=${Date.now()}`),v=Number(d?.dirtyBalance);
+   if(Number.isFinite(v)){applyBalance(v,{source});return v;}
+  }catch(_){ }
+  return null;
  }
  function isForMe(data={}){
   const targets=Array.isArray(data.targetUserIds)?data.targetUserIds.map(Number):null;

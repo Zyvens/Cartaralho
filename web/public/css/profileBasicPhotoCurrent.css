@@ -1,0 +1,10 @@
+/* Owner visual canônico da foto básica sem moldura no editor de Perfil. */
+.profile-modal-avatar-editor-card #profile-modal-avatar-preview .profile-modal-avatar{
+  padding:0!important;
+  background:none!important;
+  box-shadow:none!important;
+  filter:none!important;
+  animation:none!important;
+}
+.profile-modal-avatar-editor-card #profile-modal-avatar-preview .profile-modal-avatar::before,
+.profile-modal-avatar-editor-card #profile-modal-avatar-preview .profile-modal-avatar::after{display:none!important}

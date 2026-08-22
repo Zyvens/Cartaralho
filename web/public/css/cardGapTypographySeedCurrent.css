@@ -1,0 +1,12 @@
+/* Owner visual canônico das propriedades tipográficas residuais da lacuna antes do desenho P59/P60. */
+.black-card-gap,
+.p57-library-game-card .black-card-gap,
+.p57-detail-game-card .black-card-gap,
+.recycling-card b .black-card-gap,
+.p41-recycle-card-preview.black b .black-card-gap{
+ font:inherit!important;
+ font-weight:850!important;
+ letter-spacing:.04em!important;
+ text-decoration:none!important;
+ white-space:nowrap!important;
+}

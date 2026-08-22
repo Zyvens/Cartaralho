@@ -1,0 +1,35 @@
+/* Owner visual canônico da confirmação de Reciclagem emitida por marketplaceUI. */
+.p41-recycle-confirm-overlay{
+  position:fixed;
+  inset:0;
+  z-index:18000;
+  display:grid;
+  place-items:center;
+  padding:calc(env(safe-area-inset-top,0px) + 14px) 12px calc(env(safe-area-inset-bottom,0px) + 14px);
+  background:rgba(4,4,9,.82);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+.p41-recycle-confirm-shell{
+  width:min(680px,100%);max-height:min(90vh,860px);display:flex;flex-direction:column;overflow:hidden;
+  border:1px solid rgba(255,255,255,.11);border-radius:22px;background:#11111b;box-shadow:0 28px 80px rgba(0,0,0,.66);
+}
+.p41-recycle-confirm-shell header{padding:17px 18px 13px;border-bottom:1px solid rgba(255,255,255,.08)}
+.p41-recycle-confirm-shell header small{display:block;color:#9d94b7;font-size:.68rem;font-weight:900;letter-spacing:.12em}
+.p41-recycle-confirm-shell header h2{margin:4px 0 4px;font-size:1.35rem}
+.p41-recycle-confirm-shell header p{margin:0;font-size:.77rem}
+.p41-recycle-confirm-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:14px;overflow:auto;max-height:50vh}
+.p41-recycle-card-preview{min-height:118px;padding:14px;border-radius:15px;display:flex;flex-direction:column;justify-content:space-between;text-align:left}
+.p41-recycle-card-preview.black{background:#0d0d15;color:#fff;border:1px solid #353548}
+.p41-recycle-card-preview.white{background:#f5f5f0;color:#17171b;border:1px solid #deded7}
+.p41-recycle-card-preview span{font-size:.64rem;font-weight:900;opacity:.6}
+.p41-recycle-card-preview b{font-size:.86rem;line-height:1.3;overflow-wrap:anywhere}
+.p41-recycle-confirm-actions{display:grid;grid-template-columns:1fr 1.35fr;gap:9px;padding:13px 14px 14px;border-top:1px solid rgba(255,255,255,.08)}
+@media(max-width:620px){
+ .p41-recycle-confirm-overlay{place-items:end center;padding-left:7px;padding-right:7px}
+ .p41-recycle-confirm-shell{max-height:90vh;border-radius:21px 21px 12px 12px}
+ .p41-recycle-confirm-list{grid-template-columns:1fr;max-height:52vh;padding:11px}
+ .p41-recycle-card-preview{min-height:100px}
+ .p41-recycle-confirm-actions{grid-template-columns:1fr}
+ .p41-recycle-confirm-actions .btn{width:100%}
+}

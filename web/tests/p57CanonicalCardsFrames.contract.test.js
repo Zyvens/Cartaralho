@@ -1,66 +1,20 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const js=read('public/js/p57.js'),css=read('public/css/p57.css'),index=read('public/index.html'),p53=read('public/css/p53.css'),release=read('lib/releaseP57.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
+const cards=read('public/js/domains/cardsLibrary.js'),progression=read('public/js/domains/cardProgression.js'),profile=read('public/js/domains/profileUI.js'),market=read('public/js/domains/marketplaceUI.js'),libraryCss=read('public/css/cardLibraryPresentationCurrent.css'),framesCss=read('public/css/profileFramesLiveCurrent.css'),shim=read('public/css/p57.css'),gapBase=read('public/css/cardCompactCurrent.css'),gapFinal=read('public/css/cardTypographyMissionsCurrent.css'),index=read('public/index.html'),release=read('lib/releaseP57.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
 
-test('P57 compila e carrega depois do P56',()=>{
- assert.doesNotThrow(()=>new Function(js));
- assert.ok(index.indexOf('css/p57.css?v=1.4.57')>index.indexOf('css/p56.css?v=1.4.56'));
- assert.ok(index.indexOf('js/p57.js?v=1.4.72')>index.indexOf('js/p56.js?v=1.4.71'));
-});
+test('P57 foi absorvido pelos owners atuais e o script histórico não executa',()=>{[cards,progression,profile,market].forEach(src=>assert.doesNotThrow(()=>new Function(src)));assert.match(index,/<script src="js\/domains\/cardsLibrary\.js\?v=domain-2"><\/script>/);assert.match(index,/<script src="js\/domains\/cardProgression\.js\?v=domain-2"><\/script>/);assert.match(index,/<script src="js\/domains\/profileUI\.js\?v=domain-2"><\/script>/);assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p57\.js\?v=1\.4\.72"><\/script>/);assert.match(index,/<link rel="stylesheet" href="css\/p57\.css\?v=1\.4\.57">/);assert.match(shim,/cardLibraryPresentationCurrent\.css/);assert.match(shim,/profileFramesLiveCurrent\.css/);});
 
-test('Minhas Cartas e a ficha usam o CardComponent real do jogo',()=>{
- assert.match(js,/typeof CardComponent!=='undefined'/);
- assert.doesNotMatch(js,/window\.CardComponent/);
- assert.match(js,/C\.createBlackCard\(valueOf\(c\),options\)/);
- assert.match(js,/C\.createWhiteCard\(valueOf\(c\),options\)/);
- assert.match(js,/p57-library-game-card/);
- assert.match(js,/p56-card-art p57-detail-game-card/);
- assert.match(js,/ProfessionalUI\.renderCards=render/);
- assert.match(js,/HomeScreen\.renderCards=render/);
- assert.match(js,/MetaUI\.renderCards=render/);
-});
+test('Minhas Cartas usa CardComponent real e owner visual da biblioteca',()=>{assert.match(cards,/CardComponent\.createBlackCard\(value,options\)/);assert.match(cards,/CardComponent\.createWhiteCard\(value,options\)/);assert.match(cards,/HomeScreen\.renderCards=render/);assert.match(cards,/ProfessionalUI\.renderCards=render/);assert.match(cards,/MetaUI\.renderCards=render/);assert.match(libraryCss,/\.p57-library-card-shell/);assert.match(libraryCss,/\.p57-library-favorite/);assert.match(libraryCss,/\.p57-card-origin\.native/);});
 
-test('renderer final de Minhas Cartas gera autoria em vez de metadado técnico',()=>{
- assert.match(js,/const creatorLabel=c=>/);
- assert.match(js,/o\.creatorUsername\|\|c\?\.creator_username\|\|o\.creatorName/);
- assert.match(js,/<small>Criado por \$\{esc\(creatorLabel\(c\)\)\}<\/small>/);
- assert.doesNotMatch(js,/contorno \$\{label\(c\.borderTier\)\}/);
-});
+test('renderer final gera autoria legível e não metadado técnico',()=>{assert.match(cards,/const creatorLabel=c=>/);assert.match(cards,/<small>Criado por \$\{esc\(creatorLabel\(c\)\)\}<\/small>/);assert.doesNotMatch(cards,/contorno \$\{label\(c\.borderTier\)\}/);});
 
-test('Lacunas pretas ficam canônicas também na Reciclagem',()=>{
- assert.match(js,/C\._formatBlackText\(c\.text\)/);
- assert.match(js,/Recycling\.normalize\(body\)/);
- assert.match(css,/recycling-card b \.black-card-gap/);
- assert.match(css,/border-bottom:3px solid #d946ef!important/);
-});
+test('lacuna P57 foi supersedida e o resultado atual vive em P59/P60',()=>{assert.match(cards,/CardComponent\._formatBlackText=function\(text\)/);assert.match(market,/CardComponent\._formatBlackText\(c\.text\)/);assert.doesNotMatch(shim,/black-card-gap/);assert.match(gapBase,/recycling-card b \.black-card-gap/);assert.match(gapBase,/width:1\.72em!important/);assert.match(gapFinal,/height:\.82em!important/);});
 
-test('Molduras do perfil voltam a animar em vez de usar thumbnails congelados do P53',()=>{
- assert.match(p53,/profile-modal-frame-grid[\s\S]*animation:none!important/);
- assert.match(js,/grid\.classList\.remove\('profile-modal-frame-grid'\)/);
- assert.match(js,/grid\.classList\.add\('p57-live-frame-grid'\)/);
- assert.match(css,/\.p57-live-frame-grid \.profile-modal-frame-item\{contain:none!important/);
-});
+test('dimensões antigas P57 foram deixadas para P58/P59, preservando apenas apresentação residual',()=>{assert.doesNotMatch(libraryCss,/grid-template-columns/);assert.doesNotMatch(libraryCss,/min-height:190px/);assert.doesNotMatch(libraryCss,/width:100%!important;min-height/);assert.match(libraryCss,/box-shadow:0 14px 34px/);assert.match(libraryCss,/card-watermark\{opacity:\.38!important/);});
 
-test('Progressão exibida ao jogador é Bronze, Prata, Ouro e Platina',()=>{
- assert.match(js,/copper:'Bronze'/);
- assert.match(js,/silver:'Prata'/);
- assert.match(js,/gold:'Ouro'/);
- assert.match(js,/platinum:'Platina'/);
- assert.doesNotMatch(js,/copper:'Copper'/);
- assert.match(js,/\+\$\{fmt\(remaining\)\} → \$\{label\(next\)\}/);
-});
+test('molduras do Perfil são previews live e Gênese mantém estabilização',()=>{assert.match(profile,/classList\.remove\('profile-modal-frame-grid'\)/);assert.match(profile,/classList\.add\('p57-live-frame-grid','p58-live-frame-grid'\)/);assert.match(profile,/p58-genesis-preview/);assert.match(framesCss,/\.p57-live-frame-grid \.profile-modal-frame-item/);assert.match(framesCss,/contain:none!important/);});
 
-test('P57 preserva o layout P56 do modal e troca somente preview e progressão',()=>{
- assert.match(js,/D\.preview=/);
- assert.match(js,/D\.track=function/);
- assert.doesNotMatch(js,/D\.open=/);
- assert.match(css,/\.p56-card-preview-host \.p57-detail-game-card/);
-});
+test('progressão exibida ao jogador é Bronze, Prata, Ouro e Platina',()=>{assert.match(progression,/copper:'Bronze'/);assert.match(progression,/silver:'Prata'/);assert.match(progression,/gold:'Ouro'/);assert.match(progression,/platinum:'Platina'/);});
 
-test('P57 permanece publicado e preservado após releases futuros',()=>{
- assert.match(release,/APP_VERSION='v1\.4\.57'/);
- assert.match(version,/releaseP(?:57|5[8-9]|[6-9]\d)/);
- assert.ok(notifications.includes('P57_RELEASE')||notifications.includes("require('../lib/releaseP57')"));
- assert.match(notifications,/P56_RELEASE/);
-});
+test('P57 permanece como proveniência publicada e P75 é a release corrente',()=>{assert.match(release,/APP_VERSION='v1\.4\.57'/);assert.match(version,/releaseP75/);assert.match(notifications,/releaseP75/);assert.ok(notifications.includes('P57_RELEASE')||notifications.includes("require('../lib/releaseP57')"));assert.match(notifications,/P56_RELEASE/);});

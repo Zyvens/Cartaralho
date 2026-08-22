@@ -1,0 +1,16 @@
+/* Owner visual canônico da posição final das Asas cosméticas, refinamento P36.
+   As transformações P35 foram supersedidas por esta geometria de base/laterais. */
+.avatar-frame.frame-cosmetic-asas{position:relative!important;isolation:isolate!important;overflow:visible!important}
+.avatar-frame.frame-cosmetic-asas::before,
+.avatar-frame.frame-cosmetic-asas::after{
+  position:absolute!important;
+  top:auto!important;
+  bottom:-10px!important;
+  z-index:40!important;
+  font-size:1.65em!important;
+  pointer-events:none!important;
+  transform-origin:center!important;
+}
+.avatar-frame.frame-cosmetic-asas::before{left:-10px!important;right:auto!important;transform:scaleX(-1) rotate(45deg)!important}
+.avatar-frame.frame-cosmetic-asas::after{right:-10px!important;left:auto!important;transform:rotate(45deg)!important}
+@media(max-width:620px){.avatar-frame.frame-cosmetic-asas::before{left:-8px!important}.avatar-frame.frame-cosmetic-asas::after{right:-8px!important}}

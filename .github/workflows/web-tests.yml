@@ -3,7 +3,7 @@ on:
   pull_request:
     paths: ['web/**','.github/workflows/web-tests.yml']
   push:
-    branches: [main]
+    branches: [main, 'refactor/**']
     paths: ['web/**','.github/workflows/web-tests.yml']
 permissions:
   contents: read
@@ -21,4 +21,14 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: npm ci
-      - run: npm test
+      - name: Run full contract suite
+        shell: bash
+        run: |
+          set -o pipefail
+          node --test --test-concurrency=1 tests/*.test.js 2>&1 | tee test-output.log
+      - name: Upload test output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-test-output
+          path: web/test-output.log

@@ -5,42 +5,57 @@ const fs=require('fs');
 const path=require('path');
 const root=path.join(__dirname,'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const js=read('public/js/p52.js');
-const p24=read('public/js/homeMenuP24.js');
-const p25=read('public/js/uiP25.js');
-const p27=read('public/js/homeMenuP27.js');
-const p50=read('public/js/p50.js');
+const shim=read('public/css/p52.css');
+const homeCss=read('public/css/homeHeaderLayoutCurrent.css');
+const missionCss=read('public/css/missionsCoinVisualCurrent.css');
+const history=read('public/js/p52.js');
+const missions=read('public/js/domains/missionsUI.js');
+const nav=read('public/js/domains/navigationUI.js');
+const account=read('public/js/domains/accountUI.js');
+const admin=read('public/js/domains/adminUI.js');
 const presence=read('lib/presence.js');
+const cards=read('public/js/domains/cardsLibrary.js');
 const index=read('public/index.html');
+const version=read('api/version.js');
 
-test('P52 continua compilando e preserva as recompensas',()=>{
- assert.doesNotThrow(()=>new Function(js));
- assert.ok(js.includes('p52-mission-coin-pill'));
- assert.ok(js.includes('mission-xp-pill'));
+test('P52 mantém apenas owners visuais ainda efetivos',()=>{
+ assert.ok(homeCss.includes('.home-subtitle'));
+ assert.ok(homeCss.includes('.home-logo'));
+ assert.ok(missionCss.includes('.p52-mission-coin-pill'));
+ assert.ok(shim.includes('homeHeaderLayoutCurrent.css'));
+ assert.ok(shim.includes('missionsCoinVisualCurrent.css'));
 });
 
-test('um único observer continua dono da ordem atual',()=>{
- assert.ok(!p24.includes('new MutationObserver'));
- assert.ok(!p25.includes('new MutationObserver'));
- assert.ok(!p50.includes('new MutationObserver'));
- assert.ok(p27.includes('mainObserver?.disconnect()'));
- for(const src of[p24,p25,p27,p50]){
-  const n=src.indexOf('#notifications-menu-btn');
-  const h=src.indexOf('[data-panel="history"]');
-  assert.ok(n>=0&&h>n);
- }
+test('ordem visual histórica de P52 foi supersedida pelo único owner navigationUI',()=>{
+ assert.ok(!shim.includes('marketplace-menu-btn'));
+ assert.ok(!homeCss.includes('notifications-menu-btn'));
+ const n=nav.indexOf('#notifications-menu-btn');
+ const h=nav.indexOf('[data-panel="history"]');
+ assert.ok(n>=0&&h>n);
+ assert.ok(nav.includes('mainObserver=null'));
+ assert.ok(nav.includes('mainObserver=new MutationObserver'));
+ assert.ok(nav.includes('mainObserver?.disconnect()'));
 });
 
-test('fundo dinâmico continua sendo destruído ao sair da Home',()=>{
- assert.ok(js.includes('stopDynamicBackground'));
- assert.ok(js.includes('clearInterval(this.bgInterval)'));
- assert.ok(js.includes('__p52BgGeneration'));
+test('layout antigo de Missões e entrada p48 de criação não são recanonizados',()=>{
+ assert.ok(missions.includes('p52-mission-coin-pill'));
+ assert.ok(missions.includes('mission-xp-pill'));
+ assert.doesNotMatch(shim,/\.mission-row\s*\{/);
+ assert.doesNotMatch(shim,/\.p48-create-card-entry\s*\{/);
+ assert.ok(cards.includes('p54-create-card-entry p56-create-card-entry p57-create-card-entry'));
 });
 
-test('retorno à Home continua reutilizando sessão',()=>{
- assert.ok(js.includes('if(this.user&&this.token)return this.user'));
- assert.ok(js.includes('CartP49?.ensureBalanceSlot'));
- assert.ok(js.includes('CartP37?.ensureAdminButton'));
+test('navigationUI preserva lifecycle seguro do fundo dinâmico',()=>{
+ assert.ok(nav.includes('HomeScreen.stopDynamicBackground=function'));
+ assert.ok(nav.includes('clearInterval(this.bgInterval)'));
+ assert.ok(nav.includes('__domainBgGeneration'));
+ assert.ok(nav.includes("window.addEventListener('pagehide'"));
+});
+
+test('atalhos da Home agora são responsabilidade de accountUI e adminUI',()=>{
+ assert.ok(account.includes('HomeScreen.renderAccount=function'));
+ assert.ok(account.includes('CartMarketplaceDomain?.mountBalance'));
+ assert.ok(admin.includes('CartAdminDomain'));
 });
 
 test('presença continua tolerando corrida de DDL',()=>{
@@ -49,9 +64,11 @@ test('presença continua tolerando corrida de DDL',()=>{
  assert.ok(presence.includes('ready=null'));
 });
 
-test('assets P52 continuam presentes após P53',()=>{
+test('P52 é histórico não executável, shim visual, e P77 permanece corrente',()=>{
+ assert.doesNotThrow(()=>new Function(history));
  assert.ok(index.includes('css/p52.css?v=1.4.52'));
- assert.ok(index.includes('js/p52.js?v=1.4.52'));
- assert.ok(index.includes('css/p53.css?v=1.4.53'));
- assert.ok(index.includes('js/p53.js?v=1.4.53'));
+ assert.ok(index.includes('type="application/x-cartaralho-legacy" src="js/p52.js?v=1.4.52"'));
+ assert.ok(!index.includes('<script src="js/p52.js'));
+ assert.ok(shim.startsWith('/* COMPAT P52'));
+ assert.ok(version.includes('releaseP77'));
 });

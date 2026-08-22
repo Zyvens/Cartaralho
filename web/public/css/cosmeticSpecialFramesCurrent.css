@@ -1,0 +1,28 @@
+/* Owner visual canônico dos cosméticos especiais ainda vigentes de P33.
+   Asas não pertencem a esta folha: sua geometria final é P36. */
+.avatar-frame.frame-cosmetic-fita-isolante{
+  padding:5px!important;
+  background:repeating-linear-gradient(135deg,#facc15 0 12px,#111214 12px 24px)!important;
+  box-shadow:0 0 0 2px #090a0b,0 0 0 4px #facc15,0 8px 20px rgba(0,0,0,.46)!important;
+}
+@property --p33-cintilante-hue{
+  syntax:'<angle>';
+  inherits:false;
+  initial-value:0deg;
+}
+.avatar-frame.frame-cosmetic-cintilante img{
+  --p33-cintilante-hue:0deg;
+  filter:saturate(1.5) hue-rotate(var(--p33-cintilante-hue))!important;
+  animation:p33CintilantePhotoRGB 5.4s linear infinite!important;
+  will-change:filter;
+}
+@keyframes p33CintilantePhotoRGB{
+  from{--p33-cintilante-hue:0deg}
+  to{--p33-cintilante-hue:360deg}
+}
+@media(prefers-reduced-motion:reduce){
+  .avatar-frame.frame-cosmetic-cintilante img{
+    animation:none!important;
+    --p33-cintilante-hue:210deg;
+  }
+}

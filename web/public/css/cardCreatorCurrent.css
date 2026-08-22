@@ -1,0 +1,26 @@
+/* Owner visual canônico do criador de cartas dentro de Minhas Cartas. */
+.p58-library-creator{max-width:760px!important;margin:0 auto!important;padding:4px 0 18px!important}
+.p58-library-creator-head{margin:4px 0 18px;text-align:center}
+.p58-library-creator-head small{display:block;color:var(--text-muted);font-size:.65rem;font-weight:900;letter-spacing:.14em}
+.p58-library-creator-head h2{margin:4px 0 6px;font-size:clamp(1.45rem,3vw,2rem)}
+.p58-library-creator-head p{margin:0 auto;max-width:620px;color:var(--text-muted);font-size:.8rem;line-height:1.5}
+.p58-card-type-tabs{margin:0 0 18px!important}
+.p58-clean-stack-grid{margin-bottom:20px!important}
+.p58-creator-workspace{display:grid;gap:12px;margin-top:4px}
+.p58-creator-workspace .creation-instruction{margin:0!important;text-align:center!important}
+.p58-creator-workspace .creation-input-row{margin:0!important}
+.p58-creator-workspace .input-group{margin:0!important}
+.p58-buy-clean{padding:14px!important;margin:2px 0!important}
+.p58-buy-clean small{display:block;margin:4px 0 10px;color:var(--text-muted)}
+.p58-creator-note{display:block;text-align:center;color:var(--text-muted);font-size:.7rem;line-height:1.45}
+.p58-back-library{margin-top:10px!important}
+.p58-clean-fallback{min-height:120px;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px;display:grid;align-content:center;gap:6px;background:rgba(255,255,255,.025)}
+.p58-clean-fallback.white{background:#f5f5f0;color:#17171b}.p58-clean-fallback.black{background:#0d0d15;color:#fff}.p58-clean-fallback b{font-size:2rem}
+@media(max-width:620px){
+ .p58-library-creator{padding-bottom:12px!important}
+ .p58-library-creator-head{margin-bottom:14px}
+ .p58-card-type-tabs{margin-bottom:14px!important}
+ .p58-clean-stack-grid{margin-bottom:16px!important}
+ .p58-creator-workspace .creation-input-row{display:grid!important;grid-template-columns:1fr!important;gap:9px!important}
+ .p58-creator-workspace .creation-input-row .btn{width:100%!important}
+}

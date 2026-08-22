@@ -16,6 +16,5 @@
   async claim(){if(this.busy)return;this.busy=true;this.render();try{const r=await req('/api/loot',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'claim',matchId:this.current.matchId,claimId:claimId(),cardIds:[...this.selected]})});const n=(r.granted||[]).length,skipped=(r.skippedAlreadyOwned||[]).length;Toast.success(n?`${n} carta${n===1?'':'s'} adicionada${n===1?'':'s'} ao seu portfólio.`:'Espólio encerrado.');if(skipped)Toast.info(`${skipped} carta${skipped===1?' já estava':'s já estavam'} no seu portfólio e não foi duplicada.`);this.close();document.getElementById('loot-gameover-box')?.remove();setTimeout(()=>this.injectHome(),50);}catch(e){Toast.error(e.message);}finally{this.busy=false;if(this.overlay)this.render();}}
  };
  window.LootUI=LootUI;
- if(window.HomeScreen){const old=HomeScreen.renderAccount;HomeScreen.renderAccount=function(...a){const r=old.apply(this,a);setTimeout(()=>LootUI.injectHome(),180);return r;};}
- if(window.GameOverScreen){const old=GameOverScreen.render;GameOverScreen.render=function(container,data={}){const r=old.call(this,container,data);const matchId=data.matchId||App.state.roomCode;setTimeout(()=>LootUI.attachGameOver(matchId),80);return r;};}
+ window.CartLootFoundation={LootUI};
 })();

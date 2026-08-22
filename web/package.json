@@ -4,7 +4,7 @@
   "private": true,
   "description": "Cartaralho — online build (Vercel + Neon Postgres + Pusher)",
   "scripts": {
-    "test": "node --test tests/*.test.js"
+    "test": "node --test --test-concurrency=1 tests/*.test.js"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",

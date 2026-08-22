@@ -1,8 +1,8 @@
 'use strict';
 const{withErrors,ok,fail,getBody}=require('../../lib/http');
-const admin=require('../../lib/creatorAdminP37');
+const admin=require('../../lib/creatorAdmin');
 const{broadcastGlobal}=require('../../lib/pusherServer');
-const{notifyBalanceUpdated}=require('../../lib/balanceRealtimeP63');
+const{notifyBalanceUpdated}=require('../../lib/balanceRealtime');
 
 function scopeOf(v){return String(v||'global')==='individual'?'individual':'global';}
 function targetIds(scope,user){return scope==='individual'?[Number(user.id)]:null;}
@@ -30,7 +30,6 @@ module.exports=withErrors(async(req,res)=>{
   if(scope==='individual'){balance=await admin.creditIndividual(target.id,amount,operationId,message);credited=1;}
   else credited=await admin.creditAll(amount,operationId,message);
 
-  /* O saldo é sincronizado a partir da transação confirmada, independente do megafone. */
   const balanceEventId=await notifyBalanceUpdated({
    userIds:targetIds(scope,target),
    balance:scope==='individual'?balance:null,
