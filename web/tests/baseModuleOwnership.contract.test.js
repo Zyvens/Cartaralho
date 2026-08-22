@@ -51,11 +51,15 @@ test('missionLayoutSafe foi supersedido e missão canônica preserva moedas XP e
  assert.match(missions,/p10-mission-buff/);
 });
 
-test('minimum player grace mantém UI sem listeners e gameplay owns os bindings uma vez',()=>{
- assert.match(grace,/const MinimumPlayersGrace=/);
- assert.match(grace,/remainingSeconds\|\|60/);
- assert.match(grace,/setInterval\(\(\)=>this\.tick\(\),250\)/);
+test('minimum player grace foi absorvido integralmente pelo gameplay owner',()=>{
+ assert.match(grace,/status:'SUPERSEDED'/);
+ assert.doesNotMatch(grace,/const MinimumPlayersGrace=/);
+ assert.doesNotMatch(grace,/setInterval\(/);
  assert.doesNotMatch(grace,/SocketClient\.on\(/);
+ assert.match(gameplay,/const MinimumPlayersGrace=/);
+ assert.match(gameplay,/remainingSeconds\|\|60/);
+ assert.match(gameplay,/setInterval\(\(\)=>this\.tick\(\),250\)/);
+ assert.match(gameplay,/window\.MinimumPlayersGrace=MinimumPlayersGrace/);
  for(const event of ['insufficient_players_started','insufficient_players_cancelled','minimum_players_sync'])assert.match(gameplay,new RegExp(`SocketClient\\.on\\('${event}'`));
  for(const event of ['game_over','room_closed','room_cancelled'])assert.match(gameplay,new RegExp(`'${event}'`));
  assert.match(gameplay,/__domainMinimumPlayersGrace/);
