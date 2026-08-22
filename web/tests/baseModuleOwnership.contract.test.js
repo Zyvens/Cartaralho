@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const canonical=read('public/js/canonicalCardBadge.js'),progression=read('public/js/cardProgressionUI.js'),rewards=read('public/js/domains/rewardsUI.js'),stats=read('public/js/domains/statsUI.js'),cards=read('public/js/domains/cardsLibrary.js');
+const canonical=read('public/js/canonicalCardBadge.js'),progression=read('public/js/cardProgressionUI.js'),rewards=read('public/js/domains/rewardsUI.js'),stats=read('public/js/domains/statsUI.js'),cards=read('public/js/domains/cardsLibrary.js'),credits=read('public/js/creditsPolish.js'),polish=read('public/js/domains/uiPolishUI.js');
 
 test('canonicalCardBadge é owner apenas da autoria original',()=>{
  assert.match(canonical,/CARTA ORIGINAL/);
@@ -31,4 +31,12 @@ test('Meu Legado sobrevive sobre o renderer final de Estatísticas',()=>{
  assert.match(progression,/my-card-legacy/);
  assert.match(progression,/\/api\/profile\/legacy/);
  assert.match(progression,/SocketClient\.on\('round_result',celebrateOriginalPlay\)/);
+});
+
+test('creditsPolish não é mais writer e UI polish preserva o resultado',()=>{
+ assert.match(credits,/status:'SUPERSEDED'/);
+ assert.doesNotMatch(credits,/addEventListener\('click'/);
+ assert.match(polish,/ensureCreditsProducedBy/);
+ assert.match(polish,/Produzido por:/);
+ assert.match(polish,/\[data-panel=\\"credits\\"\]/);
 });
