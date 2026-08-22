@@ -3,6 +3,7 @@
  if(window.CartSocialFoundationDomain)return;
  CartDomains.claim('socialFoundationUI','domains/socialFoundationUI.js',()=>{
   const esc=v=>{const d=document.createElement('div');d.textContent=String(v??'');return d.innerHTML;};
+  function ensureHomeButton(){if(!AuthClient?.user)return null;const actions=document.querySelector('.profile-actions');if(!actions)return null;let button=document.getElementById('friends-menu-btn');if(!button){button=document.createElement('button');button.id='friends-menu-btn';button.type='button';button.className='btn btn-secondary';const credits=actions.querySelector('[data-panel="credits"]');actions.insertBefore(button,credits||null);}button.dataset.panel='friends';if(!button.querySelector('.home-action-copy'))button.textContent='🤝 Amigos de merda';button.onclick=()=>HomeScreen.openPanel('friends');return button;}
   const SocialUI={
    async render(host,tab='friends'){
     host.innerHTML=`<div class="social-tabs"><button class="social-tab ${tab==='friends'?'active':''}" data-social-tab="friends">👥 Amigos</button><button class="social-tab ${tab==='groups'?'active':''}" data-social-tab="groups">🫂 Turmas</button></div><div id="social-content" class="social-content"><div class="app-panel-loading"><span></span><b>Carregando...</b></div></div>`;
@@ -28,7 +29,6 @@
     root.querySelectorAll('[data-group-id]').forEach(x=>x.onclick=async()=>{const host=window.AppPanelModal?.host||root;await MetaUI.renderFriendGroup(host,x.dataset.groupId);window.AppPanelModal?.normalize?.();});
    }
   };
-  window.SocialUI=SocialUI;
-  window.CartSocialFoundationDomain={SocialUI};
+  window.SocialUI=SocialUI;window.CartSocialFoundationDomain={SocialUI,ensureHomeButton};
  });
 })();
