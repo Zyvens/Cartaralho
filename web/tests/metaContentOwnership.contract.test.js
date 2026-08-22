@@ -22,7 +22,8 @@ test('detalhe de Turma tem owner separado e volta à foundation social',()=>{
  assert.match(social,/MetaUI\.renderFriendGroup\(host/);
 });
 
-test('owners de conteúdo carregam depois de meta e antes do uso interativo',()=>{
- const meta=index.indexOf('js/meta.js'),historyPos=index.indexOf('js/domains/historyUI.js'),groupsPos=index.indexOf('js/domains/socialGroupsUI.js');
- assert.ok(meta>0&&historyPos>meta&&groupsPos>meta);
+test('owners de conteúdo carregam depois da base Meta e antes do uso interativo',()=>{
+ const metaBase=index.indexOf('js/metaUIBase.js'),historyPos=index.indexOf('js/domains/historyUI.js'),groupsPos=index.indexOf('js/domains/socialGroupsUI.js');
+ assert.ok(metaBase>0&&historyPos>metaBase&&groupsPos>metaBase);
+ assert.ok(index.includes('type="application/x-cartaralho-legacy" src="js/meta.js"'));
 });
