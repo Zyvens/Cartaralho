@@ -6,36 +6,36 @@
 
 ## Estado atual da extração
 
-Duas responsabilidades já possuem owners executáveis carregados após `app.js` e **antes de `DOMContentLoaded`**:
+Quatro responsabilidades já possuem owners executáveis carregados após `app.js` e **antes de `DOMContentLoaded`**:
 
 1. **App State** — `public/js/core/appState.js` é o owner runtime de estado inicial + reset;
-2. **Base Screen Router** — `public/js/core/screenRouter.js` é o owner runtime da transição/cleanup das telas e é capturado depois por `navigationUI`.
+2. **Base Screen Router** — `public/js/core/screenRouter.js` é o owner runtime da transição/cleanup das telas e é capturado depois por `navigationUI`;
+3. **Local Turn Flow** — `public/js/core/localTurnFlow.js` é o owner runtime da fila local/blind screen/passagem ao Czar;
+4. **App Bootstrap** — `public/js/core/appBootstrap.js` é o owner runtime da ordem `SocketClient.init → registerSocketEvents → guest detection → primeira tela`.
 
-Os equivalentes físicos ainda presentes em `app.js` permanecem apenas como fallback de compatibilidade durante a migração. Como os owners core são avaliados antes de `App.init()`, eles são substituídos antes do primeiro uso observável do bootstrap. A remoção física desses blocos do monólito deve ocorrer quando as demais responsabilidades forem separadas, evitando um rewrite grande e arriscado no mesmo passo.
+Os equivalentes físicos ainda presentes em `app.js` permanecem apenas como fallback de compatibilidade durante a migração. Como os owners core são avaliados antes de `App.init()` ser chamado no `DOMContentLoaded`, eles são substituídos antes do primeiro uso observável do bootstrap. A remoção física desses blocos do monólito deve ocorrer depois da extração dos sockets, evitando um rewrite grande e arriscado em paralelo.
 
-## Responsabilidades ainda executáveis no controller
+## Responsabilidade runtime ainda no controller
 
-`public/js/app.js` continua concentrando:
+`public/js/app.js` continua sendo o owner do **lifecycle de rede** em `registerSocketEvents()`.
 
-1. **bootstrap** em `init()` + `DOMContentLoaded`;
-2. **lifecycle de rede** em `registerSocketEvents()`;
-3. **fluxo local** em `handleLocalNextTurn()`.
+Estado/reset, roteador-base, fluxo local e bootstrap já têm owners runtime externos. `navigationUI` continua sendo o writer final da navegação.
 
-`App.state/resetState` e o roteador-base já têm owners runtime externos. `navigationUI` continua sendo o writer final da navegação.
-
-## Ordem de bootstrap que deve sobreviver
+## Ordem de bootstrap preservada
 
 1. scripts de tela/componentes são avaliados;
 2. `app.js` declara `window.App` e agenda o `DOMContentLoaded`;
 3. `core/appState.js` instala estado/reset canônicos;
 4. `core/screenRouter.js` instala o roteador-base canônico;
-5. demais módulos/owners são avaliados;
-6. `DOMContentLoaded` chama `App.init()`;
-7. `SocketClient.init()` executa antes do registro dos listeners;
-8. `registerSocketEvents()` registra o lifecycle da sala/partida;
-9. o modo guest/localtunnel é detectado;
-10. a primeira tela é escolhida;
-11. `navigationUI`, já avaliado antes do evento, captura o roteador-base e permanece writer final de `App.showScreen`.
+5. `core/localTurnFlow.js` instala o fluxo local;
+6. `core/appBootstrap.js` instala `App.init()` canônico;
+7. demais módulos/owners são avaliados;
+8. `DOMContentLoaded` chama `App.init()`;
+9. `SocketClient.init()` executa antes do registro dos listeners;
+10. `registerSocketEvents()` registra o lifecycle da sala/partida;
+11. o modo guest/localtunnel é detectado;
+12. a primeira tela é escolhida;
+13. `navigationUI` captura o roteador-base e permanece writer final de `App.showScreen`.
 
 Trocar essa ordem pode perder eventos iniciais, quebrar guest mode ou fazer owners capturarem uma função incompleta.
 
@@ -52,22 +52,31 @@ Trocar essa ordem pode perder eventos iniciais, quebrar guest mode ou fazer owne
 
 ## Roteador-base
 
-`core/screenRouter.js` preserva as telas:
-
-- Home
-- Waiting Host
-- Guest
-- Criar Sala
-- Lobby
-- Server Dashboard
-- Criação de Cartas
-- Rodada
-- Host/Mestre
-- Resultado
-- Game Over
-- Admin
+`core/screenRouter.js` preserva Home, Waiting Host, Guest, Criar Sala, Lobby, Server Dashboard, Criação de Cartas, Rodada, Host/Mestre, Resultado, Game Over e Admin.
 
 Antes de sair de Resultado, `ResultScreen.cleanup()` executa. Antes de sair de Waiting Host, `WaitingHostScreen.cleanup()` executa. As classes `screen-exit`/`screen-enter` e timings **300 ms / 400 ms** foram preservados. `navigationUI` captura este roteador e continua sendo o único writer final de `App.showScreen` entre owners.
+
+## Fluxo local
+
+`core/localTurnFlow.js` mantém:
+
+- descoberta do Czar a partir de `localPlayersData`;
+- fila dos jogadores não-host;
+- `SocketClient.setActiveLocalPlayer()` antes de cada turno;
+- blind screen `Vez de:` antes de abrir `round`;
+- blind screen `Vez do Czar:` antes de abrir `host`;
+- nenhuma inscrição de socket própria, evitando duplicação de listeners.
+
+## Bootstrap
+
+`core/appBootstrap.js` mantém exatamente:
+
+1. `SocketClient.init()`;
+2. `app.registerSocketEvents()`;
+3. detecção `cartaralho-*.loca.lt` e `guestCode`;
+4. escolha entre `guest`, `waitingHost` e `home`.
+
+O listener `DOMContentLoaded` continua físico em `app.js`, porém chama o `App.init()` já substituído pelo owner canônico.
 
 ## Eventos de socket ainda registrados pelo controller
 
@@ -116,12 +125,13 @@ Antes de sair de Resultado, `ResultScreen.cleanup()` executa. Antes de sair de W
 
 1. **Room Socket Lifecycle** — sala/presença/preparação, provando inscrição única por evento;
 2. **Gameplay Socket Lifecycle** — rodada/resultado/game over, preservando ordem de mutação;
-3. **Local Turn Flow** — `handleLocalNextTurn()` separado sem alterar blind screens;
-4. **Bootstrap mínimo** — `App.init()` apenas compõe peças e escolhe a primeira tela;
-5. somente então remover fisicamente os fallbacks de state/router do `app.js`.
+3. criar um único compositor `registerSocketEvents()` que chama os dois módulos exatamente uma vez;
+4. somente após contratos/preview verdes remover fisicamente os fallbacks de state/router/local/bootstrap e os listeners antigos do `app.js`.
 
 Nenhuma etapa deve duplicar listeners. Migração de socket só é aceita quando o contrato prova uma única inscrição por evento e a ordem de mutação continua idêntica.
 
 ## Evidência
 
-`tests/appLifecycle.contract.test.js` agora prova explicitamente os owners `core/appState.js` e `core/screenRouter.js`, sua ordem de carregamento e a permanência dos eventos de socket no controller até a próxima extração.
+`tests/appLifecycle.contract.test.js` prova explicitamente `core/appState.js`, `core/screenRouter.js`, `core/localTurnFlow.js`, `core/appBootstrap.js`, sua ordem de carregamento e a permanência temporária dos eventos de socket no controller até a próxima extração.
+
+Os commits de implementação e contratos desses quatro owners chegaram a preview Vercel **READY**.
