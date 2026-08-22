@@ -13,7 +13,7 @@ const historicalContracts=[
 ];
 
 test('README de revisões declara P01-P12 em ordem causal e como migrations aditivas',()=>{
- for(let n=1;n<=12;n++)assert.match(revisions,new RegExp(`P${String(n).padStart(2,'0')}:`),`P${n}`);
+ let previous=-1;for(let n=1;n<=12;n++){const tag=`P${String(n).padStart(2,'0')}`,at=revisions.indexOf(tag);assert.ok(at>previous,`${tag} ausente ou fora de ordem`);previous=at;}
  assert.match(revisions,/scripts são aditivos\/idempotentes/);
  assert.match(revisions,/preservam cartas e estatísticas existentes/);
 });
