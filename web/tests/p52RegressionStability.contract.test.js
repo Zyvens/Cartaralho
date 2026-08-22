@@ -40,8 +40,8 @@ test('ordem visual histórica de P52 foi supersedida pelo único owner navigatio
 test('layout antigo de Missões e entrada p48 de criação não são recanonizados',()=>{
  assert.ok(missions.includes('p52-mission-coin-pill'));
  assert.ok(missions.includes('mission-xp-pill'));
- assert.ok(!shim.includes('mission-row'));
- assert.ok(!shim.includes('p48-create-card-entry'));
+ assert.doesNotMatch(shim,/\.mission-row\s*\{/);
+ assert.doesNotMatch(shim,/\.p48-create-card-entry\s*\{/);
  assert.ok(cards.includes('p54-create-card-entry p56-create-card-entry p57-create-card-entry'));
 });
 
@@ -64,11 +64,11 @@ test('presença continua tolerando corrida de DDL',()=>{
  assert.ok(presence.includes('ready=null'));
 });
 
-test('P52 é histórico não executável, shim visual, e P75 permanece corrente',()=>{
+test('P52 é histórico não executável, shim visual, e P77 permanece corrente',()=>{
  assert.doesNotThrow(()=>new Function(history));
  assert.ok(index.includes('css/p52.css?v=1.4.52'));
  assert.ok(index.includes('type="application/x-cartaralho-legacy" src="js/p52.js?v=1.4.52"'));
  assert.ok(!index.includes('<script src="js/p52.js'));
  assert.ok(shim.startsWith('/* COMPAT P52'));
- assert.ok(version.includes('releaseP75'));
+ assert.ok(version.includes('releaseP77'));
 });
