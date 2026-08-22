@@ -41,7 +41,7 @@
   return slot;
  }
  function patchHome(){
-  if(!window.HomeScreen||HomeScreen.__p65ImmediateWallet)return;
+  if(typeof HomeScreen==='undefined'||HomeScreen.__p65ImmediateWallet)return;
   HomeScreen.__p65ImmediateWallet=true;
   const base=HomeScreen.renderAccount.bind(HomeScreen);
   HomeScreen.renderAccount=function(...args){const out=base(...args);canonicalizeBalance();return out;};
