@@ -63,5 +63,8 @@ jobs:
           shopt -s nullglob
           files=(tests/[u-z]*.test.js)
           if ((${#files[@]})); then node --test "${files[@]}"; fi
+      - name: Diagnose full suite serial
+        continue-on-error: true
+        run: node --test --test-concurrency=1 tests/*.test.js
       - name: Canonical npm test
         run: npm test
