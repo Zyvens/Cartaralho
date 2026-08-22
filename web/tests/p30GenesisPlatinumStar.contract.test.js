@@ -1,11 +1,11 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const owner=read('public/js/domains/genesisFrameUI.js'),css=read('public/css/genesisAtomicCurrent.css'),base=read('public/css/genesisFrameBaseCurrent.css'),p17=read('public/css/p17.css'),index=read('public/index.html'),notifications=read('lib/appNotifications.js'),version=read('api/version.js');
+const owner=read('public/js/domains/genesisFrameUI.js'),css=read('public/css/genesisAtomicCurrent.css'),base=read('public/css/genesisFrameBaseCurrent.css'),progression=read('public/css/progressionFramesCurrent.css'),index=read('public/index.html'),notifications=read('lib/appNotifications.js'),version=read('api/version.js');
 
 test('Gênese usa a mesma estrela visual da progressão Platina',()=>{
- assert.match(p17,/frame-platinum::after[\s\S]*content:'✦'/);
- assert.match(p17,/frame-platinum\{--p17-spark:#dffcff;--p17-glow:rgba\(139,234,255,\.98\)\}/);
+ assert.match(progression,/frame-platinum::after[\s\S]*content:'✦'/);
+ assert.match(progression,/frame-platinum\{--p17-spark:#dffcff;--p17-glow:rgba\(139,234,255,\.98\)\}/);
  assert.ok(owner.includes("STAR='✦'"));
  assert.ok(owner.includes('particle.textContent=STAR'));
  assert.ok(css.includes('color:#dffcff'));
@@ -33,11 +33,11 @@ test('foto e arco Celestial permanecem independentes da estrela orbital',()=>{
  assert.ok(css.includes('genese-atom-track'));
 });
 
-test('P30 permanece registrado; runtime usa owner canônico e P75 é corrente',()=>{
+test('P30 permanece registrado; runtime usa owner canônico e P77 é corrente',()=>{
  assert.ok(index.includes('css/p29.css?v=1.4.31'));
  assert.ok(index.includes('js/domains/genesisFrameUI.js?v=domain-2'));
  assert.ok(notifications.includes('release:p30'));
  assert.ok(notifications.includes("version:'v1.4.30'"));
  assert.ok(notifications.includes('Estrela orbital da Gênese'));
- assert.ok(version.includes('releaseP75'));
+ assert.ok(version.includes('releaseP77'));
 });
