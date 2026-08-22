@@ -1,17 +1,18 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const app=read('public/js/app.js'),state=read('public/js/core/appState.js'),router=read('public/js/core/screenRouter.js'),nav=read('public/js/domains/navigationUI.js'),gameplay=read('public/js/domains/gameplayUI.js'),index=read('public/index.html');
+const app=read('public/js/app.js'),state=read('public/js/core/appState.js'),router=read('public/js/core/screenRouter.js'),local=read('public/js/core/localTurnFlow.js'),nav=read('public/js/domains/navigationUI.js'),gameplay=read('public/js/domains/gameplayUI.js'),index=read('public/index.html');
 
 const screens=['home','waitingHost','guest','createRoom','lobby','serverDash','cardCreation','round','host','result','gameOver','admin'];
 const socketEvents=['room_created','room_joined','room_closed','player_list_update','cards_submitted','all_cards_ready','game_started','new_round','card_played','all_cards_played','round_result','game_over','error','player_disconnected','player_left','round_skipped','room_cancelled','player_abandoned','player_reconnected','server_status_update'];
 
-test('owners core de estado e roteamento compilam e entram antes do bootstrap observável',()=>{
- assert.doesNotThrow(()=>new Function(state));assert.doesNotThrow(()=>new Function(router));
+test('owners core de estado, roteamento e turno local compilam antes do bootstrap observável',()=>{
+ for(const src of[state,router,local])assert.doesNotThrow(()=>new Function(src));
  assert.match(state,/window\.CartAppState=\{initial,reset,install\}/);
  assert.match(router,/window\.CartScreenRouter=\{render,cleanup,show,install\}/);
- const appPos=index.indexOf('js/app.js'),statePos=index.indexOf('js/core/appState.js'),routerPos=index.indexOf('js/core/screenRouter.js'),navPos=index.indexOf('js/domains/navigationUI.js');
- assert.ok(appPos>=0&&statePos>appPos&&routerPos>statePos&&navPos>routerPos,'app.js → appState → screenRouter → navigationUI');
+ assert.match(local,/window\.CartLocalTurnFlow=\{next,install\}/);
+ const appPos=index.indexOf('js/app.js'),statePos=index.indexOf('js/core/appState.js'),routerPos=index.indexOf('js/core/screenRouter.js'),localPos=index.indexOf('js/core/localTurnFlow.js'),navPos=index.indexOf('js/domains/navigationUI.js');
+ assert.ok(appPos>=0&&statePos>appPos&&routerPos>statePos&&localPos>routerPos&&navPos>localPos,'app.js → appState → screenRouter → localTurnFlow → navigationUI');
 });
 
 test('bootstrap inicializa socket, registra eventos uma vez e só então escolhe a primeira tela',()=>{
@@ -41,6 +42,18 @@ test('screenRouter é o owner do roteador-base, mantendo telas, cleanup e timing
  assert.match(router,/setTimeout\(\(\)=>\{[\s\S]*app\.innerHTML=''[\s\S]*\},300\)/);
  assert.match(router,/setTimeout\(\(\)=>app\.classList\.remove\('screen-enter'\),400\)/);
  assert.match(router,/app\.showScreen=function\(name,data=\{\}\)/);
+});
+
+test('localTurnFlow preserva fila, blind screen e passagem ao Czar sem tocar em socket lifecycle',()=>{
+ assert.match(local,/state\.players\.map\(p=>p\.nickname\)/);
+ assert.match(local,/state\.localTurnQueue=nonHosts/);assert.match(local,/state\.localHostNick=hostNick/);
+ assert.match(local,/SocketClient\.setActiveLocalPlayer\(nextNick\)/);
+ assert.match(local,/Vez de: \$\{nextNick\}/);assert.match(local,/Começar/);
+ assert.match(local,/showScreen\('round'/);
+ assert.match(local,/SocketClient\.setActiveLocalPlayer\(state\.localHostNick\)/);
+ assert.match(local,/Vez do Czar: \$\{state\.localHostNick\}/);assert.match(local,/Ver Cartas Jogadas/);
+ assert.match(local,/showScreen\('host'/);
+ assert.doesNotMatch(local,/SocketClient\.on\(/);
 });
 
 test('socket lifecycle ainda registra no controller o conjunto canônico de eventos críticos',()=>{
