@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const professional=read('public/js/professionalUI.js'),meta=read('public/js/meta.js'),registration=read('public/js/domains/registrationUI.js'),panel=read('public/js/domains/appPanelUI.js'),socialBase=read('public/js/domains/socialFoundationUI.js'),homePresentation=read('public/js/domains/homePresentationUI.js'),cards=read('public/js/domains/cardsLibrary.js'),stats=read('public/js/domains/statsUI.js'),rank=read('public/js/domains/rankUI.js'),nav=read('public/js/domains/navigationUI.js'),social=read('public/js/domains/socialUI.js'),account=read('public/js/domains/accountUI.js'),identity=read('public/js/domains/identityUI.js'),missions=read('public/js/domains/missionsUI.js'),profile=read('public/js/domains/profileUI.js');
+const professional=read('public/js/professionalUI.js'),metaClient=read('public/js/metaClient.js'),meta=read('public/js/meta.js'),registration=read('public/js/domains/registrationUI.js'),panel=read('public/js/domains/appPanelUI.js'),socialBase=read('public/js/domains/socialFoundationUI.js'),homePresentation=read('public/js/domains/homePresentationUI.js'),cards=read('public/js/domains/cardsLibrary.js'),stats=read('public/js/domains/statsUI.js'),rank=read('public/js/domains/rankUI.js'),nav=read('public/js/domains/navigationUI.js'),social=read('public/js/domains/socialUI.js'),account=read('public/js/domains/accountUI.js'),identity=read('public/js/domains/identityUI.js'),missions=read('public/js/domains/missionsUI.js'),profile=read('public/js/domains/profileUI.js');
 
 test('professionalUI foi retirado do runtime ownership',()=>{
  assert.match(professional,/status:'SUPERSEDED'/);
@@ -22,8 +22,13 @@ test('professionalUI mantém apenas delegates compatíveis sem reassumir ownersh
  assert.match(professional,/renderCards\(\.\.\.args\).*CartCardsLibrary/s);
 });
 
-test('meta mantém APIs únicas que precisam ser extraídas antes da remoção',()=>{
- assert.match(meta,/const MetaClient=/);
+test('MetaClient saiu do monólito preservando binding lexical',()=>{
+ assert.match(metaClient,/^'use strict';\nconst MetaClient=/);
+ assert.doesNotMatch(meta,/const MetaClient=/);
+ assert.match(meta,/MetaClient\.metagame\(\)/);
+});
+
+test('meta ainda mantém features únicas que precisam ser extraídas antes da remoção',()=>{
  for(const token of ['openSpectator(code)','renderSpectator(s)','exitSpectator()','updateReactionDock(name)','showReaction(d)','addRoomShare()'])assert.ok(meta.includes(token),token);
  assert.match(meta,/SocketClient\.subscribeRoom=async code/);
 });
