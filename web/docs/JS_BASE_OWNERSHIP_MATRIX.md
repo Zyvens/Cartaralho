@@ -35,9 +35,9 @@ A branch contém `main@P77` em sua ancestralidade e preserva primeiro paint da c
 | `metaFixes.js` | `CURRENT BRIDGE` | owner `publicProfileUI`; Perfil Público sem listener global e sem duplicação de título/moldura |
 | `rewardPreviewUI.js` | `CURRENT FOUNDATION` | estimativa econômica autoritativa |
 | `roomRulesUI.js` | `CURRENT FOUNDATION` | regras/sumário/editor da sala |
-| `achievementUI.js` | `CURRENT FOUNDATION` | base de Badges/Achievements; domain normaliza resultado |
+| `achievementUI.js` | `SUPERSEDED` | Badges/royalties/refresh → `domains/achievementsUI.js`; missão permanece em `missionsUI/profileUI` |
 | `notificationsUI.js` | `SUPERSEDED` | shell/modal/badge/leitura → `domains/notificationsUI.js` |
-| `marketplaceUI.js` | `CURRENT FOUNDATION` | shell do Mercado; `domains/marketplaceUI` owns wallet/realtime/transações |
+| `marketplaceUI.js` | `CURRENT FOUNDATION` | shell do Mercado; `domains/marketplaceUI` owns wallet/realtime/transações; botão da Home agora é montado por `accountUI` sem observer global |
 | `marketplaceShop.js` | `CURRENT FOUNDATION` | catálogo/compra idempotente |
 | `marketplaceInventory.js` | `CURRENT FOUNDATION` | inventário BUFFs/cartas de packs |
 | `marketplaceLedger.js` | `CURRENT FOUNDATION` | Extrato/histórico de compras |
@@ -86,6 +86,8 @@ A branch contém `main@P77` em sua ancestralidade e preserva primeiro paint da c
 - **Perfil Público:** `metaFixes.js` é bridge explícita de `publicProfileUI`; título não duplica e o X fecha o AppPanel corretamente.
 - **Gameplay / mínimo de jogadores:** overlay, 60s, tick de 250ms, retomada e listeners pertencem integralmente a `gameplayUI`; base antiga é marker.
 - **Central de Notificações:** botão, badge, fetch, modal, spoilers e não-lidas pertencem integralmente ao domain; leitura só é confirmada no fechamento.
+- **Achievements:** Badges, royalties, unlock notifications, som e refresh pós-jogo pertencem ao domain final; o patch P10 antigo de `missionCard` não foi recanonizado porque Missões já têm owner próprio.
+- **Mercado/Home:** removido `MutationObserver` global usado apenas para o botão do Mercado; `accountUI` agora garante essa entrada junto da Home autenticada, sem tocar compra, saldo, realtime ou reciclagem.
 - **Rank:** `rankUI` é renderer completo e não depende mais de `MetaUI.renderRank.bind`.
 - **Identidade:** catálogo-base + títulos posteriores pertencem a `identityUI`; observer de títulos saiu do monólito.
 - **Reactions:** binding de canal pertence a `metaLifecycleUI`; apresentação/dock a `reactionsUI`.
