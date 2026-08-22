@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const fixes=read('public/js/metaFixes.js'),identity=read('public/js/domains/identityUI.js'),roomLifecycle=read('public/js/core/roomSocketLifecycle.js'),preview=read('public/js/rewardPreviewUI.js'),roomRules=read('public/js/roomRulesUI.js'),rewards=read('public/js/domains/rewardsUI.js'),room=read('public/js/domains/roomUI.js'),loot=read('public/js/lootUI.js'),account=read('public/js/domains/accountUI.js');
+const fixes=read('public/js/metaFixes.js'),identity=read('public/js/domains/identityUI.js'),roomLifecycle=read('public/js/core/roomSocketLifecycle.js'),preview=read('public/js/rewardPreviewUI.js'),roomRules=read('public/js/roomRulesUI.js'),rewards=read('public/js/domains/rewardsUI.js'),room=read('public/js/domains/roomUI.js'),loot=read('public/js/lootUI.js'),account=read('public/js/domains/accountUI.js'),finalReward=read('public/js/finalRewardUI.js');
 
 test('metaFixes é o único writer do Perfil Público; identity apenas fornece decoração',()=>{
  assert.match(fixes,/async function render\(panel,userId\)/);
@@ -36,4 +36,17 @@ test('LootUI é foundation de Espólio sem reassumir renderers globais',()=>{
  assert.match(rewards,/function installLootGameOver/);
  assert.match(rewards,/LootUI\?\.attachGameOver\?\.\(matchId\)/);
  assert.match(rewards,/GameOverScreen\.__domainLoot/);
+});
+
+test('FinalRewardUI é foundation do Saqueador e rewardsUI owns inicialização e handoff para Espólio',()=>{
+ assert.match(finalReward,/window\.CartFinalRewardFoundation=\{FinalRewardUI\}/);
+ assert.match(finalReward,/_initialized:false/);
+ assert.match(finalReward,/if\(this\._initialized\)return false/);
+ assert.doesNotMatch(finalReward,/FinalRewardUI\.init\(\);/);
+ assert.doesNotMatch(finalReward,/LootUI\?\.attachGameOver/);
+ assert.match(finalReward,/CartRewardsDomain\?\.onFinalRewardSettled/);
+ assert.match(rewards,/function installFinalReward/);
+ assert.match(rewards,/FinalRewardUI\.__domainOwned=true/);
+ assert.match(rewards,/FinalRewardUI\.init\(\)/);
+ assert.match(rewards,/function onFinalRewardSettled\(code\)/);
 });
