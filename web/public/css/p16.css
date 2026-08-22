@@ -1,31 +1,6 @@
-/* Cartaralho P16 — prontidão explícita, Reciclagem e BUFF cards. */
-
-/* Lobby: editar cartas e declarar prontidão são ações diferentes. */
-.lobby-actions{display:grid!important;gap:8px!important}
-.lobby-card-menu{display:grid;gap:6px}
-.lobby-card-menu>small{display:block;padding:0 4px;color:var(--text-muted);font-size:.7rem;line-height:1.4}
-.lobby-ready-btn{border:1px solid rgba(34,197,94,.25)!important;background:rgba(34,197,94,.08)!important;color:#d5f7df!important;font-weight:900!important;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease}
-.lobby-ready-btn:hover{background:rgba(34,197,94,.14)!important;border-color:rgba(34,197,94,.4)!important}
-.lobby-ready-btn.is-ready{background:linear-gradient(135deg,#15803d,#22c55e)!important;border-color:#4ade80!important;color:#fff!important;box-shadow:0 8px 24px rgba(34,197,94,.2)}
-.lobby-ready-btn.is-ready span{margin-left:5px}
-.card-editor-hint{color:var(--text-muted);font-size:.9rem;line-height:1.55}.card-editor-hint strong{color:#d8d3e6;font-weight:700}.card-editor-save{margin-top:var(--space-xl)}
-
-/* Reciclagem: coleção descartável em lotes claros e auditáveis. */
-.recycling-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;margin-bottom:13px;padding:18px;border:1px solid rgba(34,197,94,.17);border-radius:17px;background:linear-gradient(135deg,rgba(21,128,61,.12),rgba(12,12,20,.78))}
-.recycling-hero small{color:#86efac;font-size:.65rem;font-weight:900;letter-spacing:.12em}.recycling-hero h3{margin:4px 0 5px;font-size:1.2rem}.recycling-hero p{margin:0;color:var(--text-muted);font-size:.78rem;line-height:1.48;max-width:600px}
-.recycling-rate{min-width:180px;padding:11px 13px;border-radius:13px;border:1px solid rgba(250,204,21,.18);background:rgba(250,204,21,.06)}.recycling-rate small,.recycling-rate span{display:block}.recycling-rate small{color:#facc15}.recycling-rate b{display:block;margin:3px 0;color:#fff;font-size:1rem}.recycling-rate span{color:var(--text-muted);font-size:.66rem}
-.recycling-warning{margin-bottom:13px;padding:10px 12px;border-left:3px solid #f59e0b;border-radius:8px;background:rgba(245,158,11,.055);color:#bbb3a3;font-size:.72rem;line-height:1.45}
-.recycling-toolbar{position:sticky;top:-18px;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;padding:11px 12px;border:1px solid rgba(255,255,255,.08);border-radius:13px;background:rgba(15,14,22,.95);backdrop-filter:blur(12px)}.recycling-toolbar b,.recycling-toolbar small{display:block}.recycling-toolbar small{margin-top:2px;color:var(--text-muted);font-size:.68rem}.recycling-toolbar .btn{white-space:nowrap}
-.recycling-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.recycling-card{position:relative;min-height:112px;padding:13px 38px 13px 13px;text-align:left;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.03);color:#fff;cursor:pointer;transition:border-color .16s ease,background .16s ease,transform .16s ease}.recycling-card:hover{transform:translateY(-1px);border-color:rgba(167,139,250,.27)}.recycling-card.is-selected{border-color:rgba(34,197,94,.55);background:rgba(34,197,94,.08);box-shadow:inset 0 0 0 1px rgba(34,197,94,.12)}.recycling-card>small{display:block;color:var(--text-muted);font-size:.61rem;font-weight:800;letter-spacing:.04em}.recycling-card>b{display:block;margin:7px 0 6px;font-size:.82rem;line-height:1.35}.recycling-card>span:not(.recycling-check){display:block;color:#8e879d;font-size:.65rem}.recycling-check{position:absolute;right:11px;top:11px;display:grid!important;place-items:center;width:22px;height:22px;border:1px solid rgba(255,255,255,.13);border-radius:7px;background:rgba(255,255,255,.035);color:#fff}.recycling-card.is-selected .recycling-check{border-color:#4ade80;background:#16a34a}.recycling-empty{grid-column:1/-1}
-
-/* BUFF: pills -> título/descrição -> preço. Ícone ocupa somente a coluna lateral. */
-.market-buff-product{min-height:205px!important;gap:8px!important}
-.market-buff-main{display:grid!important;grid-template-columns:minmax(0,1fr) 48px;gap:12px;align-items:start;flex:1;margin-top:2px!important}
-.market-buff-copy{min-width:0}
-.market-buff-product .market-buff-copy h4{display:block!important;min-height:0!important;margin:0!important;padding:0!important;font-size:.96rem!important;line-height:1.25!important}
-.market-buff-product .market-buff-copy p{margin:6px 0 0!important;padding:0!important;color:var(--text-muted)!important;font-size:.72rem!important;line-height:1.42!important}
-.market-buff-main .market-buff-icon{align-self:start!important;margin:0!important;width:48px!important;height:48px!important}
-.market-buff-product>.market-price{margin-top:4px!important}
-
-@media(max-width:620px){.recycling-hero{grid-template-columns:1fr}.recycling-rate{min-width:0}.recycling-toolbar{top:-13px;align-items:stretch;flex-direction:column}.recycling-toolbar .btn{width:100%}.recycling-grid{grid-template-columns:1fr}}
-@media(max-width:390px){.market-buff-main{grid-template-columns:minmax(0,1fr) 44px;gap:9px}.market-buff-main .market-buff-icon{width:44px!important;height:44px!important}}
+/* P16 — shim histórico.
+   CURRENT: prontidão explícita, base da Reciclagem e apresentação de BUFFs.
+   Refinamentos de Reciclagem posteriores continuam em P28/P41/P53/P58. */
+@import url('./lobbyReadinessCurrent.css');
+@import url('./recyclingBaseCurrent.css');
+@import url('./buffCardPresentationCurrent.css');
