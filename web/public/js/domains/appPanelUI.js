@@ -29,7 +29,7 @@
   };
   window.AppPanelModal=AppPanelModal;
   const baseOpen=HomeScreen.openPanel.bind(HomeScreen);
-  HomeScreen.openPanel=async kind=>PANEL_META[kind]?AppPanelModal.open(kind):baseOpen(kind);
+  HomeScreen.openPanel=async kind=>kind==='profile'?ProfileModal.open('profile'):PANEL_META[kind]?AppPanelModal.open(kind):baseOpen(kind);
   window.CartAppPanelDomain={AppPanelModal,PANEL_META};
  });
 })();
