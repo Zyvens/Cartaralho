@@ -36,9 +36,9 @@ test('P71 mantém cache-bust dos módulos estruturais não reabertos depois dele
  assert.ok(index.includes('js/p61.js?v=1.4.75'));
 });
 
-test('P71 permanece no histórico após P76',()=>{
+test('P71 permanece no histórico após P77',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.71'/);
- assert.match(version,/releaseP76/);
+ assert.match(version,/releaseP77/);
  assert.match(notifications,/releaseP72/);
  assert.match(notifications,/P71_RELEASE/);
  assert.match(notifications,/P69_RELEASE/);
