@@ -19,7 +19,9 @@ test('registro preserva campos, validações e recovery code',()=>{
  assert.match(registration,/HomeScreen\.renderAccount\(\)/);
 });
 
-test('professionalUI fica como fallback físico e não é o writer final em runtime',()=>{
- assert.match(professional,/const RegistrationModal=/);
+test('professionalUI não contém mais implementação de registro',()=>{
+ assert.match(professional,/status:'SUPERSEDED'/);
+ assert.doesNotMatch(professional,/const RegistrationModal=/);
+ assert.doesNotMatch(professional,/HomeScreen\.register=/);
  assert.match(registration,/window\.RegistrationModal=RegistrationModal/);
 });
