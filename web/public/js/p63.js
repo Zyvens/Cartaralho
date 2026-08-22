@@ -69,7 +69,7 @@
 
  /* Também atualiza pelo retorno da própria transação, sem esperar realtime. */
  function patchRequest(){
-  if(!window.AuthClient||AuthClient.__p63BalanceResponses)return;
+  if(typeof AuthClient==='undefined'||AuthClient.__p63BalanceResponses)return;
   AuthClient.__p63BalanceResponses=true;
   const base=AuthClient.request.bind(AuthClient);
   AuthClient.request=async function(path,options={}){

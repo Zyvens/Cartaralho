@@ -4,6 +4,9 @@
  const VERSION='v1.4.73';
  const money=v=>Number(v||0).toLocaleString('pt-BR');
  const strip=()=>document.querySelector('.home-account-bar,.account-strip');
+ const authClient=()=>typeof AuthClient!=='undefined'?AuthClient:window.AuthClient;
+ const homeScreen=()=>typeof HomeScreen!=='undefined'?HomeScreen:window.HomeScreen;
+ const professionalUI=()=>typeof ProfessionalUI!=='undefined'?ProfessionalUI:window.ProfessionalUI;
 
  function ensureAction(button,kind){
   if(!button)return;
@@ -33,7 +36,7 @@
  }
 
  function fallbackBalance(explicit){
-  const root=strip(),user=window.AuthClient?.user;if(!root||!user)return null;
+  const root=strip(),user=authClient()?.user;if(!root||!user)return null;
   let slot=root.querySelector('.home-account-balance,.p49-balance-slot,[aria-label*="Moedas Sujas"]');
   if(!slot){slot=document.createElement('div');root.insertBefore(slot,root.querySelector('.p56-account-actions,#profile-shortcut')||null);}
   root.querySelectorAll('.home-account-balance,.p49-balance-slot,[aria-label*="Moedas Sujas"]').forEach(x=>{if(x!==slot)x.remove();});
@@ -49,29 +52,29 @@
  }
 
  function reconcileBalance(explicit){
-  if(!window.AuthClient?.user)return null;
+  if(!authClient()?.user)return null;
   if(window.CartP65?.canonicalizeBalance)return CartP65.canonicalizeBalance(explicit);
   return fallbackBalance(explicit);
  }
 
  function reconcile(explicit){
-  if(!window.AuthClient?.user)return;
+  if(!authClient()?.user)return;
   reconcileActions();
   reconcileBalance(explicit);
  }
 
  function patchProfessionalUI(){
-  if(!window.ProfessionalUI||ProfessionalUI.__p73AccountStrip)return;
-  ProfessionalUI.__p73AccountStrip=true;
-  const base=ProfessionalUI.polishHome.bind(ProfessionalUI);
-  ProfessionalUI.polishHome=function(...args){const out=base(...args);reconcile();return out;};
+  const ui=professionalUI();if(!ui||ui.__p73AccountStrip)return;
+  ui.__p73AccountStrip=true;
+  const base=ui.polishHome.bind(ui);
+  ui.polishHome=function(...args){const out=base(...args);reconcile();return out;};
  }
 
  function patchHome(){
-  if(!window.HomeScreen||HomeScreen.__p73AccountStrip)return;
-  HomeScreen.__p73AccountStrip=true;
-  const base=HomeScreen.renderAccount.bind(HomeScreen);
-  HomeScreen.renderAccount=function(...args){
+  const home=homeScreen();if(!home||home.__p73AccountStrip)return;
+  home.__p73AccountStrip=true;
+  const base=home.renderAccount.bind(home);
+  home.renderAccount=function(...args){
    const out=base(...args);
    // First paint uses /api/auth/me's dirty_balance (or the local last-known value).
    // No wallet request is required before the slot exists.

@@ -15,20 +15,20 @@ test('Perfil e Sair deixam de herdar o marcador mobile legado que escondia seus 
 
 test('carteira é reconciliada no render síncrono e após o decorator profissional, sem esperar outra chamada HTTP',()=>{
  assert.match(js,/CartP65\?\.canonicalizeBalance/);
- assert.match(js,/AuthClient\?\.user/);
+ assert.match(js,/typeof AuthClient!==['"]undefined['"]\?AuthClient:window\.AuthClient/);
  assert.match(js,/dirty_balance/);
- assert.match(js,/HomeScreen\.renderAccount=function/);
- assert.match(js,/ProfessionalUI\.polishHome=function/);
+ assert.match(js,/home\.renderAccount=function/);
+ assert.match(js,/ui\.polishHome=function/);
  assert.match(js,/reconcile\(\);[\s\S]*queueMicrotask\(\(\)=>reconcile\(\)\);[\s\S]*requestAnimationFrame\(\(\)=>reconcile\(\)/);
  assert.doesNotMatch(js,/fetch\(|\/api\/wallet\/balance/);
  assert.match(js,/cartaralho:balance-updated/);
 });
 
-test('P73 permanece carregado no histórico depois do P76',()=>{
+test('P73 permanece no histórico e recebe cache-bust do P77',()=>{
  assert.ok(index.includes('css/p73.css?v=1.4.73'));
- assert.ok(index.includes('js/p73.js?v=1.4.73'));
+ assert.ok(index.includes('js/p73.js?v=1.4.77'));
  assert.match(release,/APP_VERSION='v1\.4\.73'/);
- assert.match(version,/releaseP76/);
+ assert.match(version,/releaseP77/);
  assert.match(notifications,/releaseP74/);
  assert.match(notifications,/P73_RELEASE/);
 });

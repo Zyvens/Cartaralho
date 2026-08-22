@@ -1,8 +1,12 @@
 'use strict';
 (()=>{
  if(window.CartP74)return;
- const VERSION='v1.4.74',GLOBAL_CHANNEL='cartaralho-global';
+ const VERSION='v1.4.77',GLOBAL_CHANNEL='cartaralho-global';
  const money=v=>Number(v||0).toLocaleString('pt-BR');
+ const authClient=()=>typeof AuthClient!=='undefined'?AuthClient:window.AuthClient;
+ const socketClient=()=>typeof SocketClient!=='undefined'?SocketClient:window.SocketClient;
+ const homeScreen=()=>typeof HomeScreen!=='undefined'?HomeScreen:window.HomeScreen;
+ const professionalUI=()=>typeof ProfessionalUI!=='undefined'?ProfessionalUI:window.ProfessionalUI;
  let refreshTimer=null,realtimeBound=false,observer=null,ensureQueued=false,pendingExplicit=null;
 
  function accountStrip(){
@@ -14,19 +18,19 @@
  function knownBalance(explicit){
   const direct=Number(explicit);
   if(explicit!==null&&explicit!==undefined&&explicit!==''&&Number.isFinite(direct))return direct;
-  const user=window.AuthClient?.user,fromUser=Number(user?.dirty_balance);
+  const user=authClient()?.user,fromUser=Number(user?.dirty_balance);
   if(user?.dirty_balance!==null&&user?.dirty_balance!==undefined&&user?.dirty_balance!==''&&Number.isFinite(fromUser))return fromUser;
   if(!user)return null;
   try{const raw=localStorage.getItem(`cartaralho_dirty_balance_${user.id||user.username}`);if(raw!==null&&Number.isFinite(Number(raw)))return Number(raw);}catch(_){ }
   return null;
  }
  function cacheBalance(v){
-  const user=window.AuthClient?.user;if(!user||!Number.isFinite(Number(v)))return;
+  const user=authClient()?.user;if(!user||!Number.isFinite(Number(v)))return;
   user.dirty_balance=Number(v);
   try{localStorage.setItem(`cartaralho_dirty_balance_${user.id||user.username}`,String(Number(v)));}catch(_){ }
  }
  function ensureBalance(explicit=null){
-  const root=accountStrip(),user=window.AuthClient?.user;if(!root||!user)return null;
+  const root=accountStrip(),user=authClient()?.user;if(!root||!user)return null;
   const actions=root.querySelector('.p56-account-actions');
   const anchor=actions||root.querySelector('#profile-shortcut,#logout-btn');
   let slot=root.querySelector('.p74-wallet-slot,.home-account-balance,.p49-balance-slot,[aria-label*="Moedas Sujas"]');
@@ -54,11 +58,11 @@
   queueMicrotask(()=>{ensureQueued=false;const value=pendingExplicit;pendingExplicit=null;ensureBalance(value);});
  }
  function syncAuthoritative(source='p74-wallet-sync'){
-  if(!window.AuthClient?.user)return Promise.resolve(null);
+  const auth=authClient();if(!auth?.user)return Promise.resolve(null);
   if(window.CartP64?.refreshBalance)return Promise.resolve(CartP64.refreshBalance(source)).then(v=>{if(v!==null&&v!==undefined)ensureBalance(v);return v;});
   if(window.CartP63?.fetchAuthoritativeBalance)return Promise.resolve(CartP63.fetchAuthoritativeBalance(source)).then(v=>{if(v!==null&&v!==undefined)ensureBalance(v);return v;});
   if(window.CartP61?.syncDirtyBalance)return Promise.resolve(CartP61.syncDirtyBalance()).then(v=>{if(v!==null&&v!==undefined)ensureBalance(v);return v;});
-  return AuthClient.request(`/api/profile/wallet?_fresh=${Date.now()}`).then(d=>{const v=Number(d?.dirtyBalance);if(Number.isFinite(v)){ensureBalance(v);return v;}return null;}).catch(()=>null);
+  return auth.request(`/api/profile/wallet?_fresh=${Date.now()}`).then(d=>{const v=Number(d?.dirtyBalance);if(Number.isFinite(v)){ensureBalance(v);return v;}return null;}).catch(()=>null);
  }
  function scheduleAuthoritative(source='p74-wallet-sync',delay=0){
   if(refreshTimer)clearTimeout(refreshTimer);
@@ -66,7 +70,7 @@
  }
  function forCurrentUser(data={}){
   const ids=Array.isArray(data.targetUserIds)?data.targetUserIds.map(Number):null;
-  return !ids?.length||ids.includes(Number(AuthClient?.user?.id));
+  return !ids?.length||ids.includes(Number(authClient()?.user?.id));
  }
  function onBalanceRealtime(data={}){
   if(!forCurrentUser(data))return;
@@ -81,9 +85,9 @@
   scheduleAuthoritative('p74-admin-reward',0);
  }
  async function bindRealtime(){
-  if(realtimeBound||!window.SocketClient)return;
+  const socket=socketClient();if(realtimeBound||!socket)return;
   try{
-   await SocketClient._waitReady();const channel=SocketClient.pusher?.subscribe(GLOBAL_CHANNEL);if(!channel)return;
+   await socket._waitReady();const channel=socket.pusher?.subscribe(GLOBAL_CHANNEL);if(!channel)return;
    if(channel.__p74WalletPlacement){realtimeBound=true;return;}
    channel.__p74WalletPlacement=true;realtimeBound=true;
    channel.bind('balance_updated',onBalanceRealtime);
@@ -91,16 +95,16 @@
   }catch(_){realtimeBound=false;}
  }
  function patchHome(){
-  if(!window.HomeScreen||HomeScreen.__p74WalletPlacement)return;
-  HomeScreen.__p74WalletPlacement=true;
-  const base=HomeScreen.renderAccount.bind(HomeScreen);
-  HomeScreen.renderAccount=function(...args){const out=base(...args);ensureBalance();queueMicrotask(()=>ensureBalance());requestAnimationFrame(()=>ensureBalance());return out;};
+  const home=homeScreen();if(!home||home.__p74WalletPlacement)return;
+  home.__p74WalletPlacement=true;
+  const base=home.renderAccount.bind(home);
+  home.renderAccount=function(...args){const out=base(...args);ensureBalance();queueMicrotask(()=>ensureBalance());requestAnimationFrame(()=>ensureBalance());return out;};
  }
  function patchProfessionalUI(){
-  if(!window.ProfessionalUI||ProfessionalUI.__p74WalletPlacement)return;
-  ProfessionalUI.__p74WalletPlacement=true;
-  const base=ProfessionalUI.polishHome.bind(ProfessionalUI);
-  ProfessionalUI.polishHome=function(...args){const out=base(...args);ensureBalance();return out;};
+  const ui=professionalUI();if(!ui||ui.__p74WalletPlacement)return;
+  ui.__p74WalletPlacement=true;
+  const base=ui.polishHome.bind(ui);
+  ui.polishHome=function(...args){const out=base(...args);ensureBalance();return out;};
  }
  function observeAccount(){
   if(observer)return;

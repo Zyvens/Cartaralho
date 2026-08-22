@@ -10,6 +10,7 @@ test('raiz P49 usa o saldo já autenticado no primeiro paint',()=>{
  assert.match(p49,/function knownBalance\(\)/);
  assert.match(p49,/AuthClient\?\.user\?\.dirty_balance/);
  assert.match(p49,/setBalance\(value,\{loading:false\}\)/);
+ assert.match(p49,/typeof HomeScreen!==['"]undefined['"]/);
 });
 
 test('P49 não usa mais o inventário de Cartas Limpas para descobrir um único saldo',()=>{
@@ -43,11 +44,12 @@ test('P74 fica responsável por posição e não cria fetch extra no render da H
  assert.doesNotMatch(patch[0],/scheduleAuthoritative|syncAuthoritative/);
 });
 
-test('P75 permanece preservado após o reforço estrutural P76',()=>{
- for(const asset of ['js/p49.js','js/p61.js','js/p63.js','js/p64.js'])assert.ok(index.includes(`${asset}?v=1.4.75`),asset);
- assert.ok(index.includes('js/p74.js?v=1.4.76'));
+test('P75 permanece preservado enquanto P77 reabre somente os owners de lifecycle',()=>{
+ assert.ok(index.includes('js/p61.js?v=1.4.75'));
+ assert.ok(index.includes('js/p64.js?v=1.4.75'));
+ for(const asset of ['js/p49.js','js/p63.js','js/p65.js','js/p73.js','js/p74.js'])assert.ok(index.includes(`${asset}?v=1.4.77`),asset);
  assert.match(release,/APP_VERSION='v1\.4\.75'/);
- assert.match(version,/releaseP76/);
+ assert.match(version,/releaseP77/);
  assert.match(notifications,/P75_RELEASE/);
  assert.match(notifications,/P74_RELEASE/);
 });

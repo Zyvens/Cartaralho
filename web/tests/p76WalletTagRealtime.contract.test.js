@@ -32,10 +32,10 @@ test('recompensa global sem saldo único confirma pelo endpoint leve da carteira
  assert.match(p74,/\/api\/profile\/wallet\?_fresh=/);
 });
 
-test('P76 é a versão atual e força carregamento dos assets corrigidos',()=>{
+test('P76 permanece no histórico quando P77 assume a versão atual',()=>{
  assert.match(release,/APP_VERSION='v1\.4\.76'/);
- assert.match(version,/releaseP76/);
- assert.match(notifications,/P75_RELEASE/);
- assert.ok(index.includes('css/p74.css?v=1.4.76'));
- assert.ok(index.includes('js/p74.js?v=1.4.76'));
+ assert.match(version,/releaseP77/);
+ assert.match(notifications,/P76_RELEASE/);
+ assert.ok(index.includes('css/p74.css?v=1.4.77'));
+ assert.ok(index.includes('js/p74.js?v=1.4.77'));
 });
