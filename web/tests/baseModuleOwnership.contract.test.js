@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const canonical=read('public/js/canonicalCardBadge.js'),progression=read('public/js/cardProgressionUI.js'),rewards=read('public/js/domains/rewardsUI.js'),stats=read('public/js/domains/statsUI.js'),cards=read('public/js/domains/cardsLibrary.js'),credits=read('public/js/creditsPolish.js'),polish=read('public/js/domains/uiPolishUI.js');
+const canonical=read('public/js/canonicalCardBadge.js'),progression=read('public/js/cardProgressionUI.js'),rewards=read('public/js/domains/rewardsUI.js'),stats=read('public/js/domains/statsUI.js'),cards=read('public/js/domains/cardsLibrary.js'),credits=read('public/js/creditsPolish.js'),polish=read('public/js/domains/uiPolishUI.js'),missionLegacy=read('public/js/missionLayoutSafe.js'),missions=read('public/js/domains/missionsUI.js'),grace=read('public/js/minimumPlayersGrace.js'),gameplay=read('public/js/domains/gameplayUI.js');
 
 test('canonicalCardBadge é owner apenas da autoria original',()=>{
  assert.match(canonical,/CARTA ORIGINAL/);
@@ -39,4 +39,24 @@ test('creditsPolish não é mais writer e UI polish preserva o resultado',()=>{
  assert.match(polish,/ensureCreditsProducedBy/);
  assert.match(polish,/Produzido por:/);
  assert.match(polish,/\[data-panel=\\"credits\\"\]/);
+});
+
+test('missionLayoutSafe foi supersedido e missão canônica preserva moedas XP e BUFF',()=>{
+ assert.match(missionLegacy,/status:'SUPERSEDED'/);
+ assert.doesNotMatch(missionLegacy,/MetaUI\.missionRow\s*=/);
+ assert.doesNotMatch(missionLegacy,/ProfileModal\.missionCard\s*=/);
+ assert.match(missions,/p52-mission-coin-pill/);
+ assert.match(missions,/mission-xp-pill/);
+ assert.match(missions,/buffReward/);
+ assert.match(missions,/p10-mission-buff/);
+});
+
+test('minimum player grace mantém UI sem listeners e gameplay owns os bindings uma vez',()=>{
+ assert.match(grace,/const MinimumPlayersGrace=/);
+ assert.match(grace,/remainingSeconds\|\|60/);
+ assert.match(grace,/setInterval\(\(\)=>this\.tick\(\),250\)/);
+ assert.doesNotMatch(grace,/SocketClient\.on\(/);
+ for(const event of ['insufficient_players_started','insufficient_players_cancelled','minimum_players_sync'])assert.match(gameplay,new RegExp(`SocketClient\\.on\\('${event}'`));
+ for(const event of ['game_over','room_closed','room_cancelled'])assert.match(gameplay,new RegExp(`'${event}'`));
+ assert.match(gameplay,/__domainMinimumPlayersGrace/);
 });
