@@ -74,7 +74,8 @@ jobs:
           async function mock(page){
             await page.addInitScript(()=>localStorage.setItem('cartaralho_auth_token','visual-token'));
             await page.route('**/api/**',async route=>{const u=new URL(route.request().url()),p=u.pathname;let body={success:true};
-              if(p==='/api/auth/me')body={user};
+              if(p==='/api/config')body={success:true,pusherKey:'visual',pusherCluster:'mt1'};
+              else if(p==='/api/auth/me')body={user};
               else if(p==='/api/profile/wallet')body={dirtyBalance:1234};
               else if(p==='/api/profile/metagame')body=metagame;
               else if(p==='/api/profile/missions')body={missions:[]};
