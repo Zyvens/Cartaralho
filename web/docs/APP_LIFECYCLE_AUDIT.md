@@ -4,37 +4,55 @@
 > Baseline: **P75 / v1.4.75**  
 > Objetivo: decompor o controller sem alterar ordem de inicialização, estado, navegação ou semântica de eventos.
 
-## Responsabilidades atuais
+## Estado atual da extração
 
-`public/js/app.js` ainda acumula quatro papéis:
+Duas responsabilidades já possuem owners executáveis carregados após `app.js` e **antes de `DOMContentLoaded`**:
 
-1. **estado de sessão/partida** em `App.state` e `resetState()`;
-2. **bootstrap** em `init()` + `DOMContentLoaded`;
-3. **roteador-base** em `showScreen()`;
-4. **lifecycle de rede** em `registerSocketEvents()`, além do fluxo local em `handleLocalNextTurn()`.
+1. **App State** — `public/js/core/appState.js` é o owner runtime de estado inicial + reset;
+2. **Base Screen Router** — `public/js/core/screenRouter.js` é o owner runtime da transição/cleanup das telas e é capturado depois por `navigationUI`.
 
-O arquivo não é mais o writer final de navegação: `domains/navigationUI.js` captura o `App.showScreen` base e instala o interceptador canônico após o carregamento do `app.js`.
+Os equivalentes físicos ainda presentes em `app.js` permanecem apenas como fallback de compatibilidade durante a migração. Como os owners core são avaliados antes de `App.init()`, eles são substituídos antes do primeiro uso observável do bootstrap. A remoção física desses blocos do monólito deve ocorrer quando as demais responsabilidades forem separadas, evitando um rewrite grande e arriscado no mesmo passo.
+
+## Responsabilidades ainda executáveis no controller
+
+`public/js/app.js` continua concentrando:
+
+1. **bootstrap** em `init()` + `DOMContentLoaded`;
+2. **lifecycle de rede** em `registerSocketEvents()`;
+3. **fluxo local** em `handleLocalNextTurn()`.
+
+`App.state/resetState` e o roteador-base já têm owners runtime externos. `navigationUI` continua sendo o writer final da navegação.
 
 ## Ordem de bootstrap que deve sobreviver
 
-1. `DOMContentLoaded` chama `App.init()`.
-2. `SocketClient.init()` executa antes do registro dos listeners.
-3. `registerSocketEvents()` registra o lifecycle da sala/partida.
-4. o modo guest/localtunnel é detectado.
-5. a primeira tela é escolhida.
-6. posteriormente `navigationUI` captura o roteador-base e se torna o único writer final de `App.showScreen` entre owners.
+1. scripts de tela/componentes são avaliados;
+2. `app.js` declara `window.App` e agenda o `DOMContentLoaded`;
+3. `core/appState.js` instala estado/reset canônicos;
+4. `core/screenRouter.js` instala o roteador-base canônico;
+5. demais módulos/owners são avaliados;
+6. `DOMContentLoaded` chama `App.init()`;
+7. `SocketClient.init()` executa antes do registro dos listeners;
+8. `registerSocketEvents()` registra o lifecycle da sala/partida;
+9. o modo guest/localtunnel é detectado;
+10. a primeira tela é escolhida;
+11. `navigationUI`, já avaliado antes do evento, captura o roteador-base e permanece writer final de `App.showScreen`.
 
 Trocar essa ordem pode perder eventos iniciais, quebrar guest mode ou fazer owners capturarem uma função incompleta.
 
 ## Estado que não pode ser perdido
 
-O reset preserva `nickname` e limpa contexto de partida: código da sala, criador, jogadores, mão, Carta Preta, host, placar e rodada. `Scoreboard.hide()` também faz parte do reset observável.
+`core/appState.js` preserva o contrato histórico:
 
-Os rascunhos de `CardCreationScreen.blackCards/whiteCards` **não são limpos em `resetState()`** deliberadamente, para permitir recuperação após queda do host.
+- estado inicial inclui `playMode:'online'`, `isGuest:false` e `guestCode:''`;
+- reset preserva `nickname`;
+- reset limpa código da sala, criador, jogadores, mão, Carta Preta, host, placar e rodada;
+- reset restaura `useStandardDeck:true`;
+- `Scoreboard.hide()` continua parte do reset observável;
+- rascunhos de `CardCreationScreen.blackCards/whiteCards` **não são limpos**, deliberadamente, para recuperação após queda do host.
 
 ## Roteador-base
 
-Telas atualmente suportadas:
+`core/screenRouter.js` preserva as telas:
 
 - Home
 - Waiting Host
@@ -49,9 +67,9 @@ Telas atualmente suportadas:
 - Game Over
 - Admin
 
-Antes de sair de Resultado, `ResultScreen.cleanup()` precisa executar. Antes de sair de Waiting Host, `WaitingHostScreen.cleanup()` precisa executar. As classes `screen-exit`/`screen-enter` e seus timings são parte do comportamento visual atual até a futura consolidação CSS.
+Antes de sair de Resultado, `ResultScreen.cleanup()` executa. Antes de sair de Waiting Host, `WaitingHostScreen.cleanup()` executa. As classes `screen-exit`/`screen-enter` e timings **300 ms / 400 ms** foram preservados. `navigationUI` captura este roteador e continua sendo o único writer final de `App.showScreen` entre owners.
 
-## Eventos de socket canônicos registrados pelo controller
+## Eventos de socket ainda registrados pelo controller
 
 ### Sala / presença
 
@@ -87,25 +105,23 @@ Antes de sair de Resultado, `ResultScreen.cleanup()` precisa executar. Antes de 
 
 ## Invariantes de gameplay/lifecycle
 
-- `new_round` atualiza número, Carta Preta, placar, mão e papel de Host antes de navegar.
-- `all_cards_played` preserva `submissions` no estado para o modo local.
-- `round_result` limpa a fila local antes de abrir Resultado.
-- `game_over` esconde o placar antes de abrir Game Over.
-- queda/cancelamento de sala segue caminhos diferentes para localtunnel/emulador, guest remoto e cliente normal.
+- `new_round` atualiza número, Carta Preta, placar, mão e papel de Host antes de navegar;
+- `all_cards_played` preserva `submissions` no estado para modo local;
+- `round_result` limpa a fila local antes de abrir Resultado;
+- `game_over` esconde o placar antes de abrir Game Over;
+- queda/cancelamento de sala segue caminhos diferentes para localtunnel/emulador, guest remoto e cliente normal;
 - `player_abandoned` mantém modal + retorno automático ao início.
 
-## Estratégia de decomposição segura
+## Próxima decomposição segura
 
-A extração deve ocorrer em etapas e manter a API pública `window.App`:
+1. **Room Socket Lifecycle** — sala/presença/preparação, provando inscrição única por evento;
+2. **Gameplay Socket Lifecycle** — rodada/resultado/game over, preservando ordem de mutação;
+3. **Local Turn Flow** — `handleLocalNextTurn()` separado sem alterar blind screens;
+4. **Bootstrap mínimo** — `App.init()` apenas compõe peças e escolhe a primeira tela;
+5. somente então remover fisicamente os fallbacks de state/router do `app.js`.
 
-1. **App State** — factory de estado inicial + reset, sem tocar em socket.
-2. **Base Screen Router** — roteador puro/cleanup, carregado antes de `navigationUI`.
-3. **Room Socket Lifecycle** — sala/presença/preparação.
-4. **Gameplay Socket Lifecycle** — rodada/resultado/game over.
-5. **Bootstrap mínimo** — `App.init()` apenas compõe as peças e escolhe a primeira tela.
-
-Nenhuma etapa deve duplicar listeners. A migração de socket só é aceita quando o contrato prova uma única inscrição por evento e a ordem de mutação de estado continua idêntica.
+Nenhuma etapa deve duplicar listeners. Migração de socket só é aceita quando o contrato prova uma única inscrição por evento e a ordem de mutação continua idêntica.
 
 ## Evidência
 
-`tests/appLifecycle.contract.test.js` congela o contrato atual antes da primeira extração. Enquanto o `app.js` ainda contém as responsabilidades acima, esta auditoria **não aumenta sozinha o Gate 3**; o percentual só sobe quando responsabilidade executável sair efetivamente do monólito.
+`tests/appLifecycle.contract.test.js` agora prova explicitamente os owners `core/appState.js` e `core/screenRouter.js`, sua ordem de carregamento e a permanência dos eventos de socket no controller até a próxima extração.
