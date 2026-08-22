@@ -11,7 +11,38 @@
 3. regra comprovadamente substituída vira `SUPERSEDED` e **não** recebe owner novo;
 4. só no fechamento visual os shims podem sair do `index`, após comparação desktop/mobile.
 
-## Ondas migradas
+## Fundação histórica P14–P44
+
+| Trajetória | Resultado vigente | Owner(s) canônico(s) | Estado PXX |
+|---|---|---|---|
+| P14 | formulário-base de regras + molduras cosméticas-base ainda vigentes | `roomRulesCardBaseCurrent.css`, `cosmeticFramesBaseCurrent.css` | shim |
+| P15 | Resumo da partida + editor modal de regras + cards econômicos por colocação | `roomSummaryCurrent.css`, `roomRulesEditorCurrent.css`, `economyPlacementCurrent.css` | shim |
+| P16 | Pronto explícito + superfície-base da Reciclagem + apresentação de BUFFs | `lobbyReadinessCurrent.css`, `recyclingBaseCurrent.css`, `buffCardPresentationCurrent.css` | shim |
+| P17 | molduras de progressão + base animada dos cosméticos | `progressionFramesCurrent.css`, `animatedCosmeticFramesBaseCurrent.css` | shim |
+| P18 | contribuição/Mão de Vaca + grid-base de criação + raridade textual de BUFF + base da Central | `contributionCurrent.css`, `cardCreationLibraryBaseCurrent.css`, `buffRarityCurrent.css`, `notificationsBaseCurrent.css` | shim |
+| P19 | respostas duplas como uma unidade no gameplay | `doubleAnswerCurrent.css` | shim |
+| P20 | identidade pública + backdrop da Home + Player Showcase | `publicIdentityCurrent.css`, `homeBackdropCurrent.css`, `showcaseCurrent.css` | shim |
+| P21 | dashboard/configuração de sala + abas preto/branco + pilhas de Cartas Limpas | `roomSetupDashboardCurrent.css`, `cardTypeTabsCurrent.css`, `cleanCardStackCurrent.css` | shim |
+| P22 | contexto visual da estimativa + overrides semânticos da criação | `rewardEstimateCurrent.css`, `cardCreationSemanticOverridesCurrent.css` | shim |
+| P23 | único rodapé global de Salvar alterações do Perfil | `profileSaveFooterCurrent.css` | shim |
+| P26 | base/arco da Gênese | `genesisFrameBaseCurrent.css` | shim |
+| P27 | nenhuma regra vigente | — | `HISTORICAL` |
+| P28 | skeleton da Reciclagem; órbita Gênese intermediária substituída | `recyclingSkeletonCurrent.css` | shim |
+| P29→P31 | resultado final da Gênese com seis estrelas | `genesisAtomicCurrent.css` | P29 shim; P30/P31 trajetória absorvida |
+| P32 | layout de identidade pública em Lobby/placar | `publicPlayerIdentityLayoutCurrent.css` | shim |
+| P33 | Cintilante final + Fita Isolante Premium + identidade do Rank | `cosmeticSpecialFramesCurrent.css`, `rankIdentityCurrent.css` | shim |
+| P34 | nenhuma regra vigente | — | `HISTORICAL` |
+| P35 | spoilers da Central | `notificationsSpoilerCurrent.css` | shim |
+| P36 | scroll da Central + acordeões de sala + geometria final das Asas | `notificationsScrollCurrent.css`, `roomAccordionCurrent.css`, `cosmeticWingsCurrent.css` | shim |
+| P37 | reutilização/favoritos + Megafone + Ferramentas do Criador | `cardCreationReuseCurrent.css`, `adminMegaphoneCurrent.css`, `creatorAdminCurrent.css` | shim |
+| P38 | Admin apenas na Home real | owner JS `adminUI` | contrato atual; sem CSS funcional |
+| P39 | envelope genérico de Voltar + proteção mobile de toast | `backButtonEnvelopeCurrent.css`, `toastViewportCurrent.css` | shim |
+| P40 | identidade Home/Perfil/raridade já absorvida por owners de conta/perfil | owners `accountUI`/`profileUI` + CSS atuais | shim contratual |
+| P41 | identidade/confirm da Reciclagem + detalhe atual de carta | `recyclingCardIdentityCurrent.css`, `recyclingConfirmCurrent.css`, `cardDetailCurrent.css` | shim |
+| P42 | nenhuma regra vigente | — | `HISTORICAL` |
+| P44 | nenhuma regra vigente | — | `HISTORICAL` |
+
+## Ondas recentes migradas
 
 | Trajetória | Resultado vigente | Owner(s) canônico(s) | Estado PXX |
 |---|---|---|---|
@@ -39,6 +70,22 @@
 
 | Origem | Regra histórica | Substituição atual |
 |---|---|---|
+| P14 | layout de criação/recompensa/BUFF | P15/P16/P21/P22 + `roomUI` |
+| P14 | Cintilante/Arco-íris/Asas iniciais | P17/P33/P36 |
+| P15 | composição original dos quatro cards de criação | grid P21 + acordeões P36 |
+| P16 | refinamentos posteriores de Reciclagem | P28/P41/P53/P58 |
+| P17 | foto original do Cintilante sem hue-rotate | override final P33 |
+| P18 | `config-value` | P21 |
+| P18 | Gênese visual | P26→P31 |
+| P19 | pilhas de Cartas Limpas | P21/P22 |
+| P19 | savebar local de aparência | P23 + `profileUI` |
+| P23 | regras locais redundantes de Gênese | P26→P31 |
+| P27 | órbita Gênese intermediária | P29→P31 |
+| P28 | órbita de uma partícula Gênese | P29→P31 |
+| P32 | Asas/Cintilante antigos | P36/P33 |
+| P34 | Voltar/Asas/Rank | P39→P47, P36 e `rankUI` |
+| P36 | Voltar alinhado antigo | P39 e depois P45→P47 |
+| P39 | sizing antigo de Perfil/Sair | P45→P47 + owners de conta |
 | P50/P52/P53 | `.p48-create-card-entry` / `.p53-create-card-entry` | markup `p54-create-card-entry p56-create-card-entry p57-create-card-entry` de `cardsLibrary` |
 | P51 | `.p51-mission-coin-pill` | `p52-mission-coin-pill` + owners P52/P53/P60 |
 | P52 | `order` dos itens de `.profile-actions` | `navigationUI` é o único owner; Notificações antes de Histórico |
@@ -51,6 +98,33 @@
 | P58 | desenho colorido/5:7 da lacuna e cards | P59/P60 definem o resultado final |
 
 ## Trajetórias críticas preservadas
+
+### P14 → P23 — fundação de sala, economia, perfil e criação
+
+- P14 fornece apenas as bases ainda observáveis de regras e cosméticos.
+- P15 separa Resumo/editor da visualização econômica por colocação.
+- P16 separa prontidão, Reciclagem e apresentação de BUFFs.
+- P17 mantém dois eixos semanticamente independentes: progressão de moldura **Bronze → Prata → Ouro → Platina** e raridade cosmética **Comum → Incomum → Raro → Épico → Lendário → Celestial**.
+- P18 introduz a base da Central, contribuição e grid da criação; Gênese/config-value já não pertencem a ele.
+- P19 permanece somente como geometria de resposta dupla.
+- P20 divide identidade pública, Home e Showcase.
+- P21/P22 definem a composição atual de sala/criação/estimativa.
+- P23 deixa um único ponto de persistência visível no Perfil.
+
+### P26 → P31 — Gênese
+
+P26 mantém base/arco; P27 é histórico; P28 mantém somente skeleton da Reciclagem; P29→P31 definem o resultado final de seis estrelas. Efeitos orbitais intermediários não são mantidos como owners concorrentes.
+
+### P32 → P44
+
+- P32 preserva layout público; Cintilante/Asas já apontam para P33/P36.
+- P33 é a decisão final para Cintilante e identidade do Rank.
+- P34, P42 e P44 são históricos.
+- P35/P36 compõem a Central por base de spoiler + scroll e concentram a geometria final das Asas.
+- P37 divide criação/reutilização, Megafone e Criador.
+- P38 prova Admin apenas na Home via `adminUI` sem hook concorrente de navegação.
+- P39 mantém apenas envelope genérico de Voltar e toast seguro; P45→P47 refinam controles superiores depois.
+- P40/P41 apontam para owners atuais de conta/perfil/reciclagem/detalhe de carta.
 
 ### P45 → P47
 
@@ -76,7 +150,7 @@
 
 ### Perfil/Gênese
 
-`profileUI` converte o grid histórico para `p57-live-frame-grid p58-live-frame-grid` e adiciona `p58-genesis-preview`; `profileFramesLiveCurrent.css` e `genesisPreviewCurrent.css` são os owners visuais desse estado.
+`profileUI` converte o grid histórico para `p57-live-frame-grid p58-live-frame-grid` e adiciona `p58-genesis-preview`; `profileFramesLiveCurrent.css`, `genesisFrameBaseCurrent.css`, `genesisAtomicCurrent.css` e `genesisPreviewCurrent.css` compõem o estado visual final sem reviver versões intermediárias.
 
 ### P73/P74
 
@@ -93,6 +167,34 @@
 
 ## Evidência principal
 
+- `tests/p14RoomPolish.contract.test.js`
+- `tests/p15LayoutSummary.contract.test.js`
+- `tests/p16ReadyRecycling.contract.test.js`
+- `tests/p17FrameRarity.contract.test.js`
+- `tests/p18ContributionNotifications.contract.test.js`
+- `tests/p19Integrity.contract.test.js`
+- `tests/p20PublicCosmeticsShowcase.contract.test.js`
+- `tests/p21SmallBugsUI.contract.test.js`
+- `tests/p22RewardGenesisMobile.contract.test.js`
+- `tests/p23ProfileGenesisSave.contract.test.js`
+- `tests/p26GenesisFrame.contract.test.js`
+- `tests/p27HomeOrderGenesis.contract.test.js`
+- `tests/p28MusicGenesis.contract.test.js`
+- `tests/p29GenesisAtomicOrbit.contract.test.js`
+- `tests/p30GenesisPlatinumStar.contract.test.js`
+- `tests/p31GenesisSixStars.contract.test.js`
+- `tests/p32PolishAudioAmigo.contract.test.js`
+- `tests/p33CosmeticsRankHotfix.contract.test.js`
+- `tests/p34RoomWingsRankFix.contract.test.js`
+- `tests/p35NotificationSpoilersWings.contract.test.js`
+- `tests/p36NotificationScrollWingsBack.contract.test.js`
+- `tests/p37AdminFavoritesMegaphone.contract.test.js`
+- `tests/p38AdminHomeOnly.contract.test.js`
+- `tests/p39NavigationAdminToast.contract.test.js`
+- `tests/p40HomeIdentityRarity.contract.test.js`
+- `tests/p41RecyclingCardDetail.contract.test.js`
+- `tests/p42CurrentTrajectory.contract.test.js`
+- `tests/p44CriticalRegressions.contract.test.js`
 - `tests/p45TopControlsAlignment.contract.test.js`
 - `tests/p46TopNavigation.contract.test.js`
 - `tests/p47TopControlsPixelAlign.contract.test.js`
@@ -117,4 +219,4 @@
 
 ## Estado do Gate 16
 
-A camada recente **P45–P74** está majoritariamente classificada e retirada de ownership PXX, inclusive o bloco crítico P54–P60. O principal débito visual restante passou a ser a fundação/revisões **P14–P44** e o fechamento dos shims com comparação real desktop/mobile. O Gate 16 ainda não é 100% até essa etapa final.
+A faixa histórica **P14–P44** e a faixa recente **P45–P74** estão classificadas por resultado nas ondas auditadas; ownership vigente foi deslocado para folhas nomeadas e regras substituídas foram marcadas como `SUPERSEDED` em vez de recanonizadas. Os shims permanecem deliberadamente na posição histórica da cascata. O Gate 16 continua em **3/4** até comparação visual real desktop/mobile e remoção segura desses shims.
