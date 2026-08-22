@@ -1,0 +1,13 @@
+/* Owner visual canônico das molduras de progressão, originado em P17.
+   Progressão de moldura: Bronze → Prata → Ouro → Platina. Não confundir com raridade de cosmético. */
+.avatar-frame.frame-bronze,.avatar-frame.frame-silver,.avatar-frame.frame-gold,.avatar-frame.frame-platinum{--p17-spark:#fff;--p17-glow:rgba(255,255,255,.72);overflow:visible!important;isolation:isolate}
+.avatar-frame.frame-bronze{--p17-spark:#ffc27a;--p17-glow:rgba(224,113,47,.88)}
+.avatar-frame.frame-silver{--p17-spark:#f7fbff;--p17-glow:rgba(184,220,255,.92)}
+.avatar-frame.frame-gold{--p17-spark:#fff1a3;--p17-glow:rgba(255,190,26,.94)}
+.avatar-frame.frame-platinum{--p17-spark:#dffcff;--p17-glow:rgba(139,234,255,.98)}
+.avatar-frame.frame-bronze::before,.avatar-frame.frame-silver::before,.avatar-frame.frame-gold::before,.avatar-frame.frame-platinum::before{animation:p17ProgressAura 3.6s linear infinite!important;transform-origin:center;will-change:transform,opacity}
+.avatar-frame.frame-bronze::after,.avatar-frame.frame-silver::after,.avatar-frame.frame-gold::after,.avatar-frame.frame-platinum::after{content:'✦';position:absolute;z-index:4;top:-9px;right:2px;pointer-events:none;color:var(--p17-spark);font-size:.84em;line-height:1;text-shadow:0 0 5px #fff,0 0 10px var(--p17-glow),0 0 18px var(--p17-glow);animation:p17ProgressSpark 1.7s ease-in-out infinite;will-change:transform,opacity}
+.avatar-frame.frame-silver::after{animation-delay:.22s}.avatar-frame.frame-gold::after{animation-delay:.44s}.avatar-frame.frame-platinum::after{animation-duration:1.35s;animation-delay:.15s}
+@keyframes p17ProgressAura{0%{opacity:.55;transform:scale(.99) rotate(0deg)}50%{opacity:1;transform:scale(1.035) rotate(180deg)}100%{opacity:.55;transform:scale(.99) rotate(360deg)}}
+@keyframes p17ProgressSpark{0%,100%{opacity:.24;transform:translate(0,0) scale(.62) rotate(0deg)}38%{opacity:1;transform:translate(-3px,2px) scale(1.28) rotate(35deg)}68%{opacity:.58;transform:translate(-1px,5px) scale(.88) rotate(70deg)}}
+@media(prefers-reduced-motion:reduce){.avatar-frame.frame-bronze::before,.avatar-frame.frame-silver::before,.avatar-frame.frame-gold::before,.avatar-frame.frame-platinum::before,.avatar-frame.frame-bronze::after,.avatar-frame.frame-silver::after,.avatar-frame.frame-gold::after,.avatar-frame.frame-platinum::after{animation:none!important}}
