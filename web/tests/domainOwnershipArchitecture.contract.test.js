@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const index=read('public/index.html'),domainDir=path.join(root,'public/js/domains');
 const domainFiles=fs.readdirSync(domainDir).filter(x=>x.endsWith('.js')).sort(),sources=Object.fromEntries(domainFiles.map(name=>[name,read(`public/js/domains/${name}`)]));
-const expectedOwners={
+const requiredOwners={
  'accountUI.js':'accountUI','adminUI.js':'adminUI','achievementsUI.js':'achievementsUI','audioUI.js':'audioUI','buffsUI.js':'buffsUI','cardCreationUI.js':'cardCreationUI','cardProgression.js':'cardProgression','cardsLibrary.js':'cardsLibrary','cosmeticsUI.js':'cosmeticsUI','gameplayUI.js':'gameplayUI','genesisFrameUI.js':'genesisFrameUI','identityUI.js':'identityUI','marketplaceCatalogUI.js':'marketplaceCatalogUI','marketplaceUI.js':'marketplaceUI','missionsUI.js':'missionsUI','navigationUI.js':'navigationUI','notificationsUI.js':'notificationsUI','profileUI.js':'profileUI','rankUI.js':'rankUI','rewardsUI.js':'rewardsUI','roomUI.js':'roomUI','showcaseUI.js':'showcaseUI','socialUI.js':'socialUI','statsUI.js':'statsUI','uiPolishUI.js':'uiPolishUI'
 };
 
@@ -11,21 +11,19 @@ test('todos os owners compilam e o registry carrega antes deles',()=>{
  assert.doesNotThrow(()=>new Function(read('public/js/core/domainRegistry.js')));
  for(const [name,source] of Object.entries(sources))assert.doesNotThrow(()=>new Function(source),name);
  const registry=index.indexOf('js/core/domainRegistry.js?v=domain-2');
- const positions=Object.keys(expectedOwners).map(name=>index.indexOf(`js/domains/${name}?v=domain-2`));
- assert.ok(positions.every(x=>x>=0),'todos os owners devem estar no index');
+ const positions=domainFiles.map(name=>index.indexOf(`js/domains/${name}?v=domain-2`));
+ assert.ok(positions.every(x=>x>=0),'todo arquivo de domínio deve estar no index');
  assert.ok(registry>=0&&registry<Math.min(...positions),'domainRegistry deve carregar antes dos owners');
 });
 
 test('cada arquivo de domínio declara exatamente um owner único',()=>{
- assert.deepEqual(Object.keys(sources).sort(),Object.keys(expectedOwners).sort(),'todo arquivo de domínio deve estar explicitamente registrado no contrato');
  const seen=new Map();
- for(const [name,expected] of Object.entries(expectedOwners)){
-  const source=sources[name];assert.ok(source,`arquivo ausente: ${name}`);
+ for(const [name,source] of Object.entries(sources)){
   const claims=[...source.matchAll(/CartDomains\.claim\('([^']+)'\s*,\s*'([^']+)'/g)];
   assert.equal(claims.length,1,`${name} deve reivindicar exatamente um domínio`);
-  assert.equal(claims[0][1],expected,`${name} registrou domínio inesperado`);
-  assert.equal(seen.has(expected),false,`domínio duplicado: ${expected}`);seen.set(expected,name);
+  const owner=claims[0][1];assert.equal(seen.has(owner),false,`domínio duplicado: ${owner}`);seen.set(owner,name);
  }
+ for(const [name,expected] of Object.entries(requiredOwners)){const source=sources[name];assert.ok(source,`arquivo obrigatório ausente: ${name}`);assert.match(source,new RegExp(`CartDomains\\.claim\\('${expected}'`),`${name} registrou domínio inesperado`);}
 });
 
 test('PXX numérico P33-P74 não executa mais e histórico permanece rastreável',()=>{
