@@ -1,11 +1,6 @@
+'use strict';
 const MinimumPlayersGrace={
   timer:null,endsAt:0,active:false,
-  init(){
-    SocketClient.on('insufficient_players_started',d=>this.start(d));
-    SocketClient.on('insufficient_players_cancelled',d=>this.cancel(d));
-    SocketClient.on('minimum_players_sync',d=>{if(d?.minimumGrace)this.start(d.minimumGrace);else if(this.active)this.hide();});
-    ['game_over','room_closed','room_cancelled'].forEach(e=>SocketClient.on(e,()=>this.hide()));
-  },
   ensureOverlay(){
     let el=document.getElementById('minimum-players-grace');
     if(el)return el;
@@ -28,4 +23,4 @@ const MinimumPlayersGrace={
   cancel(data={}){const was=this.active;this.hide();if(was)Toast.success(data.message||'Jogadores suficientes novamente. A partida continua!');},
   hide(){this.active=false;this.endsAt=0;if(this.timer){clearInterval(this.timer);this.timer=null;}const el=document.getElementById('minimum-players-grace');if(el)el.style.display='none';}
 };
-MinimumPlayersGrace.init();
+window.MinimumPlayersGrace=MinimumPlayersGrace;
