@@ -20,6 +20,7 @@
 | `app.js` | `RUNTIME FALLBACK` | `core/appState`, `screenRouter`, `localTurnFlow`, `roomSocketLifecycle`, `gameplaySocketLifecycle`, `socketLifecycle`, `appBootstrap` | estado/router/bootstrap/listeners físicos do monólito não executam no caminho normal |
 | `canonicalCardBadge.js` | `CURRENT BRIDGE` | somente badge **🧬 CARTA ORIGINAL** na biblioteca canônica | wallet/account → `marketplaceUI/accountUI`; ledger em Estatísticas → `statsUI`; payout de `game_over` → `rewardsUI` |
 | `cardProgressionUI.js` | `CURRENT BRIDGE` | **Meu Legado** anexado após o renderer final de Estatísticas + celebração `DIRETO DA FONTE` em `round_result` | patch antigo de `HomeScreen.renderCards` → `cardsLibrary + cardProgression`; renderer-base antigo de Stats → `statsUI` |
+| `creditsPolish.js` | `SUPERSEDED` | resultado “Produzido por” pertence agora a `domains/uiPolishUI.js` | listener histórico de clique retirado; arquivo permanece só como marcador até limpeza mecânica |
 | `achievementUI.js` | `CURRENT FOUNDATION` | implementação de Badges/Achievements; `domains/achievementsUI.js` normaliza raridade/ordem e SFX | ainda não pode ser desligado: o domain chama `AchievementUI.renderBadges/notify` |
 | `notificationsUI.js` | `CURRENT FOUNDATION` | Central, leitura/badge/modal; `domains/notificationsUI.js` adiciona spoilers e semântica de não-lidas | ainda não pode ser desligado: o domain decora `NotificationsUI.open/close` |
 | `marketplaceUI.js` | `CURRENT FOUNDATION` | shell/tabs/render do Mercado; `domains/marketplaceUI.js` owns carteira realtime, transações, ordem de tabs e Reciclagem final | writers de wallet históricos fora do domain são supersedidos |
@@ -68,10 +69,16 @@ Correção aplicada:
 
 Isso restaura a característica de progressão sem reativar writers antigos.
 
+## Resultado vs trajetória — `creditsPolish.js`
+
+A trajetória tinha apenas um efeito observável: após abrir Créditos, acrescentar `Produzido por: Vitor Ivens` uma única vez.
+
+Esse comportamento agora é owned por `domains/uiPolishUI.js`, com guard de instalação. O arquivo histórico não registra mais listeners e fica somente como marcador `SUPERSEDED` até o gate de remoção física.
+
 ## Próxima onda
 
 1. decompor `professionalUI.js` em shells realmente vigentes vs writers supersedidos;
 2. decompor `meta.js`, preservando `MetaClient` e fluxos realmente consumidos;
 3. mover `minimumPlayersGrace` para ownership explícito de gameplay;
-4. auditar `marketplaceShop/Inventory/Ledger/Recycling`, `lootUI`, `finalRewardUI`, `prestigeUI`, `missionLayoutSafe`, `uiRefinement2` e `creditsPolish`;
+4. auditar `marketplaceShop/Inventory/Ledger/Recycling`, `lootUI`, `finalRewardUI`, `prestigeUI`, `missionLayoutSafe` e `uiRefinement2`;
 5. só então executar rename/move e remover wrappers/fallbacks físicos.
