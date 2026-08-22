@@ -8,7 +8,7 @@
 
 - `CURRENT FOUNDATION` — implementação-base ainda consumida/decorada por owner canônico.
 - `CURRENT BRIDGE` — comportamento vigente isolado em arquivo/posição histórica; candidato a rename/move.
-- `RUNTIME FALLBACK` — existe fisicamente, mas é substituído antes do primeiro uso normal.
+- `LEXICAL SHELL` — arquivo mínimo preserva somente binding/bootstrapping necessário; comportamento pertence a owners externos.
 - `SUPERSEDED` — compatibilidade/rastreabilidade; não possui ownership final.
 - `HISTORICAL` — não executável.
 
@@ -20,7 +20,7 @@ A branch contém `main@P77` em sua ancestralidade e preserva primeiro paint da c
 
 | Módulo-base | Estado | Resultado vigente / owner final |
 |---|---|---|
-| `app.js` | `RUNTIME FALLBACK` | estado/router/local/bootstrap/socket → `core/*`; fallback físico ainda pendente de limpeza |
+| `app.js` | `LEXICAL SHELL` | preserva apenas `const App`, `window.App` e `DOMContentLoaded`; estado/router/local/bootstrap/socket pertencem a `core/*` |
 | `metaClient.js` | `CURRENT FOUNDATION` | API transversal de metajogo como **`const MetaClient` lexical** |
 | `metaUIBase.js` | `CURRENT FOUNDATION` | namespace mínimo de compatibilidade; métodos finais são preenchidos por domains |
 | `meta.js` | `HISTORICAL` | não executável; conteúdo distribuído por owners nomeados |
@@ -32,7 +32,7 @@ A branch contém `main@P77` em sua ancestralidade e preserva primeiro paint da c
 | `uiRefinement2.js` | `SUPERSEDED` | Home/apelido → `uiPolishUI` |
 | `prestigeUI.js` | `SUPERSEDED` | títulos/raridades → `identityUI/profileUI` |
 | `minimumPlayersGrace.js` | `CURRENT FOUNDATION` | UI/timer; lifecycle → `gameplayUI` |
-| `metaFixes.js` | `CURRENT FOUNDATION` | Perfil Público; listener duplicado removido |
+| `metaFixes.js` | `CURRENT BRIDGE` | owner `publicProfileUI`; Perfil Público sem listener global e sem duplicação de título/moldura |
 | `rewardPreviewUI.js` | `CURRENT FOUNDATION` | estimativa econômica autoritativa |
 | `roomRulesUI.js` | `CURRENT FOUNDATION` | regras/sumário/editor da sala |
 | `achievementUI.js` | `CURRENT FOUNDATION` | base de Badges/Achievements; domain normaliza resultado |
@@ -80,8 +80,10 @@ A branch contém `main@P77` em sua ancestralidade e preserva primeiro paint da c
 ## Resultados de auditoria relevantes
 
 - **P75→P77:** carteira preservada nos owners atuais; Reciclagem não pode mais achatar o markup com `textContent`.
+- **App lifecycle:** `app.js` foi reduzido ao shell lexical; o contrato impede que `showScreen`, reset, fluxo local ou listeners retornem ao arquivo.
 - **Missões:** moedas + XP + BUFF preservados; superfície agora pertence integralmente a `missionsUI`.
-- **Perfil:** rota Perfil → `ProfileModal` foi restaurada em `appPanelUI` após aposentadoria do monólito.
+- **Perfil:** rota Perfil → `ProfileModal` permanece em `appPanelUI`.
+- **Perfil Público:** `metaFixes.js` é bridge explícita de `publicProfileUI`; título usa `public-profile-equipped-title`, evitando duplicação pelo decorator de identidade, e o X fecha o AppPanel corretamente.
 - **Rank:** `rankUI` é renderer completo e não depende mais de `MetaUI.renderRank.bind`.
 - **Identidade:** catálogo-base + títulos posteriores pertencem a `identityUI`; observer de títulos saiu do monólito.
 - **Reactions:** binding de canal pertence a `metaLifecycleUI`; apresentação/dock a `reactionsUI`.
@@ -91,7 +93,7 @@ A branch contém `main@P77` em sua ancestralidade e preserva primeiro paint da c
 ## Próxima onda
 
 1. varrer foundations atuais por listeners/writers duplicados e dependências transitivas;
-2. reduzir/remover fisicamente bridges e fallbacks já cobertos por contratos — especialmente `app.js`;
+2. renomear/mover bridges físicos (`metaFixes`, `canonicalCardBadge`, `cardProgressionUI`) somente quando a mudança de path puder ser feita sem alterar ordem de carregamento;
 3. manter foundations coesas (`RoomRulesUI`, `RewardPreviewUI`, Mercado, Loot, FinalReward, ProfileModal) até haver benefício arquitetural claro em movê-las;
 4. comparação visual real desktop/mobile antes de remover shims CSS;
 5. CI integral + aceite iPhone/PWA/multiplayer antes de qualquer merge.
