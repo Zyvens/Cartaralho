@@ -1,14 +1,15 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const home=read('public/js/domains/homePresentationUI.js'),profile=read('public/js/domains/profileUI.js'),cards=read('public/js/domains/cardsLibrary.js'),panel=read('public/js/domains/appPanelUI.js'),registration=read('public/js/domains/registrationUI.js'),social=read('public/js/domains/socialFoundationUI.js'),index=read('public/index.html');
+const home=read('public/js/domains/homePresentationUI.js'),account=read('public/js/domains/accountUI.js'),profile=read('public/js/domains/profileUI.js'),cards=read('public/js/domains/cardsLibrary.js'),panel=read('public/js/domains/appPanelUI.js'),registration=read('public/js/domains/registrationUI.js'),social=read('public/js/domains/socialFoundationUI.js'),index=read('public/index.html');
 
 test('Home presentation preserva composição profissional sem possuir dados de domínio',()=>{
  assert.doesNotThrow(()=>new Function(home));
  assert.match(home,/CartDomains\.claim\('homePresentationUI'/);
  for(const copy of ['PRONTO PARA COMEÇAR?','JOGAR','Perfil','Sair','Amigos de merda'])assert.ok(home.includes(copy),copy);
- assert.match(home,/HomeScreen\.renderAccount=function/);
+ assert.doesNotMatch(home,/HomeScreen\.renderAccount\s*=/);
  assert.match(home,/HomeScreen\.render=async function/);
+ assert.match(account,/CartHomePresentationDomain\?\.polishHome/);
 });
 
 test('responsabilidades antigas de professionalUI já têm owners finais separados',()=>{
@@ -21,6 +22,6 @@ test('responsabilidades antigas de professionalUI já têm owners finais separad
 });
 
 test('homePresentation carrega antes dos refinamentos finais de conta e polish',()=>{
- const p=index.indexOf('js/domains/homePresentationUI.js'),account=index.indexOf('js/domains/accountUI.js'),polish=index.indexOf('js/domains/uiPolishUI.js');
- assert.ok(p>0&&account>p&&polish>p);
+ const p=index.indexOf('js/domains/homePresentationUI.js'),accountPos=index.indexOf('js/domains/accountUI.js'),polish=index.indexOf('js/domains/uiPolishUI.js');
+ assert.ok(p>0&&accountPos>p&&polish>p);
 });
