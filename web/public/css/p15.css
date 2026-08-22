@@ -1,54 +1,6 @@
-/* Cartaralho P15 — four floating cards, compact lobby summary and unified prize cards. */
-
-/* Creation dashboard: four independent cards without card-inside-card framing. */
-.create-room-dashboard{display:grid;grid-template-columns:minmax(360px,.84fr) minmax(500px,1.16fr);gap:20px;align-items:start;max-width:1220px;margin:0 auto}
-.create-room-column{display:flex;flex-direction:column;gap:20px;min-width:0}
-.create-room-dashboard .dashboard-card{min-width:0}
-.dashboard-config-card,.dashboard-summary-slot,.dashboard-estimate-card{background:none!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0!important}
-.dashboard-config-card>.room-rules-card,.dashboard-summary-slot>.room-summary-card,.dashboard-estimate-card>.economy-preview{margin:0!important;width:100%}
-.how-to-play-card{padding:24px 28px;border:1px solid rgba(255,255,255,.09);border-radius:20px;background:linear-gradient(145deg,rgba(18,18,24,.94),rgba(11,11,17,.96));box-shadow:0 16px 36px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.025)}
-.how-to-play-card h3{margin:0 0 18px;font-size:1.35rem}
-.how-to-play-card .rules-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:26px;row-gap:0;margin:0;padding:0;list-style:none}
-.how-to-play-card .rules-list li{padding:11px 0;border-bottom:1px solid rgba(255,255,255,.045);color:var(--text-muted);line-height:1.55}
-.how-to-play-card .rules-list strong{display:block;margin-bottom:3px;color:#fff}
-.create-room-submit{max-width:1220px;margin:20px auto 0}
-
-/* Compact match summary used in create room and Lobby. */
-.room-summary-card{border:1px solid rgba(139,92,246,.27);border-radius:20px;background:linear-gradient(145deg,rgba(21,21,33,.96),rgba(11,11,20,.96));box-shadow:0 16px 36px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.035);overflow:hidden}
-.room-summary-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:17px 18px 14px;border-bottom:1px solid rgba(255,255,255,.065)}
-.room-summary-heading>div{min-width:0}.room-summary-heading small{display:block;color:#9c8dbb;font-size:.66rem;font-weight:900;letter-spacing:.12em}.room-summary-heading h3{margin:4px 0 3px;font-size:1.08rem}.room-summary-heading p{margin:0;color:var(--text-muted);font-size:.78rem;line-height:1.4}
-.room-summary-edit{flex:none;min-height:34px;padding:7px 12px;font-size:.75rem}
-.room-summary-primary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:14px 18px 10px}
-.room-summary-primary>div{padding:10px 11px;border-radius:12px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.055)}
-.room-summary-primary small{display:block;color:var(--text-muted);font-size:.68rem}.room-summary-primary b{display:block;margin-top:3px;font-size:.92rem;color:#fff}
-.room-summary-flags{display:flex;flex-wrap:wrap;gap:7px;padding:4px 18px 16px}
-.room-summary-flags span{display:inline-flex;align-items:center;min-height:28px;padding:6px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.035);font-size:.7rem;font-weight:750;color:#b8bdca}
-.room-summary-flags span.is-on{border-color:rgba(34,197,94,.18);background:rgba(34,197,94,.07);color:#c5f7d2}.room-summary-flags span.is-off{opacity:.7}
-
-/* Lobby: the rules form is hidden behind Edit; only the compact summary is visible. */
-.lobby-rules-wrap{display:block!important;margin-top:14px}.lobby-rules-wrap>.room-summary-card{width:100%}
-.lobby-reward-card{padding:0!important;border:0!important;background:none!important;box-shadow:none!important}.lobby-reward-card .economy-preview{margin:0!important}
-
-/* Rules editor modal. */
-.room-rules-editor-overlay{position:fixed;inset:0;z-index:24000;display:grid;place-items:center;padding:20px;background:rgba(4,4,9,.74);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px)}
-.room-rules-editor-shell{width:min(680px,100%);max-height:min(90vh,900px);display:flex;flex-direction:column;border:1px solid rgba(139,92,246,.32);border-radius:22px;background:linear-gradient(145deg,#151522,#0d0d16);box-shadow:0 30px 90px rgba(0,0,0,.58);overflow:hidden}
-.room-rules-editor-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.07)}
-.room-rules-editor-head small{font-size:.65rem;font-weight:900;letter-spacing:.12em;color:#a78bfa}.room-rules-editor-head h2{margin:4px 0 3px;font-size:1.25rem}.room-rules-editor-head p{margin:0;color:var(--text-muted);font-size:.78rem}.room-rules-editor-close{width:38px;height:38px;display:grid;place-items:center;flex:none;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.04);color:#fff;cursor:pointer}
-.room-rules-editor-body{padding:16px 20px;overflow:auto}.room-rules-editor-body>.room-rules-card{box-shadow:none}.room-rules-editor-body .room-rules-edit-pill{display:none}
-.room-rules-editor-actions{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid rgba(255,255,255,.07);background:rgba(7,7,13,.6)}
-
-/* Unified estimate: each placement owns both its coin reward and loot. */
-.economy-preview{padding:18px!important}
-.economy-prizes-heading{display:flex;align-items:center;justify-content:space-between;margin:14px 0 10px}.economy-prizes-heading b{display:block;font-size:.95rem}.economy-prizes-heading small{display:block;margin-top:2px;color:var(--text-muted);font-size:.68rem}
-.economy-placement-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:13px}
-.economy-placement-card{padding:12px;border:1px solid rgba(255,255,255,.075);border-radius:14px;background:rgba(255,255,255,.035)}
-.economy-placement-card>header{display:flex;align-items:center;gap:8px;margin-bottom:9px}.economy-placement-medal{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.05);font-size:1rem}.economy-placement-card>header small{display:block;color:var(--text-muted);font-size:.61rem}.economy-placement-card>header b{display:block;margin-top:1px;color:#fff;font-size:.82rem}
-.economy-placement-rewards{display:grid;grid-template-columns:1fr 1fr;gap:7px}.economy-reward-chip{padding:9px;border-radius:10px;border:1px solid rgba(255,255,255,.055);background:rgba(9,10,18,.42);min-width:0}.economy-reward-chip small{display:block;color:var(--text-muted);font-size:.62rem}.economy-reward-chip b{display:block;margin-top:3px;font-size:.8rem;color:#fff;white-space:nowrap}.economy-reward-coins{border-color:rgba(245,158,11,.11);background:rgba(245,158,11,.045)}.economy-reward-loot{border-color:rgba(236,72,153,.1);background:rgba(236,72,153,.035)}.economy-placement-card.is-survival{border-style:dashed}
-.economy-note{display:block;margin-top:2px;line-height:1.5}
-
-/* Old P14 reward sub-cards are intentionally retired by RewardPreviewUI source. */
-.economy-payout-grid,.economy-loot{display:none!important}
-
-@media(max-width:980px){.create-room-dashboard{grid-template-columns:minmax(320px,.9fr) minmax(390px,1.1fr)}.how-to-play-card .rules-list{grid-template-columns:1fr}.economy-placement-rewards{grid-template-columns:1fr}}
-@media(max-width:760px){.create-room-dashboard{display:flex;flex-direction:column;max-width:620px}.create-room-column{display:contents}.dashboard-config-card{order:1}.how-to-play-card{order:2}.dashboard-summary-slot{order:3}.dashboard-estimate-card{order:4}.create-room-submit{max-width:620px}.room-rules-editor-overlay{padding:10px}.room-rules-editor-shell{max-height:94vh}.economy-placement-rewards{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){.how-to-play-card{padding:19px}.room-summary-primary{grid-template-columns:1fr 1fr}.room-summary-primary>div:last-child{grid-column:1/-1}.economy-placement-grid{grid-template-columns:1fr}.room-rules-editor-body{padding:12px}.room-rules-editor-actions{padding:12px;flex-direction:column-reverse}.room-rules-editor-actions .btn{width:100%}}
+/* P15 — shim histórico.
+   CURRENT: resumo da partida, editor modal de regras e cards econômicos por colocação.
+   SUPERSEDED: composição original de quatro cards por P21/P36 e casca de estimativa por P22. */
+@import url('./roomSummaryCurrent.css');
+@import url('./roomRulesEditorCurrent.css');
+@import url('./economyPlacementCurrent.css');
