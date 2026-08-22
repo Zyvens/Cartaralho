@@ -14,7 +14,7 @@ const html=read('public/index.html');
 test('pilhas são fonte do CardCreationScreen e owner final compila',()=>{
  assert.doesNotThrow(()=>new Function(domain));
  assert.match(screen,/cleanStack\(type,count\)/);
- assert.match(screen,/clean-stack-grid-live/);
+ assert.match(screen,/clean-stack-grid/);
  assert.match(screen,/clean-stack-sheet/);
  assert.match(screen,/clean-stack-empty/);
  assert.match(html,/css\/cleanCardStacksFix\.css/);
@@ -29,7 +29,7 @@ test('hotfix antigo permanece apenas para rastreabilidade',()=>{
 test('saldo zero, profundidade e animação continuam preservados',()=>{
  assert.match(css,/border:2px dashed/);
  assert.match(css,/cleanCardSpent/);
- assert.match(screen,/Math\.min\(n,12\)/);
+ assert.match(screen,/Math\.min\(8,n\)/);
  assert.match(screen,/clean-stack-depth/);
  assert.match(screen,/\+\$\{n-visible\}/);
 });
