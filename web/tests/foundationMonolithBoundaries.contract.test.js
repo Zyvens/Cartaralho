@@ -6,32 +6,10 @@ const index=read('public/index.html'),professional=read('public/js/professionalU
 test('professionalUI foi retirado do runtime ownership',()=>{
  assert.match(professional,/status:'SUPERSEDED'/);
  for(const forbidden of [/const AppPanelModal=/,/const RegistrationModal=/,/const SocialUI=/,/HomeScreen\.register=/,/HomeScreen\.openPanel=/,/HomeScreen\.renderAccount=function/,/ProfileModal\.render=function/])assert.doesNotMatch(professional,forbidden);
- assert.match(registration,/HomeScreen\.register=/);assert.match(panel,/HomeScreen\.openPanel=/);assert.match(socialBase,/window\.SocialUI=SocialUI/);assert.match(homePresentation,/HomeScreen\.renderAccount=function/);assert.match(cards,/HomeScreen\.renderCards=render/);assert.match(profile,/RARITY_LABEL/);assert.match(account,/CartHomePresentationDomain\?\.polishHome/);assert.match(social,/SocialUI\.renderFriends/);
+ assert.match(registration,/HomeScreen\.register=/);assert.match(panel,/HomeScreen\.openPanel=/);assert.match(socialBase,/window\.SocialUI=SocialUI/);assert.doesNotMatch(homePresentation,/HomeScreen\.renderAccount\s*=/);assert.match(account,/HomeScreen\.renderAccount=function/);assert.match(cards,/HomeScreen\.renderCards=render/);assert.match(profile,/RARITY_LABEL/);assert.match(account,/CartHomePresentationDomain\?\.polishHome/);assert.match(social,/SocialUI\.renderFriends/);
 });
 
-test('professionalUI mantém apenas delegates compatíveis',()=>{
- assert.match(professional,/polishHome\(\.\.\.args\).*CartHomePresentationDomain/s);
- assert.match(professional,/renderCards\(\.\.\.args\).*CartCardsLibrary/s);
-});
-
-test('MetaClient e MetaUI base substituem o monólito meta no runtime',()=>{
- assert.match(metaClient,/^'use strict';\nconst MetaClient=/);
- assert.match(metaBase,/var MetaUI=window\.MetaUI\|\|/);
- assert.ok(index.includes('<script src="js/metaUIBase.js"></script>'));
- assert.ok(index.includes('type="application/x-cartaralho-legacy" src="js/meta.js"'));
- assert.ok(!index.includes('<script src="js/meta.js"></script>'));
-});
-
-test('features do meta estão distribuídas em owners independentes',()=>{
- assert.match(rank,/async function render\(/);assert.doesNotMatch(rank,/MetaUI\.renderRank\.bind/);
- assert.match(stats,/HomeScreen\.renderStats=render/);assert.match(cards,/HomeScreen\.renderCards=render/);assert.match(history,/HomeScreen\.renderHistory=render/);assert.match(groups,/MetaUI\.renderFriendGroup=renderFriendGroup/);
- assert.match(reactions,/updateReactionDock/);assert.match(spectator,/openSpectator/);assert.match(share,/addRoomShare/);assert.match(metaLifecycle,/channel\.bind\('reaction'/);
-});
-
-test('Home, identidade e missões não dependem de MetaUI.patch',()=>{
- assert.match(account,/CartSocialFoundationDomain/);assert.match(account,/CartSpectatorDomain/);assert.match(account,/CartMissionsDomain/);
- assert.match(nav,/CartReactionsDomain/);assert.match(nav,/CartRoomShareDomain/);
- assert.match(identity,/BASE_TITLES/);assert.match(identity,/document\.__cartTitleObserver/);
- assert.match(missions,/async function ensureMissionUI/);
- assert.match(panel,/kind==='profile'\?ProfileModal\.open\('profile'\)/);
-});
+test('professionalUI mantém apenas delegates compatíveis',()=>{assert.match(professional,/polishHome\(\.\.\.args\).*CartHomePresentationDomain/s);assert.match(professional,/renderCards\(\.\.\.args\).*CartCardsLibrary/s);});
+test('MetaClient e MetaUI base substituem o monólito meta no runtime',()=>{assert.match(metaClient,/^'use strict';\nconst MetaClient=/);assert.match(metaBase,/var MetaUI=window\.MetaUI\|\|/);assert.ok(index.includes('<script src="js/metaUIBase.js"></script>'));assert.ok(index.includes('type="application/x-cartaralho-legacy" src="js/meta.js"'));assert.ok(!index.includes('<script src="js/meta.js"></script>'));});
+test('features do meta estão distribuídas em owners independentes',()=>{assert.match(rank,/async function render\(/);assert.doesNotMatch(rank,/MetaUI\.renderRank\.bind/);assert.match(stats,/HomeScreen\.renderStats=render/);assert.match(cards,/HomeScreen\.renderCards=render/);assert.match(history,/HomeScreen\.renderHistory=render/);assert.match(groups,/MetaUI\.renderFriendGroup=renderFriendGroup/);assert.match(reactions,/updateReactionDock/);assert.match(spectator,/openSpectator/);assert.match(share,/addRoomShare/);assert.match(metaLifecycle,/channel\.bind\('reaction'/);});
+test('Home, identidade e missões não dependem de MetaUI.patch',()=>{assert.match(account,/CartSocialFoundationDomain/);assert.match(account,/CartSpectatorDomain/);assert.match(account,/CartMissionsDomain/);assert.match(nav,/CartReactionsDomain/);assert.match(nav,/CartRoomShareDomain/);assert.match(identity,/BASE_TITLES/);assert.match(identity,/document\.__cartTitleObserver/);assert.match(missions,/async function ensureMissionUI/);assert.match(panel,/kind==='profile'\?ProfileModal\.open\('profile'\)/);});
