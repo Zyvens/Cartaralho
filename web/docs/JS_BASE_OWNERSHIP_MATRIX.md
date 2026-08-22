@@ -31,12 +31,12 @@ A branch contém `main@P77` em sua ancestralidade e preserva primeiro paint da c
 | `missionLayoutSafe.js` | `SUPERSEDED` | Missões → `missionsUI/profileUI` |
 | `uiRefinement2.js` | `SUPERSEDED` | Home/apelido → `uiPolishUI` |
 | `prestigeUI.js` | `SUPERSEDED` | títulos/raridades → `identityUI/profileUI` |
-| `minimumPlayersGrace.js` | `CURRENT FOUNDATION` | UI/timer; lifecycle → `gameplayUI` |
+| `minimumPlayersGrace.js` | `SUPERSEDED` | UI/timer + lifecycle → `domains/gameplayUI.js` |
 | `metaFixes.js` | `CURRENT BRIDGE` | owner `publicProfileUI`; Perfil Público sem listener global e sem duplicação de título/moldura |
 | `rewardPreviewUI.js` | `CURRENT FOUNDATION` | estimativa econômica autoritativa |
 | `roomRulesUI.js` | `CURRENT FOUNDATION` | regras/sumário/editor da sala |
 | `achievementUI.js` | `CURRENT FOUNDATION` | base de Badges/Achievements; domain normaliza resultado |
-| `notificationsUI.js` | `CURRENT FOUNDATION` | base da Central; domain owns spoilers/não-lidas |
+| `notificationsUI.js` | `SUPERSEDED` | shell/modal/badge/leitura → `domains/notificationsUI.js` |
 | `marketplaceUI.js` | `CURRENT FOUNDATION` | shell do Mercado; `domains/marketplaceUI` owns wallet/realtime/transações |
 | `marketplaceShop.js` | `CURRENT FOUNDATION` | catálogo/compra idempotente |
 | `marketplaceInventory.js` | `CURRENT FOUNDATION` | inventário BUFFs/cartas de packs |
@@ -81,9 +81,11 @@ A branch contém `main@P77` em sua ancestralidade e preserva primeiro paint da c
 
 - **P75→P77:** carteira preservada nos owners atuais; Reciclagem não pode mais achatar o markup com `textContent`.
 - **App lifecycle:** `app.js` foi reduzido ao shell lexical; o contrato impede que `showScreen`, reset, fluxo local ou listeners retornem ao arquivo.
-- **Missões:** moedas + XP + BUFF preservados; superfície agora pertence integralmente a `missionsUI`.
+- **Missões:** moedas + XP + BUFF preservados; superfície pertence integralmente a `missionsUI`.
 - **Perfil:** rota Perfil → `ProfileModal` permanece em `appPanelUI`.
-- **Perfil Público:** `metaFixes.js` é bridge explícita de `publicProfileUI`; título usa `public-profile-equipped-title`, evitando duplicação pelo decorator de identidade, e o X fecha o AppPanel corretamente.
+- **Perfil Público:** `metaFixes.js` é bridge explícita de `publicProfileUI`; título não duplica e o X fecha o AppPanel corretamente.
+- **Gameplay / mínimo de jogadores:** overlay, 60s, tick de 250ms, retomada e listeners pertencem integralmente a `gameplayUI`; base antiga é marker.
+- **Central de Notificações:** botão, badge, fetch, modal, spoilers e não-lidas pertencem integralmente ao domain; leitura só é confirmada no fechamento.
 - **Rank:** `rankUI` é renderer completo e não depende mais de `MetaUI.renderRank.bind`.
 - **Identidade:** catálogo-base + títulos posteriores pertencem a `identityUI`; observer de títulos saiu do monólito.
 - **Reactions:** binding de canal pertence a `metaLifecycleUI`; apresentação/dock a `reactionsUI`.
@@ -92,8 +94,9 @@ A branch contém `main@P77` em sua ancestralidade e preserva primeiro paint da c
 
 ## Próxima onda
 
-1. varrer foundations atuais por listeners/writers duplicados e dependências transitivas;
-2. renomear/mover bridges físicos (`metaFixes`, `canonicalCardBadge`, `cardProgressionUI`) somente quando a mudança de path puder ser feita sem alterar ordem de carregamento;
-3. manter foundations coesas (`RoomRulesUI`, `RewardPreviewUI`, Mercado, Loot, FinalReward, ProfileModal) até haver benefício arquitetural claro em movê-las;
-4. comparação visual real desktop/mobile antes de remover shims CSS;
-5. CI integral + aceite iPhone/PWA/multiplayer antes de qualquer merge.
+1. varrer foundations atuais por dependências transitivas e wrappers duplicados;
+2. manter `canonicalCardBadge` e `cardProgressionUI` até os três resultados únicos terem owner equivalente;
+3. consolidar gameplay/telas-base onde houver fragmentação real;
+4. manter foundations coesas (`RoomRulesUI`, `RewardPreviewUI`, Mercado, Loot, FinalReward, ProfileModal) até haver benefício arquitetural claro em movê-las;
+5. comparação visual real desktop/mobile antes de remover shims CSS;
+6. CI integral + aceite iPhone/PWA/multiplayer antes de qualquer merge.
