@@ -18,18 +18,20 @@ test('Social foundation não fecha sobre AppPanelModal lexical antigo',()=>{
  assert.match(socialBase,/window\.SocialUI=SocialUI/);
  assert.match(socialBase,/window\.AppPanelModal\?\.host\|\|root/);
  assert.match(socialBase,/MetaUI\.renderFriendGroup\(host/);
- assert.doesNotMatch(socialBase,/AppPanelModal\.host/);
+ assert.doesNotMatch(socialBase,/[^.]AppPanelModal\.host/);
 });
 
-test('decorator de presença continua sendo aplicado depois da foundation nova',()=>{
+test('decorator de presença continua depois da foundation nova',()=>{
  const basePos=index.indexOf('js/domains/socialFoundationUI.js'),decoratorPos=index.indexOf('js/domains/socialUI.js');
  assert.ok(basePos>0&&decoratorPos>basePos);
  assert.match(social,/installSocialRenderer/);
  assert.match(social,/SocialUI\.__domainPresence/);
 });
 
-test('professionalUI mantém AppPanel/Social apenas como fallback físico nesta etapa',()=>{
- assert.match(professional,/const AppPanelModal=/);
- assert.match(professional,/const SocialUI=/);
+test('professionalUI não contém mais AppPanel nem Social runtime',()=>{
+ assert.match(professional,/status:'SUPERSEDED'/);
+ assert.doesNotMatch(professional,/const AppPanelModal=/);
+ assert.doesNotMatch(professional,/const SocialUI=/);
+ assert.doesNotMatch(professional,/HomeScreen\.openPanel=/);
  assert.ok(index.indexOf('js/professionalUI.js')<index.indexOf('js/domains/appPanelUI.js'));
 });
