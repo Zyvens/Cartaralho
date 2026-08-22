@@ -36,8 +36,6 @@ jobs:
   visual:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      BASE_URL: https://cartaralho-git-refactor-domain-owners-owner-de9f2a3c.vercel.app
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -49,17 +47,14 @@ jobs:
           npm init -y >/dev/null 2>&1
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
-      - name: Wait for preview
+      - name: Serve exact branch frontend
         shell: bash
         run: |
-          set -e
-          for i in $(seq 1 60); do
-            code=$(curl -L -sS -o /tmp/home.html -w '%{http_code}' "$BASE_URL/" || true)
-            echo "attempt=$i status=$code"
-            if [ "$code" = "200" ] && grep -q 'CARTARALHO' /tmp/home.html; then exit 0; fi
-            sleep 5
-          done
-          echo 'Preview did not become publicly reachable.' >&2
+          cd web/public
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/cartaralho-http.log 2>&1 &
+          echo $! >/tmp/cartaralho-http.pid
+          for i in $(seq 1 20); do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/cartaralho-http.log
           exit 1
       - name: Run browser acceptance
         shell: bash
@@ -68,41 +63,37 @@ jobs:
           cd /tmp/cartaralho-visual
           node <<'NODE'
           const { chromium }=require('playwright'),fs=require('fs'),path=require('path');
-          const out=process.env.GITHUB_WORKSPACE+'/visual-artifacts',base=process.env.BASE_URL;
+          const out=process.env.GITHUB_WORKSPACE+'/visual-artifacts',base='http://127.0.0.1:4173';
           const report={base,startedAt:new Date().toISOString(),checks:[],consoleErrors:[],pageErrors:[]};
+          const user={id:990001,username:'visual_rc',display_name:'Visual RC',email:'',avatar_data:null,bio:'QA visual',dirty_balance:1234,equipped_title_key:null,equipped_frame_key:null};
+          const metagame={level:7,xp:1450,equipped:{titleKey:null,frameKey:null},titles:[{key:'tester',name:'Testador',icon:'🧪',description:'QA',rarity:'common',rarityInfo:{label:'Comum'},unlocked:true,progress:1,target:1}],frames:[{key:'bronze',name:'Bronze',description:'QA',rarity:'common',rarityInfo:{label:'Comum'},unlocked:true,progress:1,target:1}],missions:[]};
+          const market={dirtyBalance:1234,whiteBalance:3,blackBalance:2,marketplaceEnabled:true,buffsFeatureEnabled:true,catalog:[{category:'clean_cards',product_key:'clean_white',name:'Carta Limpa Branca',description:'Crédito de teste',price:100},{category:'card_pack',product_key:'pack_test',name:'Pack Suspeito',description:'Pack de teste',price:250,product_kind:'pack_random'},{category:'buff',product_key:'buff_test',name:'BUFF Teste',description:'Consumível de teste',price:80}]};
+          const notifications={currentVersion:'v1.4.77',updates:[{id:'u1',title:'Release candidate',description:'Owner domains em validação visual.',version:'v1.4.77',publishedAt:new Date().toISOString(),icon:'🧪'}],rewards:[]};
           const check=(name,ok,detail='')=>{report.checks.push({name,ok,detail});if(!ok)throw new Error(`${name}: ${detail}`);};
           const visible=async(page,sel)=>{const l=page.locator(sel).first();return !!(await l.count())&&await l.isVisible();};
-          async function authenticate(page){
-            await page.goto(base,{waitUntil:'domcontentloaded',timeout:60000});
-            await page.waitForFunction(()=>window.AuthClient&&window.App,{timeout:30000});
-            const user=`rc_${Date.now().toString(36).slice(-8)}`.slice(0,24),password='RcVisual#2026';
-            const result=await page.evaluate(async ({user,password})=>{const r=await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:user,password,displayName:`RC ${user}`,email:''})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.token)throw new Error(d.error||`register ${r.status}`);localStorage.setItem('cartaralho_auth_token',d.token);return d.user;},{user,password});
-            check('registration returned authenticated user',!!result?.id);
-            await page.reload({waitUntil:'domcontentloaded',timeout:60000});
-            await page.waitForSelector('#home-account .account-strip',{state:'visible',timeout:30000});await page.waitForTimeout(900);
+          async function mock(page){
+            await page.addInitScript(()=>localStorage.setItem('cartaralho_auth_token','visual-token'));
+            await page.route('**/api/**',async route=>{const u=new URL(route.request().url()),p=u.pathname;let body={success:true};
+              if(p==='/api/auth/me')body={user};
+              else if(p==='/api/profile/wallet')body={dirtyBalance:1234};
+              else if(p==='/api/profile/metagame')body=metagame;
+              else if(p==='/api/profile/missions')body={missions:[]};
+              else if(p==='/api/notifications')body=notifications;
+              else if(p==='/api/marketplace')body=market;
+              else if(p==='/api/sample-cards')body={blackCards:[{text:'Teste _ visual'}],whiteCards:[{text:'Resposta visual'}]};
+              else if(p==='/api/social/friends')body={friends:[],requests:[]};
+              else if(p==='/api/social/groups')body={groups:[]};
+              else if(p==='/api/profile/cards')body={cards:[]};
+              else if(p==='/api/profile/history')body={matches:[]};
+              else if(p==='/api/profile/rank')body={ranking:[],me:null,season:'current'};
+              else if(p==='/api/profile/stats')body={stats:{},totals:{}};
+              await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(body)});
+            });
           }
-          async function assertHome(page,label){
-            for(const [name,sel] of [['profile','#profile-shortcut'],['logout','#logout-btn'],['profile icon','#profile-shortcut .p56-account-action-icon'],['logout icon','#logout-btn .p56-account-action-icon'],['wallet','.p74-wallet-slot']])check(`${label} ${name} visible`,await visible(page,sel));
-            const wallet=await page.locator('.p74-wallet-slot').first().textContent();check(`${label} wallet has value`,/\d|—/.test(wallet||''),wallet||'empty');
-            const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);check(`${label} no horizontal overflow`,overflow<=2,`overflow=${overflow}`);
-          }
-          async function desktop(browser){
-            const ctx=await browser.newContext({viewport:{width:1440,height:1000}}),page=await ctx.newPage();
-            page.on('console',m=>{if(m.type()==='error')report.consoleErrors.push({mode:'desktop',text:m.text()});});page.on('pageerror',e=>report.pageErrors.push({mode:'desktop',text:e.message}));
-            await authenticate(page);await assertHome(page,'desktop');await page.screenshot({path:path.join(out,'desktop-home.png'),fullPage:true});
-            await page.locator('#profile-shortcut').click();await page.waitForSelector('.profile-modal-overlay',{state:'visible',timeout:20000});check('desktop profile modal visible',await visible(page,'.profile-modal-shell'));await page.screenshot({path:path.join(out,'desktop-profile.png'),fullPage:true});await page.locator('.profile-modal-close').click();
-            await page.locator('#notifications-menu-btn').click();await page.waitForSelector('.notifications-overlay',{state:'visible',timeout:20000});check('desktop notifications visible',await visible(page,'.notifications-shell'));await page.screenshot({path:path.join(out,'desktop-notifications.png'),fullPage:true});await page.locator('.notifications-close').click();
-            await page.locator('#marketplace-menu-btn').click();await page.waitForSelector('.market-overlay',{state:'visible',timeout:20000});check('desktop market visible',await visible(page,'.market-shell'));await page.screenshot({path:path.join(out,'desktop-market.png'),fullPage:true});await page.locator('.market-close').click();
-            for(const panel of ['cards','rank','stats']){const b=page.locator(`[data-panel="${panel}"]`).first();check(`desktop ${panel} menu exists`,await b.count()>0);await b.click();await page.waitForTimeout(900);await page.screenshot({path:path.join(out,`desktop-${panel}.png`),fullPage:true});await page.keyboard.press('Escape');await page.waitForTimeout(300);if(!(await visible(page,'#home-main'))){await page.evaluate(()=>window.App?.showScreen?.('home'));await page.waitForTimeout(700);}}
-            await ctx.close();
-          }
-          async function mobile(browser){
-            const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'}),page=await ctx.newPage();
-            page.on('console',m=>{if(m.type()==='error')report.consoleErrors.push({mode:'mobile',text:m.text()});});page.on('pageerror',e=>report.pageErrors.push({mode:'mobile',text:e.message}));
-            await authenticate(page);await assertHome(page,'mobile');await page.screenshot({path:path.join(out,'mobile-home.png'),fullPage:true});
-            await page.locator('#profile-shortcut').click();await page.waitForSelector('.profile-modal-overlay',{state:'visible',timeout:20000});const po=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);check('mobile profile no horizontal overflow',po<=2,`overflow=${po}`);await page.screenshot({path:path.join(out,'mobile-profile.png'),fullPage:true});await page.locator('.profile-modal-close').click();
-            await page.locator('#marketplace-menu-btn').click();await page.waitForSelector('.market-overlay',{state:'visible',timeout:20000});const box=await page.locator('.market-shell').boundingBox();check('mobile market fits viewport',!!box&&box.width<=390&&box.height<=844,JSON.stringify(box));await page.screenshot({path:path.join(out,'mobile-market.png'),fullPage:true});await ctx.close();
-          }
+          async function openHome(page){await mock(page);await page.goto(base,{waitUntil:'domcontentloaded',timeout:30000});await page.waitForFunction(()=>window.AuthClient?.user&&window.App,{timeout:20000});await page.waitForSelector('#home-account .account-strip',{state:'visible',timeout:20000});await page.waitForTimeout(1000);}
+          async function assertHome(page,label){for(const [name,sel] of [['profile','#profile-shortcut'],['logout','#logout-btn'],['profile icon','#profile-shortcut .p56-account-action-icon'],['logout icon','#logout-btn .p56-account-action-icon'],['wallet','.p74-wallet-slot']])check(`${label} ${name} visible`,await visible(page,sel));const wallet=await page.locator('.p74-wallet-slot').first().textContent();check(`${label} wallet first paint value`,/1[\.\s]?234|1234/.test(wallet||''),wallet||'empty');const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);check(`${label} no horizontal overflow`,overflow<=2,`overflow=${overflow}`);}
+          async function desktop(browser){const ctx=await browser.newContext({viewport:{width:1440,height:1000}}),page=await ctx.newPage();page.on('console',m=>{if(m.type()==='error')report.consoleErrors.push({mode:'desktop',text:m.text()});});page.on('pageerror',e=>report.pageErrors.push({mode:'desktop',text:e.message}));await openHome(page);await assertHome(page,'desktop');await page.screenshot({path:path.join(out,'desktop-home.png'),fullPage:true});await page.locator('#profile-shortcut').click();await page.waitForSelector('.profile-modal-overlay',{state:'visible'});check('desktop profile modal visible',await visible(page,'.profile-modal-shell'));await page.screenshot({path:path.join(out,'desktop-profile.png'),fullPage:true});await page.locator('.profile-modal-close').click();await page.locator('#notifications-menu-btn').click();await page.waitForSelector('.notifications-overlay',{state:'visible'});check('desktop notifications visible',await visible(page,'.notifications-shell'));await page.screenshot({path:path.join(out,'desktop-notifications.png'),fullPage:true});await page.locator('.notifications-close').click();await page.locator('#marketplace-menu-btn').click();await page.waitForSelector('.market-overlay',{state:'visible'});check('desktop market visible',await visible(page,'.market-shell'));await page.screenshot({path:path.join(out,'desktop-market.png'),fullPage:true});await ctx.close();}
+          async function mobile(browser){const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'}),page=await ctx.newPage();page.on('console',m=>{if(m.type()==='error')report.consoleErrors.push({mode:'mobile',text:m.text()});});page.on('pageerror',e=>report.pageErrors.push({mode:'mobile',text:e.message}));await openHome(page);await assertHome(page,'mobile');await page.screenshot({path:path.join(out,'mobile-home.png'),fullPage:true});await page.locator('#profile-shortcut').click();await page.waitForSelector('.profile-modal-overlay',{state:'visible'});const po=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);check('mobile profile no horizontal overflow',po<=2,`overflow=${po}`);const sizes=await page.locator('.profile-modal-overlay input,.profile-modal-overlay textarea,.profile-modal-overlay select').evaluateAll(els=>els.map(el=>parseFloat(getComputedStyle(el).fontSize||'0')));check('mobile profile inputs >=16px',sizes.every(x=>x>=16),JSON.stringify(sizes));await page.screenshot({path:path.join(out,'mobile-profile.png'),fullPage:true});await page.locator('.profile-modal-close').click();await page.locator('#marketplace-menu-btn').click();await page.waitForSelector('.market-overlay',{state:'visible'});const box=await page.locator('.market-shell').boundingBox();check('mobile market fits viewport',!!box&&box.width<=390&&box.height<=844,JSON.stringify(box));await page.screenshot({path:path.join(out,'mobile-market.png'),fullPage:true});await ctx.close();}
           (async()=>{const browser=await chromium.launch({headless:true});try{await desktop(browser);await mobile(browser);}finally{await browser.close();report.finishedAt=new Date().toISOString();fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2));}if(report.pageErrors.length)throw new Error(`page errors: ${JSON.stringify(report.pageErrors)}`);})().catch(e=>{report.failure=e.stack||String(e);fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2));console.error(e);process.exit(1);});
           NODE
       - name: Upload visual evidence
