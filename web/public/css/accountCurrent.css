@@ -1,4 +1,4 @@
-/* Owner visual canônico do account strip — resultado P73/P74 preservado na mesma posição de cascata via shim histórico P74. */
+/* Owner visual canônico do account strip — resultado P73→P77 preservado na mesma posição de cascata via shim histórico P74. */
 .home-account-bar .home-account-balance,
 .account-strip .home-account-balance{
   display:inline-flex!important;
@@ -11,17 +11,17 @@
   visibility:visible!important;
   opacity:1!important;
 }
-body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip{
+#home-account>.account-strip.p74-account-strip{
   display:flex!important;
   align-items:center!important;
   flex-wrap:nowrap!important;
   overflow:visible!important;
 }
-body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.home-account-identity{
+#home-account>.account-strip.p74-account-strip>.home-account-identity{
   flex:1 1 auto!important;
   min-width:0!important;
 }
-body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.p74-wallet-slot{
+#home-account>.account-strip.p74-account-strip>.p74-wallet-slot{
   position:static!important;
   inset:auto!important;
   transform:none!important;
@@ -34,14 +34,14 @@ body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.p7
   opacity:1!important;
   margin-left:8px!important;
 }
-body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.p56-account-actions{
+#home-account>.account-strip.p74-account-strip>.p56-account-actions{
   position:static!important;
   flex:0 0 auto!important;
   order:40!important;
   margin-left:8px!important;
 }
-body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.p74-wallet-slot .p65-balance-icon,
-body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.p74-wallet-slot .p49-balance-value{
+#home-account>.account-strip.p74-account-strip>.p74-wallet-slot .p65-balance-icon,
+#home-account>.account-strip.p74-account-strip>.p74-wallet-slot .p49-balance-value{
   display:inline-block!important;
   visibility:visible!important;
   opacity:1!important;
@@ -62,13 +62,13 @@ body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.p7
     height:28px!important;
     margin:0!important;
   }
-  body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip{
+  #home-account>.account-strip.p74-account-strip{
     gap:6px!important;
   }
-  body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.p74-wallet-slot{
+  #home-account>.account-strip.p74-account-strip>.p74-wallet-slot{
     margin-left:4px!important;
   }
-  body[data-cart-screen="home"] #home-account>.account-strip.p74-account-strip>.p56-account-actions{
+  #home-account>.account-strip.p74-account-strip>.p56-account-actions{
     margin-left:0!important;
   }
 }
