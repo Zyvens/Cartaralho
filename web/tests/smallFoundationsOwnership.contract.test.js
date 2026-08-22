@@ -4,8 +4,9 @@ const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'
 const fixes=read('public/js/metaFixes.js'),identity=read('public/js/domains/identityUI.js'),roomLifecycle=read('public/js/core/roomSocketLifecycle.js'),preview=read('public/js/rewardPreviewUI.js'),roomRules=read('public/js/roomRulesUI.js'),rewards=read('public/js/domains/rewardsUI.js'),room=read('public/js/domains/roomUI.js');
 
 test('metaFixes conserva Perfil Público mas não registra placar duplicado',()=>{
- assert.match(fixes,/HomeScreen\.renderPublicProfile=async/);
- assert.match(fixes,/MetaFixesPublicProfile/);
+ assert.match(fixes,/async function render\(panel,userId\)/);
+ assert.match(fixes,/HomeScreen\.renderPublicProfile=render/);
+ assert.match(fixes,/owner:'publicProfileUI'/);
  assert.doesNotMatch(fixes,/SocketClient\.on\('player_list_update'/);
  assert.match(identity,/SocketClient\.on\('player_list_update'/);
  assert.match(roomLifecycle,/SocketClient\.on\('player_list_update'/);
