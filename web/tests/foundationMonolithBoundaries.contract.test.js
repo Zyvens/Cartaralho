@@ -1,46 +1,37 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const professional=read('public/js/professionalUI.js'),metaClient=read('public/js/metaClient.js'),meta=read('public/js/meta.js'),registration=read('public/js/domains/registrationUI.js'),panel=read('public/js/domains/appPanelUI.js'),socialBase=read('public/js/domains/socialFoundationUI.js'),homePresentation=read('public/js/domains/homePresentationUI.js'),cards=read('public/js/domains/cardsLibrary.js'),stats=read('public/js/domains/statsUI.js'),rank=read('public/js/domains/rankUI.js'),nav=read('public/js/domains/navigationUI.js'),social=read('public/js/domains/socialUI.js'),account=read('public/js/domains/accountUI.js'),identity=read('public/js/domains/identityUI.js'),missions=read('public/js/domains/missionsUI.js'),profile=read('public/js/domains/profileUI.js');
+const index=read('public/index.html'),professional=read('public/js/professionalUI.js'),metaClient=read('public/js/metaClient.js'),metaBase=read('public/js/metaUIBase.js'),registration=read('public/js/domains/registrationUI.js'),panel=read('public/js/domains/appPanelUI.js'),socialBase=read('public/js/domains/socialFoundationUI.js'),history=read('public/js/domains/historyUI.js'),groups=read('public/js/domains/socialGroupsUI.js'),reactions=read('public/js/domains/reactionsUI.js'),spectator=read('public/js/domains/spectatorUI.js'),share=read('public/js/domains/roomShareUI.js'),metaLifecycle=read('public/js/domains/metaLifecycleUI.js'),homePresentation=read('public/js/domains/homePresentationUI.js'),cards=read('public/js/domains/cardsLibrary.js'),stats=read('public/js/domains/statsUI.js'),rank=read('public/js/domains/rankUI.js'),nav=read('public/js/domains/navigationUI.js'),social=read('public/js/domains/socialUI.js'),account=read('public/js/domains/accountUI.js'),identity=read('public/js/domains/identityUI.js'),missions=read('public/js/domains/missionsUI.js'),profile=read('public/js/domains/profileUI.js');
 
 test('professionalUI foi retirado do runtime ownership',()=>{
  assert.match(professional,/status:'SUPERSEDED'/);
  for(const forbidden of [/const AppPanelModal=/,/const RegistrationModal=/,/const SocialUI=/,/HomeScreen\.register=/,/HomeScreen\.openPanel=/,/HomeScreen\.renderAccount=function/,/ProfileModal\.render=function/])assert.doesNotMatch(professional,forbidden);
- assert.match(registration,/HomeScreen\.register=/);
- assert.match(panel,/HomeScreen\.openPanel=/);
- assert.match(socialBase,/window\.SocialUI=SocialUI/);
- assert.match(homePresentation,/HomeScreen\.renderAccount=function/);
- assert.match(cards,/HomeScreen\.renderCards=render/);
- assert.match(profile,/RARITY_LABEL/);
- assert.match(account,/CartHomePresentationDomain\?\.polishHome/);
- assert.doesNotMatch(account,/ProfessionalUI\?\.polishHome/);
- assert.match(social,/SocialUI\.renderFriends/);
+ assert.match(registration,/HomeScreen\.register=/);assert.match(panel,/HomeScreen\.openPanel=/);assert.match(socialBase,/window\.SocialUI=SocialUI/);assert.match(homePresentation,/HomeScreen\.renderAccount=function/);assert.match(cards,/HomeScreen\.renderCards=render/);assert.match(profile,/RARITY_LABEL/);assert.match(account,/CartHomePresentationDomain\?\.polishHome/);assert.match(social,/SocialUI\.renderFriends/);
 });
 
-test('professionalUI mantém apenas delegates compatíveis sem reassumir ownership',()=>{
+test('professionalUI mantém apenas delegates compatíveis',()=>{
  assert.match(professional,/polishHome\(\.\.\.args\).*CartHomePresentationDomain/s);
  assert.match(professional,/renderCards\(\.\.\.args\).*CartCardsLibrary/s);
 });
 
-test('MetaClient saiu do monólito preservando binding lexical',()=>{
+test('MetaClient e MetaUI base substituem o monólito meta no runtime',()=>{
  assert.match(metaClient,/^'use strict';\nconst MetaClient=/);
- assert.doesNotMatch(meta,/const MetaClient=/);
- assert.match(meta,/MetaClient\.metagame\(\)/);
+ assert.match(metaBase,/var MetaUI=window\.MetaUI\|\|/);
+ assert.ok(index.includes('<script src="js/metaUIBase.js"></script>'));
+ assert.ok(index.includes('type="application/x-cartaralho-legacy" src="js/meta.js"'));
+ assert.ok(!index.includes('<script src="js/meta.js"></script>'));
 });
 
-test('meta ainda mantém features únicas que precisam ser extraídas antes da remoção',()=>{
- for(const token of ['openSpectator(code)','renderSpectator(s)','exitSpectator()','updateReactionDock(name)','showReaction(d)','addRoomShare()'])assert.ok(meta.includes(token),token);
- assert.match(meta,/SocketClient\.subscribeRoom=async code/);
+test('features do meta estão distribuídas em owners independentes',()=>{
+ assert.match(rank,/async function render\(/);assert.doesNotMatch(rank,/MetaUI\.renderRank\.bind/);
+ assert.match(stats,/HomeScreen\.renderStats=render/);assert.match(cards,/HomeScreen\.renderCards=render/);assert.match(history,/HomeScreen\.renderHistory=render/);assert.match(groups,/MetaUI\.renderFriendGroup=renderFriendGroup/);
+ assert.match(reactions,/updateReactionDock/);assert.match(spectator,/openSpectator/);assert.match(share,/addRoomShare/);assert.match(metaLifecycle,/channel\.bind\('reaction'/);
 });
 
-test('writers genéricos do meta são substituídos por owners finais',()=>{
- assert.match(meta,/HomeScreen\.renderRank=/);assert.match(rank,/HomeScreen\.renderRank=render/);
- assert.match(meta,/HomeScreen\.renderStats=/);assert.match(stats,/HomeScreen\.renderStats=render/);
- assert.match(meta,/HomeScreen\.renderCards=/);assert.match(cards,/HomeScreen\.renderCards=render/);
- assert.match(meta,/App\.showScreen=/);assert.match(nav,/App\.showScreen=function/);
-});
-
-test('identity/missions decoram MetaUI sem exigir que ele reassuma renderers finais',()=>{
- assert.match(identity,/MetaUI\.titleName/);
- assert.match(missions,/MetaUI\.missionRow=missionRow/);
+test('Home, identidade e missões não dependem de MetaUI.patch',()=>{
+ assert.match(account,/CartSocialFoundationDomain/);assert.match(account,/CartSpectatorDomain/);assert.match(account,/CartMissionsDomain/);
+ assert.match(nav,/CartReactionsDomain/);assert.match(nav,/CartRoomShareDomain/);
+ assert.match(identity,/BASE_TITLES/);assert.match(identity,/document\.__cartTitleObserver/);
+ assert.match(missions,/async function ensureMissionUI/);
+ assert.match(panel,/kind==='profile'\?ProfileModal\.open\('profile'\)/);
 });
