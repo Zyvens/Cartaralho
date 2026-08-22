@@ -8,6 +8,14 @@ const roomEvents=['room_created','room_joined','room_closed','player_list_update
 const gameplayEvents=['new_round','card_played','all_cards_played','round_result','game_over','round_skipped'];
 const socketEvents=[...roomEvents,...gameplayEvents];
 
+test('app.js é somente shell lexical e não reassume lifecycle',()=>{
+ assert.match(app,/^'use strict';/);
+ assert.match(app,/const App=\{state:\{\}\};/);
+ assert.match(app,/window\.App=App/);
+ assert.match(app,/document\.addEventListener\('DOMContentLoaded',[\s\S]*App\.init\(\)/);
+ for(const forbidden of [/showScreen\s*\(/,/resetState\s*\(/,/handleLocalNextTurn\s*\(/,/registerSocketEvents\s*\(/,/SocketClient\.on\(/,/SocketClient\.init\(\)/,/case 'home':/])assert.doesNotMatch(app,forbidden);
+});
+
 test('owners core compilam e são carregados antes do primeiro uso observável',()=>{
  for(const src of[state,router,local,roomSockets,gameSockets,socketLifecycle,bootstrap])assert.doesNotThrow(()=>new Function(src));
  assert.match(state,/window\.CartAppState=\{initial,reset,install\}/);
