@@ -13,7 +13,7 @@
    const profile=document.getElementById('profile-shortcut');if(profile){profile.innerHTML='👤 <span>Perfil</span>';profile.classList.add('home-header-button');}
    const logout=document.getElementById('logout-btn');if(logout){logout.innerHTML='↗ <span>Sair</span>';logout.classList.add('home-header-button');}
   }
-  function install(){if(HomeScreen.__domainHomePresentation)return;HomeScreen.__domainHomePresentation=true;const accountBase=HomeScreen.renderAccount.bind(HomeScreen),renderBase=HomeScreen.render.bind(HomeScreen);HomeScreen.renderAccount=function(...args){const out=accountBase(...args);setTimeout(polishHome,0);return out;};HomeScreen.render=async function(...args){const out=await renderBase(...args);polishHome();return out;};}
+  function install(){if(HomeScreen.__domainHomePresentation)return;HomeScreen.__domainHomePresentation=true;const renderBase=HomeScreen.render.bind(HomeScreen);HomeScreen.render=async function(...args){const out=await renderBase(...args);polishHome();return out;};}
   install();setTimeout(polishHome,0);window.CartHomePresentationDomain={actionMeta,polishHome,install};
  });
 })();
