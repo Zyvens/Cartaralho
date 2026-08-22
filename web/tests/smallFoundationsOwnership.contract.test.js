@@ -3,10 +3,13 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const fixes=read('public/js/metaFixes.js'),identity=read('public/js/domains/identityUI.js'),roomLifecycle=read('public/js/core/roomSocketLifecycle.js'),preview=read('public/js/rewardPreviewUI.js'),roomRules=read('public/js/roomRulesUI.js'),rewards=read('public/js/domains/rewardsUI.js'),room=read('public/js/domains/roomUI.js');
 
-test('metaFixes conserva Perfil Público mas não registra placar duplicado',()=>{
+test('metaFixes é o único writer do Perfil Público; identity apenas fornece decoração',()=>{
  assert.match(fixes,/async function render\(panel,userId\)/);
  assert.match(fixes,/HomeScreen\.renderPublicProfile=render/);
  assert.match(fixes,/owner:'publicProfileUI'/);
+ assert.doesNotMatch(identity,/HomeScreen\.renderPublicProfile\s*=/);
+ assert.match(identity,/avatarHtml\(player,size=48/);
+ assert.match(identity,/decoratePublicProfile\(panel,userId\)/);
  assert.doesNotMatch(fixes,/SocketClient\.on\('player_list_update'/);
  assert.match(identity,/SocketClient\.on\('player_list_update'/);
  assert.match(roomLifecycle,/SocketClient\.on\('player_list_update'/);
