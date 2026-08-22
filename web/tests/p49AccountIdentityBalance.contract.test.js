@@ -28,7 +28,7 @@ test('P49 permanece carregado e preservado após releases futuros',()=>{
  assert.ok(index.indexOf('css/p49.css?v=1.4.49')>index.indexOf('css/p48Friends.css?v=1.4.48'));
  assert.ok(index.indexOf('js/p49.js?v=1.4.77')>index.indexOf('js/p48Friends.js?v=1.4.48'));
  assert.match(version,/releaseP77/);
- assert.match(notifications,/releaseP(?:49|[5-9]\d)/);
+ assert.match(notifications,/releaseP77/);
  assert.match(notifications,/P49_RELEASE|releaseP49/);
  assert.match(notifications,/P48_RELEASE/);
 });
