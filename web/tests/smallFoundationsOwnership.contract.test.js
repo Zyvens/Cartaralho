@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const fixes=read('public/js/metaFixes.js'),identity=read('public/js/domains/identityUI.js'),roomLifecycle=read('public/js/core/roomSocketLifecycle.js'),preview=read('public/js/rewardPreviewUI.js'),roomRules=read('public/js/roomRulesUI.js'),rewards=read('public/js/domains/rewardsUI.js'),room=read('public/js/domains/roomUI.js'),loot=read('public/js/lootUI.js'),account=read('public/js/domains/accountUI.js'),finalReward=read('public/js/finalRewardUI.js');
+const fixes=read('public/js/metaFixes.js'),identity=read('public/js/domains/identityUI.js'),roomLifecycle=read('public/js/core/roomSocketLifecycle.js'),preview=read('public/js/rewardPreviewUI.js'),roomRules=read('public/js/roomRulesUI.js'),rewards=read('public/js/domains/rewardsUI.js'),room=read('public/js/domains/roomUI.js'),loot=read('public/js/lootUI.js'),account=read('public/js/domains/accountUI.js'),finalReward=read('public/js/finalRewardUI.js'),profileFoundation=read('public/js/profileModal.js'),appPanel=read('public/js/domains/appPanelUI.js');
 
 test('metaFixes é o único writer do Perfil Público; identity apenas fornece decoração',()=>{
  assert.match(fixes,/async function render\(panel,userId\)/);
@@ -13,6 +13,13 @@ test('metaFixes é o único writer do Perfil Público; identity apenas fornece d
  assert.doesNotMatch(fixes,/SocketClient\.on\('player_list_update'/);
  assert.match(identity,/SocketClient\.on\('player_list_update'/);
  assert.match(roomLifecycle,/SocketClient\.on\('player_list_update'/);
+});
+
+test('ProfileModal é foundation do modal sem reassumir openPanel',()=>{
+ assert.match(profileFoundation,/window\.CartProfileFoundation=\{ProfileModal\}/);
+ assert.doesNotMatch(profileFoundation,/HomeScreen\.openPanel\s*=/);
+ assert.match(appPanel,/HomeScreen\.openPanel=async kind/);
+ assert.match(appPanel,/kind==='profile'\?ProfileModal\.open\('profile'\)/);
 });
 
 test('RewardPreviewUI continua foundation autoritativa sem writer concorrente',()=>{
