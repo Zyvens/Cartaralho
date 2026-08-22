@@ -1,0 +1,144 @@
+name: Visual smoke
+on:
+  push:
+    branches: ['refactor/domain-owners']
+    paths: ['.github/workflows/visual-smoke.yml','web/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: https://cartaralho-git-refactor-domain-owners-owner-de9f2a3c.vercel.app
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Wait for preview
+        shell: bash
+        run: |
+          set -e
+          for i in $(seq 1 60); do
+            code=$(curl -L -sS -o /tmp/home.html -w '%{http_code}' "$BASE_URL/" || true)
+            echo "attempt=$i status=$code"
+            if [ "$code" = "200" ]; then
+              grep -q 'CARTARALHO' /tmp/home.html && exit 0
+            fi
+            sleep 5
+          done
+          echo 'Preview did not become publicly reachable.' >&2
+          exit 1
+      - name: Run visual smoke
+        shell: bash
+        run: |
+          mkdir -p visual-artifacts
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const base = process.env.BASE_URL;
+          const report = { base, startedAt:new Date().toISOString(), checks:[], consoleErrors:[], pageErrors:[] };
+          const check=(name,ok,detail='')=>{ report.checks.push({name,ok,detail}); if(!ok) throw new Error(`${name}: ${detail}`); };
+          async function visible(page,sel){ const l=page.locator(sel).first(); return await l.count() && await l.isVisible(); }
+          async function authenticate(page){
+            await page.goto(base,{waitUntil:'domcontentloaded',timeout:60000});
+            await page.waitForFunction(()=>window.AuthClient&&window.App,{timeout:30000});
+            const suffix=Date.now().toString(36).slice(-8);
+            const user=`rc_${suffix}`.slice(0,24), password='RcVisual#2026';
+            const result=await page.evaluate(async ({user,password})=>{
+              const r=await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:user,password,displayName:`RC ${user}`,email:''})});
+              const d=await r.json().catch(()=>({}));
+              if(!r.ok||!d.token) throw new Error(d.error||`register ${r.status}`);
+              localStorage.setItem('cartaralho_auth_token',d.token);
+              return {user:d.user,token:d.token};
+            },{user,password});
+            check('registration returned authenticated user',!!result.user?.id);
+            await page.reload({waitUntil:'domcontentloaded',timeout:60000});
+            await page.waitForSelector('#home-account .account-strip',{state:'visible',timeout:30000});
+            await page.waitForTimeout(800);
+          }
+          async function assertHome(page,label){
+            check(`${label} profile shortcut visible`,await visible(page,'#profile-shortcut'));
+            check(`${label} logout visible`,await visible(page,'#logout-btn'));
+            check(`${label} profile icon visible`,await visible(page,'#profile-shortcut .p56-account-action-icon'));
+            check(`${label} logout icon visible`,await visible(page,'#logout-btn .p56-account-action-icon'));
+            check(`${label} wallet visible`,await visible(page,'.p74-wallet-slot'));
+            const wallet=await page.locator('.p74-wallet-slot').first().textContent();
+            check(`${label} wallet has value`,/\d|—/.test(wallet||''),wallet||'empty');
+            const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
+            check(`${label} no horizontal overflow`,overflow<=2,`overflow=${overflow}`);
+          }
+          async function captureDesktop(browser){
+            const ctx=await browser.newContext({viewport:{width:1440,height:1000}}),page=await ctx.newPage();
+            page.on('console',m=>{if(m.type()==='error')report.consoleErrors.push({mode:'desktop',text:m.text()});});
+            page.on('pageerror',e=>report.pageErrors.push({mode:'desktop',text:e.message}));
+            await authenticate(page); await assertHome(page,'desktop');
+            await page.screenshot({path:'visual-artifacts/desktop-home.png',fullPage:true});
+            await page.locator('#profile-shortcut').click();
+            await page.waitForSelector('.profile-modal-overlay',{state:'visible',timeout:20000});
+            check('desktop profile modal visible',await visible(page,'.profile-modal-shell'));
+            await page.screenshot({path:'visual-artifacts/desktop-profile.png',fullPage:true});
+            await page.locator('.profile-modal-close').click();
+            await page.locator('#notifications-menu-btn').click();
+            await page.waitForSelector('.notifications-overlay',{state:'visible',timeout:20000});
+            check('desktop notifications modal visible',await visible(page,'.notifications-shell'));
+            await page.screenshot({path:'visual-artifacts/desktop-notifications.png',fullPage:true});
+            await page.locator('.notifications-close').click();
+            await page.locator('#marketplace-menu-btn').click();
+            await page.waitForSelector('.market-overlay',{state:'visible',timeout:20000});
+            check('desktop marketplace visible',await visible(page,'.market-shell'));
+            await page.screenshot({path:'visual-artifacts/desktop-market.png',fullPage:true});
+            await page.locator('.market-close').click();
+            for(const [panel,name] of [['cards','cards'],['rank','rank'],['stats','stats']]){
+              const b=page.locator(`[data-panel="${panel}"]`).first();
+              check(`desktop ${name} menu exists`,await b.count()>0);
+              await b.click(); await page.waitForTimeout(800);
+              await page.screenshot({path:`visual-artifacts/desktop-${name}.png`,fullPage:true});
+              await page.keyboard.press('Escape'); await page.waitForTimeout(250);
+              if(!(await visible(page,'#home-main'))) await page.evaluate(()=>window.App?.showScreen?.('home'));
+              await page.waitForTimeout(500);
+            }
+            await ctx.close();
+          }
+          async function captureMobile(browser){
+            const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'}),page=await ctx.newPage();
+            page.on('console',m=>{if(m.type()==='error')report.consoleErrors.push({mode:'mobile',text:m.text()});});
+            page.on('pageerror',e=>report.pageErrors.push({mode:'mobile',text:e.message}));
+            await authenticate(page); await assertHome(page,'mobile');
+            const fontSizes=await page.evaluate(()=>[...document.querySelectorAll('input,textarea,select')].map(el=>parseFloat(getComputedStyle(el).fontSize||'0')));
+            check('mobile form controls are >=16px',fontSizes.every(x=>x>=16),JSON.stringify(fontSizes));
+            await page.screenshot({path:'visual-artifacts/mobile-home.png',fullPage:true});
+            await page.locator('#profile-shortcut').click();
+            await page.waitForSelector('.profile-modal-overlay',{state:'visible',timeout:20000});
+            const profileOverflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
+            check('mobile profile no horizontal overflow',profileOverflow<=2,`overflow=${profileOverflow}`);
+            await page.screenshot({path:'visual-artifacts/mobile-profile.png',fullPage:true});
+            await page.locator('.profile-modal-close').click();
+            await page.locator('#marketplace-menu-btn').click();
+            await page.waitForSelector('.market-overlay',{state:'visible',timeout:20000});
+            const marketBox=await page.locator('.market-shell').boundingBox();
+            check('mobile market fits viewport',!!marketBox&&marketBox.width<=390&&marketBox.height<=844,JSON.stringify(marketBox));
+            await page.screenshot({path:'visual-artifacts/mobile-market.png',fullPage:true});
+            await ctx.close();
+          }
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            try{ await captureDesktop(browser); await captureMobile(browser); }
+            finally{ await browser.close(); report.finishedAt=new Date().toISOString(); fs.writeFileSync('visual-artifacts/report.json',JSON.stringify(report,null,2)); }
+            if(report.pageErrors.length) throw new Error(`page errors: ${JSON.stringify(report.pageErrors)}`);
+          })().catch(e=>{ report.failure=e.stack||String(e); fs.writeFileSync('visual-artifacts/report.json',JSON.stringify(report,null,2)); console.error(e); process.exit(1); });
+          NODE
+      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-smoke-evidence
+          path: visual-artifacts
+          if-no-files-found: warn
