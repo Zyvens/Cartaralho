@@ -1,7 +1,7 @@
 # Auditoria de lifecycle — `app.js`
 
 > Branch: `refactor/domain-owners`  
-> Baseline: **P75 / v1.4.75**  
+> Baseline: **P77 / v1.4.77**  
 > Objetivo: decompor o controller sem alterar ordem de inicialização, estado, navegação ou semântica de eventos.
 
 ## Estado atual da extração
@@ -19,6 +19,18 @@ O lifecycle runtime foi decomposto em owners carregados após `app.js` e **antes
 `navigationUI` continua sendo o writer final de `App.showScreen` e captura o roteador-base já substituído.
 
 Os equivalentes físicos presentes em `app.js` são agora **fallbacks de compatibilidade** durante a migração. Os owners core são avaliados antes do `DOMContentLoaded`; portanto estado, reset, roteamento, turno local, bootstrap e registro de sockets são substituídos antes do primeiro uso observável do controller.
+
+## Reconciliação P75 → P77
+
+A `main` avançou de P75 para P76/P77 durante a refatoração. A branch foi reconciliada sem reativar os patches históricos PXX:
+
+- P75: primeiro paint da carteira a partir de `dirty_balance` autenticado/cache e confirmação leve por `/api/profile/wallet`;
+- P76: carteira estrutural dentro da account strip sem depender de `body[data-cart-screen="home"]`, além de saldo exato no Megafone individual;
+- P77: correção de owners lexicais reais (`AuthClient`, `HomeScreen`, `SocketClient`) em vez de depender de propriedades `window.*` inexistentes.
+
+Essas garantias foram mapeadas para `domains/marketplaceUI.js`, `domains/accountUI.js`, `accountCurrent.css` e o backend canônico de recompensa. `tests/p77CanonicalWalletOwnership.contract.test.js` congela o resultado final na arquitetura nova.
+
+A branch contém `main@P77` em sua ancestralidade (`behind=0`) por meio do commit de reconciliação, mantendo a árvore canônica da refatoração como resolução.
 
 ## Responsabilidade runtime de `app.js`
 
@@ -145,13 +157,13 @@ Invariantes preservados:
 
 ## Gate Core/lifecycle — FECHADO EM RUNTIME
 
-O contrato final do split de sockets (`55e72ec9e9a0cb02385b391332f7189e338c334a`) e o checkpoint documental subsequente chegaram a preview Vercel **READY**. Portanto, para fins de ownership runtime, o Gate Core/lifecycle está fechado.
+O split de sockets, os owners core e a reconciliação P77 chegaram a preview Vercel **READY**. Portanto, para fins de ownership runtime, o Gate Core/lifecycle está fechado sobre a baseline atual P77.
 
 Isso **não** autoriza ainda a exclusão física dos fallbacks de `app.js`. Eles permanecem até a classificação dos módulos-base JS e o gate de limpeza mecânica, evitando regressão por acoplamentos não identificados.
 
 ## Próxima etapa
 
-1. classificar módulos-base JS restantes por `CURRENT`, `DELEGATE/WRAPPER`, `SUPERSEDED` e `HISTORICAL`;
+1. classificar/decompor `professionalUI.js` e `meta.js` preservando foundations ainda consumidas;
 2. consolidar gameplay/telas-base além do lifecycle;
 3. remover fisicamente fallbacks de `app.js` e wrappers históricos somente depois da classificação completa;
 4. comparar visualmente desktop/mobile antes de retirar shims CSS;
@@ -160,6 +172,7 @@ Isso **não** autoriza ainda a exclusão física dos fallbacks de `app.js`. Eles
 ## Evidência
 
 - `tests/appLifecycle.contract.test.js`
+- `tests/p77CanonicalWalletOwnership.contract.test.js`
 - `public/js/core/appState.js`
 - `public/js/core/screenRouter.js`
 - `public/js/core/localTurnFlow.js`
@@ -168,4 +181,4 @@ Isso **não** autoriza ainda a exclusão física dos fallbacks de `app.js`. Eles
 - `public/js/core/socketLifecycle.js`
 - `public/js/core/appBootstrap.js`
 
-Todos os owners/ativação e o contrato final desta onda chegaram a preview Vercel **READY**.
+Todos os owners/ativação, contrato P77 canônico e commit de reconciliação chegaram a preview Vercel **READY**.
