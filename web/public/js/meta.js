@@ -10,10 +10,6 @@ window.MetaTitleNames=Object.fromEntries(Object.entries(TITLE_INFO).map(([k,v])=
 const RARITY_COLORS={common:'#f4f4f5',rare:'#22c55e',superrare:'#3b82f6',epic:'#a855f7',legendary:'#facc15'};
 const esc=v=>{const d=document.createElement('div');d.textContent=String(v??'');return d.innerHTML;};
 const fmtDate=v=>v?new Date(v).toLocaleString('pt-BR'):'—';
-const MetaClient={
- get:(p)=>AuthClient.request(p),post:(p,b)=>AuthClient.request(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})}),
- metagame(){return this.get('/api/profile/metagame');},missions(){return this.get('/api/profile/missions');},equip(titleKey,frameKey){return this.post('/api/profile/equip',{titleKey,frameKey});},hall(){return this.get('/api/profile/hall-shame');},replay(code){return this.get('/api/profile/replay?code='+encodeURIComponent(code));},groups(){return this.get('/api/social/groups');},group(id){return this.get('/api/social/group?groupId='+encodeURIComponent(id));},createGroup(name){return this.post('/api/social/groups',{action:'create',name});},joinGroup(code){return this.post('/api/social/groups',{action:'join',code});},react(code,emoji){return this.post('/api/game/react',{code,emoji});},spectate(code){return this.get('/api/rooms/spectate?code='+encodeURIComponent(code));}
-};
 const MetaUI={spectatorChannel:null,spectatorCode:null,refreshSpectatorTimer:null,missionOpen:false,
  rarityClass(r){return'rarity-'+(r||'common');},titleName(k){return TITLE_INFO[k]?.[0]||k||'';},titleColor(k){return RARITY_COLORS[TITLE_INFO[k]?.[1]||'common'];},
  decorateTitles(){document.querySelectorAll('[data-title-key]').forEach(el=>{el.style.color=this.titleColor(el.dataset.titleKey);});},
