@@ -33,7 +33,7 @@
    publicPlayer(p){return{...p,titleName:p?.titleName||this.titleName(p?.titleKey),frameName:p?.frameName||this.frameName(p?.frameKey)};}
   };
   window.IdentityUI=I;
-  if(window.HomeScreen&&!HomeScreen.__domainIdentity){HomeScreen.__domainIdentity=true;if(typeof HomeScreen.renderPublicProfile==='function'){const publicBase=HomeScreen.renderPublicProfile.bind(HomeScreen);HomeScreen.renderPublicProfile=async function(panel,userId){const out=await publicBase(panel,userId);I.decoratePublicProfile(panel,userId);return out;};}}
+  if(window.HomeScreen)HomeScreen.__domainIdentity=true;
   if(window.SocketClient&&!SocketClient.__domainIdentityPlayers){SocketClient.__domainIdentityPlayers=true;SocketClient.on('player_list_update',data=>{if(!Array.isArray(data?.players))return;App.state.players=data.players;App.state.scores=data.players.map(p=>({...p,isHost:p.isHost||false,score:p.score||0}));if(['round','host','result'].includes(App.state.currentScreen))Scoreboard.update(App.state.scores);});}
   window.addEventListener('load',()=>I.decorateOwnHome());window.CartIdentityDomain={IdentityUI:I,FRAME_NAMES,BASE_TITLES,EXTRA_TITLES,TITLES,COLORS,decorateTitles};
  });
