@@ -11,6 +11,8 @@
   let payoutListenerRegistered=false;
   function registerMatchPayout(){if(payoutListenerRegistered)return false;payoutListenerRegistered=true;SocketClient.on('game_over',notifyMatchPayout);return true;}
   function installLootGameOver(){if(!window.GameOverScreen||GameOverScreen.__domainLoot)return false;GameOverScreen.__domainLoot=true;const base=GameOverScreen.render.bind(GameOverScreen);GameOverScreen.render=function(container,data={}){const out=base(container,data);const matchId=data.matchId||App.state.roomCode;setTimeout(()=>window.LootUI?.attachGameOver?.(matchId),80);return out;};return true;}
-  ensurePreviewContract();registerMatchPayout();installLootGameOver();const observer=new MutationObserver(records=>{for(const r of records)for(const n of r.addedNodes)if(n.nodeType===1)validateSaqueadorCopy(n);});if(document.body)observer.observe(document.body,{childList:true,subtree:true});window.CartRewardsDomain={ensurePreviewContract,finalRewardState,validateSaqueadorCopy,payoutForCurrentUser,notifyMatchPayout,registerMatchPayout,installLootGameOver};
+  function onFinalRewardSettled(code){if(code)setTimeout(()=>window.LootUI?.attachGameOver?.(code),180);}
+  function installFinalReward(){if(!window.FinalRewardUI)return false;FinalRewardUI.__domainOwned=true;return FinalRewardUI.init();}
+  ensurePreviewContract();registerMatchPayout();installLootGameOver();installFinalReward();const observer=new MutationObserver(records=>{for(const r of records)for(const n of r.addedNodes)if(n.nodeType===1)validateSaqueadorCopy(n);});if(document.body)observer.observe(document.body,{childList:true,subtree:true});window.CartRewardsDomain={ensurePreviewContract,finalRewardState,validateSaqueadorCopy,payoutForCurrentUser,notifyMatchPayout,registerMatchPayout,installLootGameOver,onFinalRewardSettled,installFinalReward};
  });
 })();
