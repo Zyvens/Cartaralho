@@ -15,7 +15,8 @@ test('mostrador fica como filho direto da tag principal da conta e antes das aç
 });
 
 test('saldo nasce do usuário autenticado e a reconciliação usa a carteira leve',()=>{
- assert.match(js,/AuthClient\?\.user/);
+ assert.match(js,/typeof AuthClient!==['"]undefined['"]\?AuthClient:window\.AuthClient/);
+ assert.match(js,/authClient\(\)\?\.user/);
  assert.match(js,/dirty_balance/);
  assert.match(js,/CartP64\?\.refreshBalance/);
  assert.match(js,/CartP63\?\.fetchAuthoritativeBalance/);
@@ -47,11 +48,11 @@ test('P74 se auto-recupera se outro renderer reconstruir a tag da conta',()=>{
  assert.doesNotMatch(css,/body\[data-cart-screen="home"\]/);
 });
 
-test('P74 continua histórico e recebe cache-bust do P76',()=>{
- assert.ok(index.indexOf('css/p74.css?v=1.4.76')>index.indexOf('css/p73.css?v=1.4.73'));
- assert.ok(index.indexOf('js/p74.js?v=1.4.76')>index.indexOf('js/p73.js?v=1.4.73'));
+test('P74 continua histórico e recebe cache-bust do P77',()=>{
+ assert.ok(index.indexOf('css/p74.css?v=1.4.77')>index.indexOf('css/p73.css?v=1.4.73'));
+ assert.ok(index.indexOf('js/p74.js?v=1.4.77')>index.indexOf('js/p73.js?v=1.4.77'));
  assert.match(release,/APP_VERSION='v1\.4\.74'/);
- assert.match(version,/releaseP76/);
+ assert.match(version,/releaseP77/);
  assert.match(notifications,/releaseP74/);
  assert.match(notifications,/P73_RELEASE/);
 });
