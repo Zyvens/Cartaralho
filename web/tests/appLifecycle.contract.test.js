@@ -1,10 +1,20 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const app=read('public/js/app.js'),nav=read('public/js/domains/navigationUI.js'),gameplay=read('public/js/domains/gameplayUI.js'),index=read('public/index.html');
+const app=read('public/js/app.js'),state=read('public/js/core/appState.js'),nav=read('public/js/domains/navigationUI.js'),gameplay=read('public/js/domains/gameplayUI.js'),index=read('public/index.html');
 
 const screens=['home','waitingHost','guest','createRoom','lobby','serverDash','cardCreation','round','host','result','gameOver','admin'];
 const socketEvents=['room_created','room_joined','room_closed','player_list_update','cards_submitted','all_cards_ready','game_started','new_round','card_played','all_cards_played','round_result','game_over','error','player_disconnected','player_left','round_skipped','room_cancelled','player_abandoned','player_reconnected','server_status_update'];
+
+test('appState owner compila e é instalado antes do bootstrap',()=>{
+ assert.doesNotThrow(()=>new Function(state));
+ assert.match(state,/const initial=\(\)=>\(\{/);
+ assert.match(state,/const reset=current=>\(\{/);
+ assert.match(state,/window\.CartAppState=\{initial,reset,install\}/);
+ assert.match(state,/app\.resetState=function\(\)/);
+ const appPos=index.indexOf('js/app.js'),statePos=index.indexOf('js/core/appState.js'),navPos=index.indexOf('js/domains/navigationUI.js');
+ assert.ok(appPos>=0&&statePos>appPos&&navPos>statePos,'app.js → appState → navigationUI');
+});
 
 test('bootstrap inicializa socket, registra eventos uma vez e só então escolhe a primeira tela',()=>{
  const init=app.indexOf('init()'),socket=app.indexOf('SocketClient.init()',init),register=app.indexOf('this.registerSocketEvents()',init),screen=app.indexOf("this.showScreen('home')",init);
@@ -12,12 +22,18 @@ test('bootstrap inicializa socket, registra eventos uma vez e só então escolhe
  assert.match(app,/document\.addEventListener\('DOMContentLoaded',[\s\S]*App\.init\(\)/);
 });
 
-test('estado base e reset preservam identidade enquanto limpam contexto de partida',()=>{
- for(const key of['nickname','roomCode','isCreator','currentScreen','players','hand','currentBlackCard','isHost','scores','roundNumber','maxPlayers'])assert.match(app,new RegExp(`${key}:`),key);
- assert.match(app,/nickname: this\.state\.nickname/);
- assert.match(app,/roomCode: ''/);assert.match(app,/currentScreen: 'home'/);assert.match(app,/players: \[\]/);assert.match(app,/hand: \[\]/);
- assert.match(app,/Scoreboard\.hide\(\)/);
- assert.doesNotMatch(app,/CardCreationScreen\.blackCards\s*=\s*\[\][\s\S]{0,80}resetState/);
+test('owner de estado preserva identidade e limpa exatamente o contexto histórico da partida',()=>{
+ for(const key of['nickname','roomCode','isCreator','currentScreen','players','hand','currentBlackCard','isHost','scores','roundNumber','maxPlayers','blackCardsPerPlayer','whiteCardsPerPlayer'])assert.match(state,new RegExp(`${key}:`),key);
+ assert.match(state,/nickname:current\?\.nickname\|\|''/);
+ assert.match(state,/roomCode:''/);assert.match(state,/currentScreen:'home'/);assert.match(state,/players:\[\]/);assert.match(state,/hand:\[\]/);
+ assert.match(state,/useStandardDeck:true/);
+ assert.match(state,/Scoreboard\?\.hide\?\.\(\)/);
+ assert.doesNotMatch(state,/CardCreationScreen\.blackCards\s*=\s*\[\]|CardCreationScreen\.whiteCards\s*=\s*\[\]/);
+});
+
+test('estado inicial preserva modo online e detecção guest antes de qualquer mutação',()=>{
+ assert.match(state,/playMode:'online'/);assert.match(state,/isGuest:false/);assert.match(state,/guestCode:''/);
+ assert.match(app,/this\.state\.isGuest = true/);assert.match(app,/this\.state\.guestCode = codePart\.toUpperCase\(\)/);
 });
 
 test('roteador-base mantém todas as telas e cleanup antes da transição',()=>{
