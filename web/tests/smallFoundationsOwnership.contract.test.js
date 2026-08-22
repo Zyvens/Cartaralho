@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const fixes=read('public/js/metaFixes.js'),identity=read('public/js/domains/identityUI.js'),roomLifecycle=read('public/js/core/roomSocketLifecycle.js'),preview=read('public/js/rewardPreviewUI.js'),roomRules=read('public/js/roomRulesUI.js'),rewards=read('public/js/domains/rewardsUI.js'),room=read('public/js/domains/roomUI.js');
+const fixes=read('public/js/metaFixes.js'),identity=read('public/js/domains/identityUI.js'),roomLifecycle=read('public/js/core/roomSocketLifecycle.js'),preview=read('public/js/rewardPreviewUI.js'),roomRules=read('public/js/roomRulesUI.js'),rewards=read('public/js/domains/rewardsUI.js'),room=read('public/js/domains/roomUI.js'),loot=read('public/js/lootUI.js'),account=read('public/js/domains/accountUI.js');
 
 test('metaFixes é o único writer do Perfil Público; identity apenas fornece decoração',()=>{
  assert.match(fixes,/async function render\(panel,userId\)/);
@@ -26,4 +26,14 @@ test('RoomRulesUI continua foundation única das regras de sala',()=>{
  for(const key of ['cardCreationEnabled','playerCardsEnabled','buffsEnabled','narratorEnabled','afkEnabled'])assert.match(roomRules,new RegExp(key));
  assert.match(roomRules,/openEditor\(config=/);
  assert.match(room,/RoomRulesUI/);
+});
+
+test('LootUI é foundation de Espólio sem reassumir renderers globais',()=>{
+ assert.match(loot,/window\.CartLootFoundation=\{LootUI\}/);
+ assert.doesNotMatch(loot,/HomeScreen\.renderAccount\s*=/);
+ assert.doesNotMatch(loot,/GameOverScreen\.render\s*=/);
+ assert.match(account,/LootUI\?\.injectHome\?\.\(\)/);
+ assert.match(rewards,/function installLootGameOver/);
+ assert.match(rewards,/LootUI\?\.attachGameOver\?\.\(matchId\)/);
+ assert.match(rewards,/GameOverScreen\.__domainLoot/);
 });
