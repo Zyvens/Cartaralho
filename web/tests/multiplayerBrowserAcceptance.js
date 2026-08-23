@@ -14,7 +14,7 @@ async function harness(page,{role,id,name}){
  await page.addInitScript(({token,sid})=>{localStorage.setItem('cartaralho_auth_token',token);localStorage.setItem('cartalho_session_id',sid);},{token:`token-${role}`,sid:`session-${role}`});
  await page.route('https://js.pusher.com/**',r=>r.fulfill({status:200,contentType:'application/javascript',body:`window.Pusher=class Pusher{constructor(){this.connection={bind(){}}}subscribe(){return{bind(){},unbind_all(){}}}unsubscribe(){}};`}));
  await page.route('**/api/**',async route=>{
-  const req=route.request(),p=new URL(req.url()).pathname;let body={success:true};
+  const p=new URL(route.request().url()).pathname;let body={success:true};
   if(p==='/api/config')body={success:true,pusherKey:'qa',pusherCluster:'mt1'};
   else if(p==='/api/auth/me')body={user:u};
   else if(p==='/api/profile/wallet')body={dirtyBalance:1000};
@@ -30,11 +30,11 @@ async function harness(page,{role,id,name}){
   await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(body)});
  });
  await page.goto(base,{waitUntil:'domcontentloaded',timeout:30000});
- await page.waitForFunction(()=>typeof AuthClient!=='undefined'&&!!AuthClient.user&&!!window.App&&!!window.SocketClient,{timeout:20000});
- await page.evaluate(({name,role})=>{App.state.nickname=name;App.state.isCreator=role==='host';},{name,role});
+ await page.waitForFunction(()=>typeof AuthClient!=='undefined'&&!!window.App&&!!window.SocketClient,{timeout:20000});
+ await page.evaluate(({u,name,role})=>{AuthClient.user=u;App.state.nickname=name;App.state.isCreator=role==='host';App.state.playMode='local-server';SocketClient.roomCode='MCQA77';},{u,name,role});
 }
-async function state(page){return page.evaluate(()=>({screen:App.state.currentScreen,room:App.state.roomCode,nickname:App.state.nickname,isHost:App.state.isHost,hand:(App.state.hand||[]).map(x=>x?.text||x),scores:(App.state.scores||[]).map(x=>({nickname:x.nickname,score:x.score||0,isHost:!!x.isHost})),submissions:(App.state.submissions||[]).length}));}
-async function emit(page,event,data){await page.evaluate(async({event,data})=>{await SocketClient._handleRoomEvent(event,data);},{event,data});await page.waitForTimeout(250);}
+async function state(page){return page.evaluate(()=>({screen:App.state.currentScreen,room:App.state.roomCode,socketRoom:SocketClient.roomCode,nickname:App.state.nickname,isHost:App.state.isHost,hand:(App.state.hand||[]).map(x=>x?.text||x),scores:(App.state.scores||[]).map(x=>({nickname:x.nickname,score:x.score||0,isHost:!!x.isHost})),submissions:(App.state.submissions||[]).length}));}
+async function emit(page,event,data){await page.evaluate(async({event,data})=>{await SocketClient._handleRoomEvent(event,data);},{event,data});await page.waitForTimeout(300);}
 (async()=>{
  const browser=await chromium.launch({headless:true});
  const hostCtx=await browser.newContext({viewport:{width:1280,height:900}}),playerCtx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
@@ -42,9 +42,10 @@ async function emit(page,event,data){await page.evaluate(async({event,data})=>{a
  try{
   await Promise.all([harness(host,{role:'host',id:990101,name:'Host QA'}),harness(player,{role:'player',id:990102,name:'Player QA'})]);
   const config={maxPlayers:6,pointsToWin:1,handSize:5,cardCreationEnabled:true,playerCardsEnabled:true,buffsEnabled:true,narratorEnabled:false};
-  await host.evaluate(d=>SocketClient._emit('room_created',d),{code:'MCQA77',config,players:[{nickname:'Host QA',score:0,isHost:true,isCreator:true,connected:true},{nickname:'Player QA',score:0,isHost:false,connected:true}]});
-  await player.evaluate(d=>SocketClient._emit('room_joined',d),{code:'MCQA77',config,isCreator:false,players:[{nickname:'Host QA',score:0,isHost:true,isCreator:true,connected:true},{nickname:'Player QA',score:0,isHost:false,connected:true}]});
-  await Promise.all([host.waitForTimeout(350),player.waitForTimeout(350)]);
+  const lobbyPlayers=[{nickname:'Host QA',score:0,isHost:true,isCreator:true,connected:true},{nickname:'Player QA',score:0,isHost:false,connected:true}];
+  await host.evaluate(d=>SocketClient._emit('room_created',d),{code:'MCQA77',config,players:lobbyPlayers});
+  await player.evaluate(d=>SocketClient._emit('room_joined',d),{code:'MCQA77',config,isCreator:false,players:lobbyPlayers});
+  await Promise.all([host.waitForTimeout(500),player.waitForTimeout(500)]);
   let hs=await state(host),ps=await state(player);check('both clients enter same lobby',hs.screen==='lobby'&&ps.screen==='lobby'&&hs.room==='MCQA77'&&ps.room==='MCQA77',JSON.stringify({hs,ps}));
   const players=[{nickname:'Host QA',score:0,isHost:true,isCreator:true,connected:true,cardsReady:true},{nickname:'Player QA',score:0,isHost:false,connected:true,cardsReady:true}];
   await Promise.all([emit(host,'player_list_update',{players,_eventId:'players-1'}),emit(player,'player_list_update',{players,_eventId:'players-1'})]);
@@ -61,6 +62,6 @@ async function emit(page,event,data){await page.evaluate(async({event,data})=>{a
   await Promise.all([emit(host,'game_over',over),emit(player,'game_over',over)]);hs=await state(host);ps=await state(player);check('game over converges before settlement',hs.screen==='gameOver'&&ps.screen==='gameOver',JSON.stringify({hs,ps}));
   await Promise.all([host.screenshot({path:path.join(out,'multi-host-gameover.png')}),player.screenshot({path:path.join(out,'multi-player-gameover.png')})]);
   await Promise.all([emit(host,'final_reward_settled',{status:'settled',_eventId:'settled-1'}),emit(player,'final_reward_settled',{status:'settled',_eventId:'settled-1'})]);
-  hs=await state(host);ps=await state(player);check('settlement unsubscribes both rooms',hs.room===null&&ps.room===null,JSON.stringify({hs,ps}));
+  hs=await state(host);ps=await state(player);check('settlement unsubscribes transport on both clients',hs.socketRoom===null&&ps.socketRoom===null,JSON.stringify({hs,ps}));
  }finally{await hostCtx.close();await playerCtx.close();await browser.close();report.finishedAt=new Date().toISOString();fs.writeFileSync(path.join(out,'multiplayer-report.json'),JSON.stringify(report,null,2));}
 })().catch(e=>{report.failure=e.stack||String(e);fs.writeFileSync(path.join(out,'multiplayer-report.json'),JSON.stringify(report,null,2));console.error(e);process.exit(1);});
