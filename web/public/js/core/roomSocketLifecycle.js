@@ -10,6 +10,7 @@
 
     SocketClient.on('room_created',data=>{
       app.state.roomCode=data.code;
+      app.state.roomRevision=Number(data.roomRevision||0);
       app.state.isCreator=true;
       app.state.config=data.config||{};
       app.state.maxPlayers=data.config?.maxPlayers||6;
@@ -25,6 +26,7 @@
 
     SocketClient.on('room_joined',data=>{
       app.state.roomCode=data.code;
+      app.state.roomRevision=Number(data.roomRevision||0);
       app.state.config=data.config||{};
       app.state.maxPlayers=data.config?.maxPlayers||6;
       app.state.blackCardsPerPlayer=data.config?.blackCardsPerPlayer||5;
@@ -63,6 +65,9 @@
 
     SocketClient.on('cards_submitted',data=>{
       if(!data.playerStatuses)return;
+      const incomingRevision=Number(data.roomRevision||0),currentRevision=Number(app.state.roomRevision||0);
+      if(incomingRevision&&incomingRevision<currentRevision)return;
+      if(incomingRevision)app.state.roomRevision=incomingRevision;
       app.state.players=app.state.players.map(p=>{
         const status=data.playerStatuses.find(s=>s.nickname===p.nickname);
         if(status)p.cardsReady=status.cardsReady;
