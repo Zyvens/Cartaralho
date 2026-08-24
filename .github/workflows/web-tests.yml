@@ -83,17 +83,26 @@ jobs:
         env:
           BASE_URL: https://cartaralho-git-refactor-domain-owners-owner-de9f2a3c.vercel.app
           VERCEL_TRUSTED_OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         shell: bash
         run: |
           set -e
+          headers=()
+          if [ -n "${VERCEL_TRUSTED_OIDC_TOKEN:-}" ]; then
+            headers+=(-H "x-vercel-trusted-oidc-idp-token: $VERCEL_TRUSTED_OIDC_TOKEN")
+          fi
+          if [ -n "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]; then
+            headers+=(-H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET")
+            headers+=(-H "x-vercel-set-bypass-cookie: true")
+          fi
           for i in $(seq 1 12); do
             body=/tmp/cartaralho-preview.html
-            code=$(curl -L -sS -o "$body" -w '%{http_code}' -H "x-vercel-trusted-oidc-idp-token: $VERCEL_TRUSTED_OIDC_TOKEN" "$BASE_URL/" || true)
+            code=$(curl -L -sS -o "$body" -w '%{http_code}' "${headers[@]}" "$BASE_URL/" || true)
             title=$(grep -o '<title>[^<]*</title>' "$body" 2>/dev/null | head -1 || true)
             echo "attempt=$i status=$code title=$title"
             if [ "$code" = "200" ] && grep -q '<title>CARTARALHO</title>' "$body"; then exit 0; fi
             if grep -qi '<title>Login .* Vercel</title>' "$body"; then
-              echo 'Preview Protection bloqueou o GitHub Actions: configure GitHub Actions como Trusted Source ou forneça Automation Bypass para o gate E2E real.' >&2
+              echo 'Preview Protection bloqueou o CI. Habilite GitHub Actions como Trusted Source ou configure o secret VERCEL_AUTOMATION_BYPASS_SECRET.' >&2
               exit 42
             fi
             sleep 5
@@ -107,6 +116,7 @@ jobs:
           BASE_URL: https://cartaralho-git-refactor-domain-owners-owner-de9f2a3c.vercel.app
           VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
           VERCEL_TRUSTED_OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: node web/tests/realMultiplayerPreview.js
       - name: Upload visual evidence
         if: always()
