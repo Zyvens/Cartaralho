@@ -51,8 +51,10 @@ test('seleção de cartas usa coração preto e branco, sem coração rosa',()=>
  assert.ok(shim.includes('cardCreationSemanticOverridesCurrent.css'));
 });
 
-test('P22 é shim semântico e P75 é a release corrente',()=>{
- assert.ok(index.indexOf('css/p22.css')>index.indexOf('css/p21.css'));
+test('P22 preserva shim histórico fora do runtime, owners diretos e P75 corrente',()=>{
+ assert.equal(index.indexOf('css/p22.css'),-1);
+ const base=index.indexOf('css/cleanCardStackCurrent.css'),rewardPos=index.indexOf('css/rewardEstimateCurrent.css'),semantic=index.indexOf('css/cardCreationSemanticOverridesCurrent.css'),next=index.indexOf('css/profileSaveFooterCurrent.css');
+ assert.ok(base>=0&&rewardPos>base&&semantic>rewardPos&&next>semantic);
  assert.ok(shim.startsWith('/* COMPAT P22'));
  assert.ok(notifications.includes('release:p22'));
  assert.ok(notifications.includes("version:'v1.4.22'"));
