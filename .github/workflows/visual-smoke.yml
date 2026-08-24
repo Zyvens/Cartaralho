@@ -135,6 +135,11 @@ jobs:
             if(report.pageErrors.length) throw new Error(`page errors: ${JSON.stringify(report.pageErrors)}`);
           })().catch(e=>{ report.failure=e.stack||String(e); fs.writeFileSync('visual-artifacts/report.json',JSON.stringify(report,null,2)); console.error(e); process.exit(1); });
           NODE
+      - name: Run real preview multiplayer smoke
+        env:
+          NODE_PATH: ${{ github.workspace }}/node_modules
+          VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
+        run: node web/tests/realMultiplayerPreview.js
       - name: Upload visual evidence
         if: always()
         uses: actions/upload-artifact@v4
