@@ -29,7 +29,7 @@ A porcentagem é ponderada por risco e volume funcional. Mede responsabilidade r
 | 15 | Remoção de JS/wrappers históricos do runtime | 4% | 4% | monólitos aposentados; bridges restantes têm resultado observável único |
 | 16 | Consolidação/remoção de CSS PXX | 4% | 4% | shims neutros P14–P23 retirados do runtime; owners diretos mantêm a mesma ordem; contratos e browser acceptance permaneceram verdes |
 | 17 | Release/versionamento consolidado | 2% | 2% | P77 corrente com linhagem histórica preservada |
-| 18 | CI final + preview + smoke automatizado de release candidate | 5% | 5% | contratos, browser acceptance e multi-client simulado verdes; preview atual voltou a deployar |
+| 18 | CI final + preview + smoke automatizado de release candidate | 5% | 5% | contratos, browser acceptance e multi-client simulado verdes; preview atual deploya com 8 Functions; gate protegido aceita OIDC ou Automation Bypass |
 | | **TOTAL** | **100%** | **99%** | |
 
 ## Gates fechados mais recentemente
@@ -42,7 +42,7 @@ A porcentagem é ponderada por risco e volume funcional. Mede responsabilidade r
 - `web/vercel.json` declara explicitamente as 8 Functions Node + assets estáticos, abaixo do limite Hobby de 12;
 - `tests/vercelApiGateway.contract.test.js` compara todos os handlers físicos de `api/` contra os gateways e falha se um endpoint ficar sem roteamento ou for registrado duas vezes;
 - rotas dinâmicas Admin preservam `type/index` em `req.query`;
-- deployment do commit `71baf660...` ficou **READY** com `lambdaRuntimeStats: {"nodejs":8}` e o alias da branch aponta para esse deployment.
+- deployments recentes da branch permanecem `READY` com `lambdaRuntimeStats: {"nodejs":8}`.
 
 ### Consolidação CSS
 
@@ -66,7 +66,9 @@ A porcentagem é ponderada por risco e volume funcional. Mede responsabilidade r
 - desktop 1440×1000 e viewport 390×844/iPhone são verificados sem overflow estrutural;
 - primeiro paint preserva carteira e ícones Perfil/Sair;
 - smoke de dois contextos Playwright passa pelo lifecycle `lobby → new_round → card_played → all_cards_played → round_result → game_over → settlement` com isolamento de mão/papel;
-- esse smoke continua classificado corretamente como **transporte simulado**, não como backend/realtime real.
+- esse smoke continua classificado corretamente como **transporte simulado**, não como backend/realtime real;
+- `web-tests.yml`, `visual-smoke.yml` e `tests/realMultiplayerPreview.js` aceitam agora duas vias de acesso a preview protegido sem expor credenciais: **Trusted GitHub OIDC** e **`VERCEL_AUTOMATION_BYPASS_SECRET`**;
+- se o preview ficar público, o runner real também continua válido sem mecanismo de bypass.
 
 ## O que falta para 100%
 
@@ -74,11 +76,24 @@ Resta **1%**, deliberadamente fora da contagem até prova concreta:
 
 **E2E multiplayer multi-cliente contra backend/realtime real do HEAD da branch.**
 
-O deployment atual já é `READY` e usa 8 Functions, portanto deployabilidade deixou de ser bloqueio. O gate restante é **Deployment Protection**: o GitHub Actions consegue mintar OIDC, mas o projeto Vercel ainda redireciona o browser para `Login – Vercel`, indicando que GitHub Actions não está aceito como Trusted Source (ou não há Automation Bypass fornecido ao workflow).
+A deployabilidade não é mais bloqueio: o HEAD continua gerando **8 Functions Node**. O único gate restante é **Deployment Protection**.
 
-O workflow agora verifica explicitamente `<title>CARTARALHO</title>` e falha com diagnóstico de Preview Protection, em vez de aceitar qualquer HTTP 200 da página de login.
+A execução auditada do workflow **Web tests #1032** confirmou simultaneamente:
 
-Quando o acesso trusted/bypass estiver disponível, o E2E existente `tests/realMultiplayerPreview.js` já está preparado para validar em dois clientes reais: registro → criação da sala → entrada → broadcast de jogadores → ready → início → `new_round` → papel de Mestre → isolamento da mão privada.
+- suíte contratual: verde;
+- browser acceptance: verde;
+- lifecycle multi-client simulado: verde;
+- GitHub OIDC: token emitido;
+- `VERCEL_AUTOMATION_BYPASS_SECRET`: **não configurado no GitHub Actions**;
+- preview com OIDC: HTTP 200, porém HTML de `<title>Login – Vercel</title>`;
+- E2E real: corretamente não executado, pois o CI ainda não recebeu acesso trusted/bypass ao deployment.
+
+Portanto, não existe comportamento funcional pendente identificado no código para esse 1%. Para liberar a prova final, basta uma das duas configurações externas:
+
+1. habilitar **GitHub Actions como Trusted Source** no Deployment Protection do projeto Vercel; ou
+2. gerar um **Automation Bypass** na Vercel e cadastrar o valor como secret do repositório com o nome exato `VERCEL_AUTOMATION_BYPASS_SECRET`.
+
+Depois disso, o E2E existente `tests/realMultiplayerPreview.js` valida automaticamente em dois clientes reais: registro → criação da sala → entrada → broadcast de jogadores → ready → início → `new_round` → papel de Mestre → isolamento da mão privada.
 
 ## Regras para subir a porcentagem
 
