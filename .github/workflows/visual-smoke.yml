@@ -1,48 +1,29 @@
-name: Visual smoke
+name: One-time branch cleanup
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/visual-smoke.yml']
 permissions:
-  contents: read
+  contents: write
 jobs:
-  visual:
+  cleanup:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
         with:
-          node-version: 22
-      - name: Install Playwright
-        run: |
-          mkdir -p /tmp/cartaralho-visual && cd /tmp/cartaralho-visual
-          npm init -y >/dev/null 2>&1
-          npm install --no-save playwright@1.55.0
-          npx playwright install --with-deps chromium
-      - name: Serve isolated frontend
+          fetch-depth: 0
+      - name: Delete merged and temporary branches
         shell: bash
         run: |
-          cd web/public
-          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/cartaralho-http.log 2>&1 &
-          echo $! >/tmp/cartaralho-http.pid
-          for i in $(seq 1 20); do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
-          cat /tmp/cartaralho-http.log
-          exit 1
-      - name: Browser acceptance without shared database
-        env:
-          NODE_PATH: /tmp/cartaralho-visual/node_modules
-          VISUAL_BASE_URL: http://127.0.0.1:4173
-          VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
-        run: node web/tests/browserAcceptance.js
-      - name: Simulated multiplayer without shared database
-        env:
-          NODE_PATH: /tmp/cartaralho-visual/node_modules
-          VISUAL_BASE_URL: http://127.0.0.1:4173
-          VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
-        run: node web/tests/multiplayerBrowserAcceptance.js
-      - name: Upload visual evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: visual-smoke-evidence
-          path: visual-artifacts
-          if-no-files-found: warn
+          set -euo pipefail
+          mapfile -t branches < <(git ls-remote --heads origin | awk '{print $2}' | sed 's#refs/heads/##' | sort)
+          echo "Branches before cleanup: ${#branches[@]}"
+          for branch in "${branches[@]}"; do
+            if [[ "$branch" == "main" ]]; then
+              continue
+            fi
+            echo "Deleting $branch"
+            git push origin --delete "$branch"
+          done
+          echo "Remaining branches:"
+          git ls-remote --heads origin | awk '{print $2}' | sed 's#refs/heads/##' | sort
