@@ -39,12 +39,14 @@ jobs:
         run: |
           set -e
           headers=()
-          if [ -n "${VERCEL_TRUSTED_OIDC_TOKEN:-}" ]; then
-            headers+=(-H "x-vercel-trusted-oidc-idp-token: $VERCEL_TRUSTED_OIDC_TOKEN")
-          fi
           if [ -n "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]; then
+            echo 'preview-auth=automation-bypass'
             headers+=(-H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET")
-            headers+=(-H "x-vercel-set-bypass-cookie: true")
+          elif [ -n "${VERCEL_TRUSTED_OIDC_TOKEN:-}" ]; then
+            echo 'preview-auth=trusted-oidc'
+            headers+=(-H "x-vercel-trusted-oidc-idp-token: $VERCEL_TRUSTED_OIDC_TOKEN")
+          else
+            echo 'preview-auth=public'
           fi
           for i in $(seq 1 60); do
             code=$(curl -L -sS -o /tmp/home.html -w '%{http_code}' "${headers[@]}" "$BASE_URL/" || true)
@@ -73,8 +75,8 @@ jobs:
           const oidc=process.env.VERCEL_TRUSTED_OIDC_TOKEN||'';
           const bypass=process.env.VERCEL_AUTOMATION_BYPASS_SECRET||'';
           const protectedHeaders={};
-          if(oidc)protectedHeaders['x-vercel-trusted-oidc-idp-token']=oidc;
           if(bypass){protectedHeaders['x-vercel-protection-bypass']=bypass;protectedHeaders['x-vercel-set-bypass-cookie']='true';}
+          else if(oidc)protectedHeaders['x-vercel-trusted-oidc-idp-token']=oidc;
           const report = { base, startedAt:new Date().toISOString(), protectedPreviewAuthMode:bypass?'automation-bypass':oidc?'trusted-oidc':'none', checks:[], consoleErrors:[], pageErrors:[] };
           const check=(name,ok,detail='')=>{ report.checks.push({name,ok,detail}); if(!ok) throw new Error(`${name}: ${detail}`); };
           async function visible(page,sel){ const l=page.locator(sel).first(); return await l.count() && await l.isVisible(); }
