@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const history=read('public/js/p40.js'),shim=read('public/css/p40.css'),walletCss=read('public/css/walletSurfaceCurrent.css'),appearanceCss=read('public/css/profileAppearanceControlsCurrent.css'),photoCss=read('public/css/profileBasicPhotoCurrent.css'),account=read('public/js/domains/accountUI.js'),profile=read('public/js/domains/profileUI.js'),index=read('public/index.html'),version=read('api/version.js'),notifications=read('api/notifications.js'),release=read('lib/releaseP40.js');
+const history=read('public/js/p40.js'),shim=read('public/css/p40.css'),walletCss=read('public/css/walletSurfaceCurrent.css'),appearanceCss=read('public/css/profileAppearanceControlsCurrent.css'),footerCss=read('public/css/profileSaveFooterCurrent.css'),photoCss=read('public/css/profileBasicPhotoCurrent.css'),account=read('public/js/domains/accountUI.js'),profile=read('public/js/domains/profileUI.js'),index=read('public/index.html'),version=read('api/version.js'),notifications=read('api/notifications.js'),release=read('lib/releaseP40.js');
 
 test('identidade P40 foi absorvida pelo owner atual de conta',()=>{
  assert.doesNotThrow(()=>new Function(account));
@@ -19,17 +19,17 @@ test('superfície visual da carteira vive em owner canônico próprio',()=>{
  assert.ok(shim.includes('walletSurfaceCurrent.css'));
 });
 
-test('seletores de aparência usam CSS estrutural e cor dinâmica por raridade no profileUI',()=>{
+test('seletores P40 foram supersedidos pelo preview transacional de título e moldura',()=>{
  assert.doesNotThrow(()=>new Function(profile));
- assert.ok(appearanceCss.includes('select[data-profile-draft-title]'));
- assert.ok(appearanceCss.includes('select[data-profile-draft-frame]'));
- assert.ok(appearanceCss.includes('font-weight:850!important'));
- assert.ok(profile.includes('function colorAppearanceSelectors'));
- assert.ok(profile.includes('o.dataset.rarity=rarity'));
- assert.ok(profile.includes("select.style.setProperty('color'"));
- assert.ok(profile.includes('COLORS[rarity]'));
- assert.ok(!appearanceCss.includes("data-rarity='common']{color:"));
+ assert.ok(profile.includes('function colorAppearanceSelectors(){/* v1.5: selectors removed; kept as compatibility no-op. */}'));
+ assert.ok(profile.includes('data.previewTitle=key'));
+ assert.ok(profile.includes('data.previewFrame=key'));
+ assert.ok(profile.includes('EXPERIMENTANDO'));
+ assert.ok(!profile.includes('data-profile-draft-title'));
+ assert.ok(!profile.includes('data-profile-draft-frame'));
+ assert.ok(footerCss.includes('.profile-appearance-selector-card{display:none!important}'));
  assert.ok(shim.includes('profileAppearanceControlsCurrent.css'));
+ assert.ok(appearanceCss.includes('select[data-profile-draft-title]'));
 });
 
 test('foto básica do editor permanece sem moldura equipada',()=>{
@@ -48,7 +48,7 @@ test('métricas antigas de Perfil/Sair e cores CSS P40 foram supersedidas',()=>{
  assert.ok(!appearanceCss.includes("data-rarity='legendary']{color:"));
 });
 
-test('P40 é histórico não executável, shim visual, e P75 é a release corrente',()=>{
+test('P40 é histórico não executável, shim visual, e segue na linhagem da v1.5',()=>{
  assert.doesNotThrow(()=>new Function(history));
  assert.ok(index.includes('css/p40.css?v=1.4.40'));
  assert.ok(index.includes('type="application/x-cartaralho-legacy" src="js/p40.js?v=1.4.40"'));
@@ -56,6 +56,7 @@ test('P40 é histórico não executável, shim visual, e P75 é a release corren
  assert.ok(shim.startsWith('/* COMPAT P40'));
  assert.ok(release.includes("APP_VERSION='v1.4.40'"));
  assert.ok(version.includes('releaseP75'));
+ assert.ok(version.includes('releaseV15'));
  assert.ok(notifications.includes('releaseP75'));
  assert.ok(notifications.includes('P40_RELEASE')||notifications.includes('releaseP40'));
 });

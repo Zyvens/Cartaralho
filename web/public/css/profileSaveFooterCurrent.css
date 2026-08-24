@@ -1,8 +1,14 @@
-/* Owner visual canônico do único fluxo de persistência visível do Perfil, originado em P23. */
-.profile-modal-savebar,
-.profile-appearance-savebar{display:none!important}
-.profile-global-footer.is-dirty{
-  border-top-color:rgba(250,204,21,.2)!important;
-  background:linear-gradient(180deg,rgba(20,18,25,.96),rgba(24,20,15,.98))!important;
-}
+/* Owner visual canônico do único fluxo de persistência visível do Perfil — v1.5 inclui preview transacional. */
+.profile-modal-savebar,.profile-appearance-savebar,.profile-appearance-selector-card{display:none!important}
+.profile-global-footer.is-dirty{border-top-color:rgba(250,204,21,.2)!important;background:linear-gradient(180deg,rgba(20,18,25,.96),rgba(24,20,15,.98))!important}
 .profile-global-footer.is-dirty .profile-global-footer-copy small{color:#d7bd6c!important}
+.profile-modal-unlock[data-preview-title],
+.profile-modal-frame-item[data-preview-frame]{cursor:pointer;transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease}
+.profile-modal-unlock[data-preview-title]:hover,
+.profile-modal-frame-item[data-preview-frame]:hover{transform:translateY(-1px)}
+.profile-modal-unlock[data-preview-title]:focus-visible,
+.profile-modal-frame-item[data-preview-frame]:focus-visible{outline:2px solid rgba(167,139,250,.72);outline-offset:3px}
+.profile-modal-unlock.previewing,
+.profile-modal-frame-item.previewing{border-color:rgba(167,139,250,.62)!important;box-shadow:0 0 0 1px rgba(167,139,250,.15),0 14px 34px rgba(76,29,149,.16)!important}
+.profile-modal-preview-pill{display:inline-flex;align-items:center;min-height:23px;padding:0 8px;border:1px solid rgba(167,139,250,.4);border-radius:999px;background:rgba(124,58,237,.14);color:#c4b5fd;font:900 .52rem/1 var(--font-display);letter-spacing:.06em;white-space:nowrap}
+.profile-modal-equip-button{display:none!important}
