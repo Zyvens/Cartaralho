@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  id-token: write
 jobs:
   visual:
     runs-on: ubuntu-latest
@@ -22,21 +23,46 @@ jobs:
           npm init -y >/dev/null 2>&1
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
+      - name: Mint GitHub OIDC token for Vercel preview
+        id: oidc
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken();
+            core.setSecret(token);
+            core.setOutput('token', token);
       - name: Wait for preview
+        env:
+          VERCEL_TRUSTED_OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         shell: bash
         run: |
           set -e
+          headers=()
+          if [ -n "${VERCEL_TRUSTED_OIDC_TOKEN:-}" ]; then
+            headers+=(-H "x-vercel-trusted-oidc-idp-token: $VERCEL_TRUSTED_OIDC_TOKEN")
+          fi
+          if [ -n "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]; then
+            headers+=(-H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET")
+            headers+=(-H "x-vercel-set-bypass-cookie: true")
+          fi
           for i in $(seq 1 60); do
-            code=$(curl -L -sS -o /tmp/home.html -w '%{http_code}' "$BASE_URL/" || true)
-            echo "attempt=$i status=$code"
-            if [ "$code" = "200" ]; then
-              grep -q 'CARTARALHO' /tmp/home.html && exit 0
+            code=$(curl -L -sS -o /tmp/home.html -w '%{http_code}' "${headers[@]}" "$BASE_URL/" || true)
+            title=$(grep -o '<title>[^<]*</title>' /tmp/home.html 2>/dev/null | head -1 || true)
+            echo "attempt=$i status=$code title=$title"
+            if [ "$code" = "200" ] && grep -q '<title>CARTARALHO</title>' /tmp/home.html; then exit 0; fi
+            if grep -qi '<title>Login .* Vercel</title>' /tmp/home.html; then
+              echo 'Preview Protection bloqueou o CI. Habilite GitHub Actions como Trusted Source ou configure o secret VERCEL_AUTOMATION_BYPASS_SECRET.' >&2
+              exit 42
             fi
             sleep 5
           done
-          echo 'Preview did not become publicly reachable.' >&2
+          echo 'Preview did not become reachable as the Cartaralho app.' >&2
           exit 1
       - name: Run visual smoke
+        env:
+          VERCEL_TRUSTED_OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         shell: bash
         run: |
           mkdir -p visual-artifacts
@@ -44,7 +70,12 @@ jobs:
           const { chromium } = require('playwright');
           const fs = require('fs');
           const base = process.env.BASE_URL;
-          const report = { base, startedAt:new Date().toISOString(), checks:[], consoleErrors:[], pageErrors:[] };
+          const oidc=process.env.VERCEL_TRUSTED_OIDC_TOKEN||'';
+          const bypass=process.env.VERCEL_AUTOMATION_BYPASS_SECRET||'';
+          const protectedHeaders={};
+          if(oidc)protectedHeaders['x-vercel-trusted-oidc-idp-token']=oidc;
+          if(bypass){protectedHeaders['x-vercel-protection-bypass']=bypass;protectedHeaders['x-vercel-set-bypass-cookie']='true';}
+          const report = { base, startedAt:new Date().toISOString(), protectedPreviewAuthMode:bypass?'automation-bypass':oidc?'trusted-oidc':'none', checks:[], consoleErrors:[], pageErrors:[] };
           const check=(name,ok,detail='')=>{ report.checks.push({name,ok,detail}); if(!ok) throw new Error(`${name}: ${detail}`); };
           async function visible(page,sel){ const l=page.locator(sel).first(); return await l.count() && await l.isVisible(); }
           async function authenticate(page){
@@ -76,7 +107,7 @@ jobs:
             check(`${label} no horizontal overflow`,overflow<=2,`overflow=${overflow}`);
           }
           async function captureDesktop(browser){
-            const ctx=await browser.newContext({viewport:{width:1440,height:1000}}),page=await ctx.newPage();
+            const ctx=await browser.newContext({viewport:{width:1440,height:1000},extraHTTPHeaders:protectedHeaders}),page=await ctx.newPage();
             page.on('console',m=>{if(m.type()==='error')report.consoleErrors.push({mode:'desktop',text:m.text()});});
             page.on('pageerror',e=>report.pageErrors.push({mode:'desktop',text:e.message}));
             await authenticate(page); await assertHome(page,'desktop');
@@ -108,7 +139,7 @@ jobs:
             await ctx.close();
           }
           async function captureMobile(browser){
-            const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'}),page=await ctx.newPage();
+            const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1',extraHTTPHeaders:protectedHeaders}),page=await ctx.newPage();
             page.on('console',m=>{if(m.type()==='error')report.consoleErrors.push({mode:'mobile',text:m.text()});});
             page.on('pageerror',e=>report.pageErrors.push({mode:'mobile',text:e.message}));
             await authenticate(page); await assertHome(page,'mobile');
@@ -139,6 +170,8 @@ jobs:
         env:
           NODE_PATH: ${{ github.workspace }}/node_modules
           VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
+          VERCEL_TRUSTED_OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: node web/tests/realMultiplayerPreview.js
       - name: Upload visual evidence
         if: always()
