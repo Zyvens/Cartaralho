@@ -32,13 +32,15 @@ test('hero compacto e presença pendente vivem em owners visuais canônicos',()=
  assert.ok(social.includes("pill.classList.remove('p53-presence-pending')"));
 });
 
-test('Missões permanecem fechadas no startup e usam grid canônico de duas colunas',()=>{
+test('Missões permanecem fechadas no startup e organizam BUFF na segunda linha',()=>{
  assert.ok(missions.includes("sessionStorage.setItem('cartaralho_missions_opened','1')"));
  assert.ok(missions.includes('MetaUI.missionOpen=false'));
  assert.ok(missions.includes('p52-mission-coin-pill'));
  assert.ok(missions.includes('mission-xp-pill'));
  assert.ok(missionsCss.includes('grid-template-columns:minmax(0,1fr) auto!important'));
- assert.ok(missionsCss.includes('flex-wrap:nowrap!important'));
+ assert.ok(missionsCss.includes('grid-template-columns:auto auto!important'));
+ assert.ok(missionsCss.includes('.p10-mission-buff'));
+ assert.ok(missionsCss.includes('grid-row:2!important'));
  assert.ok(shim.includes('missionsTwoColumnCurrent.css'));
 });
 
@@ -83,7 +85,7 @@ test('entrada p53/p48 de criação foi supersedida pelo fluxo atual P54/P56/P57'
  assert.ok(!shim.includes('p48-create-card-entry'));
 });
 
-test('P53 é histórico não executável, shim visual, e P75 é a release corrente',()=>{
+test('P53 é histórico não executável, shim visual, e permanece na linhagem',()=>{
  assert.doesNotThrow(()=>new Function(history));
  assert.ok(index.includes('css/p53.css?v=1.4.53'));
  assert.ok(index.includes('type="application/x-cartaralho-legacy" src="js/p53.js?v=1.4.53"'));
@@ -91,6 +93,7 @@ test('P53 é histórico não executável, shim visual, e P75 é a release corren
  assert.ok(shim.startsWith('/* COMPAT P53'));
  assert.ok(release.includes("APP_VERSION='v1.4.53'"));
  assert.ok(version.includes('releaseP75'));
+ assert.ok(version.includes('releaseV15'));
  assert.ok(notifications.includes('releaseP75'));
  assert.ok(notifications.includes('P53_RELEASE'));
  assert.ok(notifications.includes('P52_RELEASE'));
