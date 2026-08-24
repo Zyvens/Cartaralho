@@ -1,2 +1,6 @@
-/* Owner visual canônico da raridade textual dos BUFFs na loja, originado em P18. */
-.market-buff-header .cosmetic-rarity{min-height:0!important;padding:0!important;border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;line-height:1.1!important}
+/* Owner visual canônico da raridade dos BUFFs — v1.5: tipo à esquerda, raridade no canto superior direito. */
+.market-buff-header{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:12px!important;width:100%!important}
+.market-buff-header .buff-type-pill{flex:0 0 auto!important}
+.market-buff-header .cosmetic-rarity{min-height:0!important;padding:0!important;margin:1px 0 0 auto!important;border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;line-height:1.1!important;text-align:right!important;white-space:nowrap!important}
+.market-buff-product>.market-buff-presentation:first-child{position:relative!important}
+.market-buff-product>.market-buff-presentation:first-child .buff-rarity-pill{margin-left:auto!important}

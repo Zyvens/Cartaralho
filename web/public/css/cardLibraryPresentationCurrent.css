@@ -1,8 +1,10 @@
-/* Owner visual canônico da biblioteca real de cartas. Dimensões substituídas por P58/P59 não são recopiadas aqui. */
+/* Owner visual canônico da biblioteca real de cartas — v1.5 inclui marca Original interna e discreta. */
 .p57-library-card-shell{position:relative;min-width:0;display:grid;gap:8px;outline:none;cursor:pointer}
 .p57-library-card-shell:focus-visible{outline:2px solid rgba(217,70,239,.78);outline-offset:4px;border-radius:18px}
-.p57-library-game-card{margin:0!important;animation:none!important;transform:none!important;cursor:pointer;box-shadow:0 14px 34px rgba(0,0,0,.24)!important}
+.p57-library-game-card{position:relative!important;overflow:hidden!important;margin:0!important;animation:none!important;transform:none!important;cursor:pointer;box-shadow:0 14px 34px rgba(0,0,0,.24)!important}
 .p57-library-card-shell:hover .p57-library-game-card{transform:translateY(-2px)!important;box-shadow:0 18px 42px rgba(0,0,0,.31)!important}
+.canonical-original-mark{position:absolute;z-index:7;right:10px;bottom:34px;display:inline-flex;align-items:center;gap:3px;padding:2px 5px;border:1px solid rgba(129,140,248,.28);border-radius:5px;background:rgba(79,70,229,.055);color:rgba(99,102,241,.7);font:800 .48rem/1 var(--font-display);letter-spacing:.035em;text-transform:uppercase;transform:rotate(-13deg);transform-origin:center;opacity:.58;pointer-events:none;user-select:none;box-shadow:none}
+.game-card.black .canonical-original-mark{color:rgba(199,210,254,.62);border-color:rgba(199,210,254,.2);background:rgba(129,140,248,.05)}
 .p57-library-favorite{z-index:8!important;width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.13)!important;border-radius:11px;background:#11111a!important;box-shadow:0 8px 20px rgba(0,0,0,.36);font-size:1.05rem!important}
 .p57-library-favorite.on{color:#facc15!important}
 .p57-library-card-meta{display:flex;justify-content:space-between;gap:8px;padding:0 3px;min-width:0}
@@ -13,4 +15,4 @@
 .p57-card-origin.legacy{color:#858795;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05)}
 .p56-card-preview-host .p57-detail-game-card{margin:0!important;animation:none!important;transform:none!important;box-shadow:0 20px 48px rgba(0,0,0,.36)!important}
 .p56-card-preview-host .p57-detail-game-card .card-watermark{opacity:.38!important}
-@media(max-width:620px){.p57-library-card-meta{padding:0 2px}}
+@media(max-width:620px){.p57-library-card-meta{padding:0 2px}.canonical-original-mark{right:8px;bottom:29px;font-size:.44rem;opacity:.52}}
