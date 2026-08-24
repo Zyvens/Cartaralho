@@ -6,11 +6,23 @@ const path=require('path');
 const base=process.env.BASE_URL||process.env.VISUAL_BASE_URL;
 if(!base)throw new Error('BASE_URL/VISUAL_BASE_URL é obrigatório.');
 const oidc=process.env.VERCEL_TRUSTED_OIDC_TOKEN||'';
+const bypass=process.env.VERCEL_AUTOMATION_BYPASS_SECRET||'';
 const out=process.env.VISUAL_OUT||path.join(process.cwd(),'visual-artifacts');
 fs.mkdirSync(out,{recursive:true});
-const report={kind:'real-preview-multi-client',realBackend:true,base,protectedPreviewAuth:!!oidc,checks:[],startedAt:new Date().toISOString()};
+const protectedPreviewAuthMode=bypass?'automation-bypass':oidc?'trusted-oidc':'none';
+const report={kind:'real-preview-multi-client',realBackend:true,base,protectedPreviewAuth:protectedPreviewAuthMode!=='none',protectedPreviewAuthMode,checks:[],startedAt:new Date().toISOString()};
 const check=(name,ok,detail='')=>{report.checks.push({name,ok,detail});if(!ok)throw new Error(`${name}: ${detail}`);};
 const suffix=Date.now().toString(36).slice(-8);
+
+function protectionHeaders(){
+  const headers={};
+  if(oidc)headers['x-vercel-trusted-oidc-idp-token']=oidc;
+  if(bypass){
+    headers['x-vercel-protection-bypass']=bypass;
+    headers['x-vercel-set-bypass-cookie']='true';
+  }
+  return headers;
+}
 
 async function register(page,role){
   const username=`qa_${role}_${suffix}`.slice(0,24),password='QaPreview#2026',displayName=`QA ${role} ${suffix}`;
@@ -47,7 +59,7 @@ async function snapshot(page){
 
 (async()=>{
   const browser=await chromium.launch({headless:true});
-  const protectedHeaders=oidc?{'x-vercel-trusted-oidc-idp-token':oidc}:{};
+  const protectedHeaders=protectionHeaders();
   const hostCtx=await browser.newContext({viewport:{width:1280,height:900},extraHTTPHeaders:protectedHeaders});
   const playerCtx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,extraHTTPHeaders:protectedHeaders});
   const host=await hostCtx.newPage(),player=await playerCtx.newPage();
@@ -55,6 +67,7 @@ async function snapshot(page){
   player.on('pageerror',e=>report.checks.push({name:'player pageerror',ok:false,detail:e.message}));
   let code=null;
   try{
+    check('protected preview auth mechanism available',protectedPreviewAuthMode!=='none',protectedPreviewAuthMode);
     const [hu,pu]=await Promise.all([register(host,'host'),register(player,'player')]);
     await host.evaluate(name=>{App.state.nickname=name;App.state.playMode='online';},hu.displayName);
     await player.evaluate(name=>{App.state.nickname=name;App.state.playMode='online';},pu.displayName);
