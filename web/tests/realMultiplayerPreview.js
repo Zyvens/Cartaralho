@@ -16,10 +16,11 @@ const suffix=Date.now().toString(36).slice(-8);
 
 function protectionHeaders(){
   const headers={};
-  if(oidc)headers['x-vercel-trusted-oidc-idp-token']=oidc;
   if(bypass){
     headers['x-vercel-protection-bypass']=bypass;
     headers['x-vercel-set-bypass-cookie']='true';
+  }else if(oidc){
+    headers['x-vercel-trusted-oidc-idp-token']=oidc;
   }
   return headers;
 }
