@@ -38,7 +38,9 @@ module.exports=withErrors(async(req,res)=>{
  if(persisted.confirmation)return ok(res,persisted.confirmation);
  const{room,result}=persisted;
  const statuses=gameManager.getPlayerList(room).map(p=>({nickname:p.nickname,cardsReady:p.cardsReady}));
+ const roomRevision=Number(room.revision||0);
  // Prontidão usa somente status textual: avatarData em base64 fazia o evento ultrapassar o limite do Pusher e podia retornar 413 para o Host.
- await broadcast(room.code,'cards_submitted',{playerStatuses:statuses,changed:false,readyChanged:true,message:result.ready?'Prontidão atualizada.':'Prontidão cancelada.'});
- ok(res,{confirmationRequired:false,ready:result.ready,allReady:result.allReady,state:room.state,playerStatuses:statuses,contributionCount:result.contributionCount,lootEligible:result.lootEligible});
+ // A revisão impede snapshots concorrentes antigos de regredirem o estado visual se o Pusher os entregar fora de ordem.
+ await broadcast(room.code,'cards_submitted',{playerStatuses:statuses,roomRevision,changed:false,readyChanged:true,message:result.ready?'Prontidão atualizada.':'Prontidão cancelada.'});
+ ok(res,{confirmationRequired:false,ready:result.ready,allReady:result.allReady,state:room.state,roomRevision,playerStatuses:statuses,contributionCount:result.contributionCount,lootEligible:result.lootEligible});
 });
