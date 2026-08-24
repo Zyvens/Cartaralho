@@ -14,7 +14,7 @@ const suffix=Date.now().toString(36).slice(-8);
 async function register(page,role){
   const username=`qa_${role}_${suffix}`.slice(0,24),password='QaPreview#2026',displayName=`QA ${role} ${suffix}`;
   await page.goto(base,{waitUntil:'domcontentloaded',timeout:60000});
-  await page.waitForFunction(()=>window.AuthClient&&window.App&&window.SocketClient!==undefined,{timeout:30000});
+  await page.waitForFunction(()=>window.AuthClient&&window.App&&typeof SocketClient!=='undefined',{timeout:30000});
   const result=await page.evaluate(async({username,password,displayName})=>{
     const r=await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password,displayName,email:''})});
     const d=await r.json().catch(()=>({}));
@@ -24,7 +24,7 @@ async function register(page,role){
   },{username,password,displayName});
   check(`${role} registered`,!!result.id,JSON.stringify(result));
   await page.reload({waitUntil:'domcontentloaded',timeout:60000});
-  await page.waitForFunction(()=>window.App?.__bootstrapOwned===true&&App.state.currentScreen==='home'&&window.AuthClient?.user?.id,{timeout:30000});
+  await page.waitForFunction(()=>window.App?.__bootstrapOwned===true&&App.state.currentScreen==='home'&&window.AuthClient?.user?.id&&typeof SocketClient!=='undefined',{timeout:30000});
   await page.waitForTimeout(500);
   return result;
 }
