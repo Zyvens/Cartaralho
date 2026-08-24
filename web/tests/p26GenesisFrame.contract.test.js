@@ -29,9 +29,10 @@ test('órbita e breath P26 foram supersedidos pelo resultado P29-P31',()=>{
  assert.ok(atomic.includes('genese-atom-track'));
 });
 
-test('P26 mantém posição histórica da cascata e release permanece registrada',()=>{
- const old=index.indexOf('css/p18.css'),next=index.indexOf('css/p26.css?v=1.4.26');
+test('P26 mantém posição histórica da cascata após owners P14-P23 diretos e release permanece registrada',()=>{
+ const old=index.indexOf('css/profileSaveFooterCurrent.css'),next=index.indexOf('css/p26.css?v=1.4.26');
  assert.ok(old>=0&&next>old);
+ assert.equal(index.indexOf('css/p23.css'),-1);
  assert.ok(shim.startsWith('/* COMPAT P26'));
  assert.ok(notifications.includes('release:p26'));
  assert.ok(notifications.includes('P26 — Gênese refinada'));
