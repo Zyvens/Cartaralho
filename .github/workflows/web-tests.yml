@@ -88,12 +88,14 @@ jobs:
         run: |
           set -e
           headers=()
-          if [ -n "${VERCEL_TRUSTED_OIDC_TOKEN:-}" ]; then
-            headers+=(-H "x-vercel-trusted-oidc-idp-token: $VERCEL_TRUSTED_OIDC_TOKEN")
-          fi
           if [ -n "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]; then
+            echo 'preview-auth=automation-bypass'
             headers+=(-H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET")
-            headers+=(-H "x-vercel-set-bypass-cookie: true")
+          elif [ -n "${VERCEL_TRUSTED_OIDC_TOKEN:-}" ]; then
+            echo 'preview-auth=trusted-oidc'
+            headers+=(-H "x-vercel-trusted-oidc-idp-token: $VERCEL_TRUSTED_OIDC_TOKEN")
+          else
+            echo 'preview-auth=public'
           fi
           for i in $(seq 1 12); do
             body=/tmp/cartaralho-preview.html
