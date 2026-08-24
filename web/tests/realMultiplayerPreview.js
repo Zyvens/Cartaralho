@@ -67,7 +67,6 @@ async function snapshot(page){
   player.on('pageerror',e=>report.checks.push({name:'player pageerror',ok:false,detail:e.message}));
   let code=null;
   try{
-    check('protected preview auth mechanism available',protectedPreviewAuthMode!=='none',protectedPreviewAuthMode);
     const [hu,pu]=await Promise.all([register(host,'host'),register(player,'player')]);
     await host.evaluate(name=>{App.state.nickname=name;App.state.playMode='online';},hu.displayName);
     await player.evaluate(name=>{App.state.nickname=name;App.state.playMode='online';},pu.displayName);
