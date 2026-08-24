@@ -5,15 +5,18 @@ const path=require('path');
 
 const base=process.env.BASE_URL||process.env.VISUAL_BASE_URL;
 if(!base)throw new Error('BASE_URL/VISUAL_BASE_URL é obrigatório.');
+const oidc=process.env.VERCEL_TRUSTED_OIDC_TOKEN||'';
 const out=process.env.VISUAL_OUT||path.join(process.cwd(),'visual-artifacts');
 fs.mkdirSync(out,{recursive:true});
-const report={kind:'real-preview-multi-client',realBackend:true,base,checks:[],startedAt:new Date().toISOString()};
+const report={kind:'real-preview-multi-client',realBackend:true,base,protectedPreviewAuth:!!oidc,checks:[],startedAt:new Date().toISOString()};
 const check=(name,ok,detail='')=>{report.checks.push({name,ok,detail});if(!ok)throw new Error(`${name}: ${detail}`);};
 const suffix=Date.now().toString(36).slice(-8);
 
 async function register(page,role){
   const username=`qa_${role}_${suffix}`.slice(0,24),password='QaPreview#2026',displayName=`QA ${role} ${suffix}`;
-  await page.goto(base,{waitUntil:'domcontentloaded',timeout:60000});
+  const response=await page.goto(base,{waitUntil:'domcontentloaded',timeout:60000});
+  const probe=await page.evaluate(()=>({title:document.title,url:location.href,text:(document.body?.innerText||'').slice(0,180)})).catch(()=>({}));
+  report.checks.push({name:`${role} preview document`,ok:response?.status()===200,detail:JSON.stringify({status:response?.status(),...probe})});
   await page.waitForFunction(()=>window.AuthClient&&window.App&&typeof SocketClient!=='undefined',{timeout:30000});
   const result=await page.evaluate(async({username,password,displayName})=>{
     const r=await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password,displayName,email:''})});
@@ -44,8 +47,9 @@ async function snapshot(page){
 
 (async()=>{
   const browser=await chromium.launch({headless:true});
-  const hostCtx=await browser.newContext({viewport:{width:1280,height:900}});
-  const playerCtx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+  const protectedHeaders=oidc?{'x-vercel-trusted-oidc-idp-token':oidc}:{};
+  const hostCtx=await browser.newContext({viewport:{width:1280,height:900},extraHTTPHeaders:protectedHeaders});
+  const playerCtx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,extraHTTPHeaders:protectedHeaders});
   const host=await hostCtx.newPage(),player=await playerCtx.newPage();
   host.on('pageerror',e=>report.checks.push({name:'host pageerror',ok:false,detail:e.message}));
   player.on('pageerror',e=>report.checks.push({name:'player pageerror',ok:false,detail:e.message}));
