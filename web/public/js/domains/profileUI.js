@@ -27,7 +27,7 @@
   function keepBasicPhotoPlain(root=document){const node=root.querySelector?.('.profile-modal-avatar-editor-card #profile-modal-avatar-preview .profile-modal-avatar')||document.querySelector('.profile-modal-avatar-editor-card #profile-modal-avatar-preview .profile-modal-avatar');if(!node)return;frameClasses(node).forEach(c=>node.classList.remove(c));}
   function colorAppearanceSelectors(){/* v1.5: selectors removed; kept as compatibility no-op. */}
   function stabilizeGenesis(root=document){root.querySelectorAll?.('.profile-modal-frame-grid').forEach(grid=>{grid.classList.add('p57-live-frame-grid','p58-live-frame-grid');grid.classList.remove('profile-modal-frame-grid');});root.querySelectorAll?.('.p58-live-frame-grid .avatar-frame.frame-genese-celestial,.p57-live-frame-grid .avatar-frame.frame-genese-celestial').forEach(frame=>{window.GenesisFrameP29?.mount?.(frame);frame.classList.add('p58-genesis-preview');});}
-  function captureProfileDraft(pm){if(!pm?.overlay)return;const name=pm.overlay.querySelector('#profile-modal-name'),email=pm.overlay.querySelector('#profile-modal-email'),bio=pm.overlay.querySelector('#profile-modal-bio');if(!name&&!email&&!bio)return;pm.__profileDraft={displayName:name?.value??pm.__profileDraft?.displayName??AuthClient.user?.display_name??'',email:email?.value??pm.__profileDraft?.email??AuthClient.user?.email??'',bio:bio?.value??pm.__profileDraft?.bio??''};}
+  function captureProfileDraft(pm){if(!pm?.overlay)return;const name=pm.overlay.querySelector('#profile-modal-name'),email=pm.overlay.querySelector('#profile-modal-email'),bio=pm.overlay.querySelector('#profile-modal-bio');if(!name&&!email&&!bio)return;pm.__profileDraft={displayName:name?.value??pm.__profileDraft?.displayName??AuthClient.user?.display_name??'',email:email?.value??pm.__profileDraft?.email??AuthClient.user?.email??'',bio:bio?.value??pm.__profileDraft?.bio??AuthClient.user?.bio??''};}
   function bindProfileDraft(pm){if(!pm?.overlay||pm.activeTab!=='profile')return;const d=pm.__profileDraft||{},name=pm.overlay.querySelector('#profile-modal-name'),email=pm.overlay.querySelector('#profile-modal-email'),bio=pm.overlay.querySelector('#profile-modal-bio');if(name&&d.displayName!==undefined)name.value=d.displayName;if(email&&d.email!==undefined)email.value=d.email;if(bio&&d.bio!==undefined)bio.value=d.bio;[name,email,bio].filter(Boolean).forEach(el=>{if(el.__domainDraftBound)return;el.__domainDraftBound=true;el.addEventListener('input',()=>captureProfileDraft(pm));});}
   function ensureAppearanceDraft(pm){if(!pm?.data)return;if(pm._appearanceSaved)return;pm._appearanceSaved={titleKey:pm.data.equipped?.titleKey||null,frameKey:pm.data.equipped?.frameKey||null};pm.data.equipped={...pm._appearanceSaved};pm._appearanceDirty=false;pm.__appearanceDirty=false;}
   function setAppearanceDraft(pm,kind,key){
@@ -65,14 +65,14 @@
    if(!body)return;
    body.querySelectorAll('[data-equip-title]').forEach(btn=>{
     const key=btn.dataset.equipTitle,card=btn.closest('.profile-modal-unlock');if(!card)return;
-    card.dataset.previewTitle=key;card.tabIndex=0;card.setAttribute('role','button');card.setAttribute('aria-label',`Experimentar título ${card.querySelector('h3')?.textContent||''}`);
+    const data=card.dataset;data.previewTitle=key;card.tabIndex=0;card.setAttribute('role','button');card.setAttribute('aria-label',`Experimentar título ${card.querySelector('h3')?.textContent||''}`);
     btn.remove();
     const choose=e=>{if(e.type==='keydown'&&!['Enter',' '].includes(e.key))return;if(e.type==='keydown')e.preventDefault();setAppearanceDraft(pm,'title',key);};
     card.addEventListener('click',choose);card.addEventListener('keydown',choose);
    });
    body.querySelectorAll('[data-equip-frame]').forEach(btn=>{
     const key=btn.dataset.equipFrame,card=btn.closest('.profile-modal-frame-item');if(!card)return;
-    card.dataset.previewFrame=key;card.tabIndex=0;card.setAttribute('role','button');card.setAttribute('aria-label',`Experimentar moldura ${card.querySelector('h3')?.textContent||''}`);
+    const data=card.dataset;data.previewFrame=key;card.tabIndex=0;card.setAttribute('role','button');card.setAttribute('aria-label',`Experimentar moldura ${card.querySelector('h3')?.textContent||''}`);
     btn.remove();
     const choose=e=>{if(e.type==='keydown'&&!['Enter',' '].includes(e.key))return;if(e.type==='keydown')e.preventDefault();setAppearanceDraft(pm,'frame',key);};
     card.addEventListener('click',choose);card.addEventListener('keydown',choose);
