@@ -17,7 +17,7 @@ async function register(page,role){
   const response=await page.goto(base,{waitUntil:'domcontentloaded',timeout:60000});
   const probe=await page.evaluate(()=>({title:document.title,url:location.href,text:(document.body?.innerText||'').slice(0,180)})).catch(()=>({}));
   report.checks.push({name:`${role} preview document`,ok:response?.status()===200,detail:JSON.stringify({status:response?.status(),...probe})});
-  await page.waitForFunction(()=>window.AuthClient&&window.App&&typeof SocketClient!=='undefined',{timeout:30000});
+  await page.waitForFunction(()=>typeof AuthClient!=='undefined'&&!!window.App&&typeof SocketClient!=='undefined',{timeout:30000});
   const result=await page.evaluate(async({username,password,displayName})=>{
     const r=await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password,displayName,email:''})});
     const d=await r.json().catch(()=>({}));
@@ -27,7 +27,7 @@ async function register(page,role){
   },{username,password,displayName});
   check(`${role} registered`,!!result.id,JSON.stringify(result));
   await page.reload({waitUntil:'domcontentloaded',timeout:60000});
-  await page.waitForFunction(()=>window.App?.__bootstrapOwned===true&&App.state.currentScreen==='home'&&window.AuthClient?.user?.id&&typeof SocketClient!=='undefined',{timeout:30000});
+  await page.waitForFunction(()=>window.App?.__bootstrapOwned===true&&App.state.currentScreen==='home'&&typeof AuthClient!=='undefined'&&!!AuthClient.user?.id&&typeof SocketClient!=='undefined',{timeout:30000});
   await page.waitForTimeout(500);
   return result;
 }
