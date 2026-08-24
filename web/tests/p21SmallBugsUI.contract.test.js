@@ -66,8 +66,10 @@ test('pilha de Cartas Limpas usa markup atual, consumo superior e slot vazio',()
  assert.ok(shim.includes('cleanCardStackCurrent.css'));
 });
 
-test('P21 é shim semântico e P75 é a release corrente',()=>{
- assert.ok(index.indexOf('css/p21.css')>index.indexOf('css/p20.css'));
+test('P21 preserva shim histórico fora do runtime, owners diretos e P75 corrente',()=>{
+ assert.equal(index.indexOf('css/p21.css'),-1);
+ const base=index.indexOf('css/showcaseCurrent.css'),roomPos=index.indexOf('css/roomSetupDashboardCurrent.css'),tabs=index.indexOf('css/cardTypeTabsCurrent.css'),stack=index.indexOf('css/cleanCardStackCurrent.css'),next=index.indexOf('css/rewardEstimateCurrent.css');
+ assert.ok(base>=0&&roomPos>base&&tabs>roomPos&&stack>tabs&&next>stack);
  assert.ok(shim.startsWith('/* COMPAT P21'));
  assert.ok(notifications.includes('release:p21'));
  assert.ok(version.includes('releaseP75'));
