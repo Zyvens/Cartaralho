@@ -35,7 +35,7 @@ jobs:
 
   visual:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -68,6 +68,28 @@ jobs:
           VISUAL_BASE_URL: http://127.0.0.1:4173
           VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
         run: node web/tests/multiplayerBrowserAcceptance.js
+      - name: Wait for exact branch preview
+        if: github.ref == 'refs/heads/refactor/domain-owners' || github.head_ref == 'refactor/domain-owners'
+        env:
+          BASE_URL: https://cartaralho-git-refactor-domain-owners-owner-de9f2a3c.vercel.app
+        shell: bash
+        run: |
+          set -e
+          for i in $(seq 1 60); do
+            code=$(curl -L -sS -o /tmp/preview-home.html -w '%{http_code}' "$BASE_URL/" || true)
+            echo "attempt=$i status=$code"
+            if [ "$code" = "200" ] && grep -q 'CARTARALHO' /tmp/preview-home.html; then exit 0; fi
+            sleep 5
+          done
+          echo 'Exact branch preview did not become reachable.' >&2
+          exit 1
+      - name: Run real preview multiplayer lifecycle
+        if: github.ref == 'refs/heads/refactor/domain-owners' || github.head_ref == 'refactor/domain-owners'
+        env:
+          NODE_PATH: /tmp/cartaralho-visual/node_modules
+          BASE_URL: https://cartaralho-git-refactor-domain-owners-owner-de9f2a3c.vercel.app
+          VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
+        run: node web/tests/realMultiplayerPreview.js
       - name: Upload visual evidence
         if: always()
         uses: actions/upload-artifact@v4
