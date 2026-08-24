@@ -30,14 +30,14 @@ test('Gênese usa a classe visual atual e sua base vive no owner P26',()=>{
  assert.ok(!shim.includes('frame-genese-celestial'));
 });
 
-test('Perfil possui somente o Salvar alterações global e barras antigas ficam ocultas',()=>{
+test('Perfil possui somente o Salvar alterações global e barras/seletores antigos ficam ocultos',()=>{
  assert.ok(profile.includes("footer.className='profile-global-footer'"));
  assert.ok(profile.includes('profile-global-save'));
  assert.ok(profile.includes('Salvar alterações'));
- assert.ok(profile.includes("body?.querySelectorAll('.profile-modal-savebar,.profile-appearance-savebar').forEach(x=>x.remove())"));
- assert.ok(footerCss.includes('.profile-modal-savebar'));
- assert.ok(footerCss.includes('.profile-appearance-savebar{display:none!important}'));
+ assert.ok(profile.includes("body?.querySelectorAll('.profile-modal-savebar,.profile-appearance-savebar,.profile-appearance-selector-card').forEach(x=>x.remove())"));
+ assert.ok(footerCss.includes('.profile-modal-savebar,.profile-appearance-savebar,.profile-appearance-selector-card{display:none!important}'));
  assert.ok(footerCss.includes('.profile-global-footer.is-dirty'));
+ assert.ok(footerCss.includes('.profile-modal-preview-pill'));
  assert.ok(shim.includes('profileSaveFooterCurrent.css'));
 });
 
@@ -50,7 +50,7 @@ test('Salvar alterações persiste perfil, título e moldura em uma única chama
  assert.ok(settings.includes('equipped_title_key=${titleKey},equipped_frame_key=${frameKey}'));
 });
 
-test('P23 preserva shim histórico fora do runtime, owner direto e P75 corrente',()=>{
+test('P23 preserva shim histórico fora do runtime, owner direto e participa da linhagem até v1.5',()=>{
  assert.equal(index.indexOf('css/p23.css'),-1);
  const base=index.indexOf('css/cardCreationSemanticOverridesCurrent.css'),footer=index.indexOf('css/profileSaveFooterCurrent.css'),next=index.indexOf('css/p26.css?v=1.4.26');
  assert.ok(base>=0&&footer>base&&next>footer);
@@ -58,4 +58,5 @@ test('P23 preserva shim histórico fora do runtime, owner direto e P75 corrente'
  assert.ok(notifications.includes('release:p23'));
  assert.ok(notifications.includes("version:'v1.4.23'"));
  assert.ok(version.includes('releaseP75'));
+ assert.ok(version.includes('releaseV15'));
 });
