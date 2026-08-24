@@ -7,6 +7,7 @@ on:
     paths: ['web/**','.github/workflows/web-tests.yml','.github/workflows/visual-smoke.yml']
 permissions:
   contents: read
+  id-token: write
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -68,15 +69,25 @@ jobs:
           VISUAL_BASE_URL: http://127.0.0.1:4173
           VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
         run: node web/tests/multiplayerBrowserAcceptance.js
+      - name: Mint GitHub OIDC token for Vercel preview
+        if: github.ref == 'refs/heads/refactor/domain-owners' || github.head_ref == 'refactor/domain-owners'
+        id: oidc
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken();
+            core.setSecret(token);
+            core.setOutput('token', token);
       - name: Wait for exact branch preview
         if: github.ref == 'refs/heads/refactor/domain-owners' || github.head_ref == 'refactor/domain-owners'
         env:
           BASE_URL: https://cartaralho-git-refactor-domain-owners-owner-de9f2a3c.vercel.app
+          VERCEL_TRUSTED_OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
         shell: bash
         run: |
           set -e
           for i in $(seq 1 12); do
-            code=$(curl -L -sS -o /dev/null -w '%{http_code}' "$BASE_URL/" || true)
+            code=$(curl -L -sS -o /dev/null -w '%{http_code}' -H "x-vercel-trusted-oidc-idp-token: $VERCEL_TRUSTED_OIDC_TOKEN" "$BASE_URL/" || true)
             echo "attempt=$i status=$code"
             if [ "$code" = "200" ]; then exit 0; fi
             sleep 5
@@ -89,6 +100,7 @@ jobs:
           NODE_PATH: /tmp/cartaralho-visual/node_modules
           BASE_URL: https://cartaralho-git-refactor-domain-owners-owner-de9f2a3c.vercel.app
           VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
+          VERCEL_TRUSTED_OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
         run: node web/tests/realMultiplayerPreview.js
       - name: Upload visual evidence
         if: always()
