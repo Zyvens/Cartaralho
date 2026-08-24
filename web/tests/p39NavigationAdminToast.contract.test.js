@@ -1,57 +1,55 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const css=read('public/css/p39.css'),js=read('public/js/p39.js'),index=read('public/index.html'),version=read('api/version.js'),notifications=read('api/notifications.js'),release=read('lib/releaseP39.js');
+const history=read('public/js/p39.js'),shim=read('public/css/p39.css'),backCss=read('public/css/backButtonEnvelopeCurrent.css'),toastCss=read('public/css/toastViewportCurrent.css'),topNav=read('public/css/topNavigationCurrent.css'),accountActions=read('public/css/accountActionsCurrent.css'),admin=read('public/js/domains/adminUI.js'),index=read('public/index.html'),version=read('api/version.js'),notifications=read('api/notifications.js'),release=read('lib/releaseP39.js');
 
-test('P39 JS compila',()=>assert.doesNotThrow(()=>new Function(js)));
-
-test('Admin some na etapa de apelido e só permanece na Home principal',()=>{
- assert.match(js,/playFormOpen/);
- assert.match(js,/getComputedStyle\(el\)\.display!=='none'/);
- assert.match(js,/currentScreen==='home'/);
- assert.match(js,/!playFormOpen\(\)/);
- assert.match(js,/creator-admin-fab/);
- assert.match(js,/#btn-play,#back-play/);
+test('Admin home-only pertence ao owner canônico adminUI',()=>{
+ assert.doesNotThrow(()=>new Function(admin));
+ assert.ok(admin.includes("App?.state?.currentScreen==='home'"));
+ assert.ok(admin.includes("document.querySelector('.home-screen')"));
+ assert.ok(admin.includes("getComputedStyle(document.getElementById('play-form')).display==='none'"));
+ assert.ok(admin.includes("if(!isAdmin()||!mainHomeOpen()){remove();return null;}"));
+ assert.ok(admin.includes("b.id='creator-admin-fab'"));
 });
 
-test('Voltar usa proporção do pill Missões e o apelido ancora no topo esquerdo',()=>{
- assert.match(css,/button\.back-button/);
- assert.match(css,/button\.ghost-back/);
- assert.match(css,/button\[id\^='back-'\]/);
- assert.match(css,/padding:10px 14px!important/);
- assert.match(css,/border-radius:999px!important/);
- assert.match(css,/#play-form>#back-play\{[\s\S]*position:fixed!important/);
- assert.match(css,/top:calc\(env\(safe-area-inset-top,0px\) \+ 12px\)!important/);
- assert.match(css,/left:12px!important/);
+test('envelope genérico de Voltar vive em owner próprio e refinamentos superiores continuam posteriores',()=>{
+ assert.ok(backCss.includes('button.back-button'));
+ assert.ok(backCss.includes('button.ghost-back'));
+ assert.ok(backCss.includes("button[id^='back-']"));
+ assert.ok(backCss.includes('#play-form>#back-play'));
+ assert.ok(backCss.includes('border-radius:999px!important'));
+ assert.ok(shim.includes('backButtonEnvelopeCurrent.css'));
+ assert.ok(topNav.includes('button.back-button'));
+ assert.ok(topNav.includes('height:40px!important'));
+ assert.ok(index.indexOf('css/p39.css?v=1.4.39')<index.indexOf('css/p45.css?v=1.4.45'));
 });
 
-test('Perfil e Sair acompanham a altura do maior bloco da barra de conta',()=>{
- assert.match(css,/\.home-account-bar #profile-shortcut/);
- assert.match(css,/\.home-account-bar #logout-btn/);
- assert.match(css,/align-self:stretch!important/);
- assert.match(css,/height:auto!important/);
+test('toasts longos quebram linha sem exceder a viewport',()=>{
+ assert.ok(toastCss.includes('width:min(420px,calc(100vw - 24px))!important'));
+ assert.ok(toastCss.includes('white-space:normal!important'));
+ assert.ok(toastCss.includes('overflow-wrap:anywhere'));
+ assert.ok(toastCss.includes('width:calc(100vw - 20px)!important'));
+ assert.ok(shim.includes('toastViewportCurrent.css'));
 });
 
-test('toasts longos quebram linha e o aviso de prontidão fica compacto',()=>{
- assert.match(css,/#toast-container\{[\s\S]*calc\(100vw - 24px\)/);
- assert.match(css,/\.toast\{[\s\S]*white-space:normal!important/);
- assert.match(css,/\.toast-message\{[\s\S]*overflow-wrap:anywhere/);
- assert.match(js,/Prontidão cancelada\. Cartas liberadas para edição\./);
- assert.ok(!js.includes('window.Toast'));
+test('sizing histórico de Perfil/Sair não permanece sob ownership P39',()=>{
+ assert.ok(!backCss.includes('#profile-shortcut'));
+ assert.ok(!backCss.includes('#logout-btn'));
+ assert.ok(!toastCss.includes('#profile-shortcut'));
+ assert.ok(!toastCss.includes('#logout-btn'));
+ assert.ok(accountActions.includes('.p56-account-action'));
+ assert.ok(accountActions.includes('.p56-profile-action'));
+ assert.ok(accountActions.includes('.p56-logout-action'));
 });
 
-test('P39 permanece publicado no histórico após versões futuras',()=>{
- assert.match(release,/APP_VERSION='v1\.4\.39'/);
- assert.match(release,/release:p39/);
- assert.match(version,/releaseP\d+/);
- assert.match(notifications,/releaseP39/);
- assert.match(notifications,/releaseP38/);
- assert.match(notifications,/releaseP37/);
-});
-
-test('P39 continua carregado antes das camadas posteriores',()=>{
- assert.match(index,/css\/p39\.css\?v=1\.4\.39/);
- assert.match(index,/js\/p39\.js\?v=1\.4\.39/);
- assert.ok(index.indexOf('css/p39.css?v=1.4.39')>index.indexOf('css/p37.css?v=1.4.37'));
- assert.ok(index.indexOf('js/p39.js?v=1.4.39')>index.indexOf('js/p38.js?v=1.4.38'));
+test('P39 é histórico não executável, shim visual, e P75 é a release corrente',()=>{
+ assert.doesNotThrow(()=>new Function(history));
+ assert.ok(index.includes('css/p39.css?v=1.4.39'));
+ assert.ok(index.includes('type="application/x-cartaralho-legacy" src="js/p39.js?v=1.4.39"'));
+ assert.ok(!index.includes('<script src="js/p39.js'));
+ assert.ok(shim.startsWith('/* COMPAT P39'));
+ assert.ok(release.includes("APP_VERSION='v1.4.39'"));
+ assert.ok(version.includes('releaseP75'));
+ assert.ok(notifications.includes('releaseP75'));
+ assert.ok(notifications.includes('P39_RELEASE')||notifications.includes('releaseP39'));
 });

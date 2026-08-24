@@ -1,55 +1,18 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const js=read('public/js/p58.js'),css=read('public/css/p58.css'),card=read('public/js/components/card.js'),index=read('public/index.html'),release=read('lib/releaseP58.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
+const cards=read('public/js/domains/cardsLibrary.js'),market=read('public/js/domains/marketplaceUI.js'),profile=read('public/js/domains/profileUI.js'),genesis=read('public/js/domains/genesisFrameUI.js'),gapSeed=read('public/css/cardGapTypographySeedCurrent.css'),libraryMeta=read('public/css/cardLibraryMetadataCurrent.css'),creatorCss=read('public/css/cardCreatorCurrent.css'),recyclingCss=read('public/css/recyclingMetadataCurrent.css'),genesisCss=read('public/css/genesisPreviewCurrent.css'),shim=read('public/css/p58.css'),p59=read('public/css/cardCompactCurrent.css'),p60=read('public/css/cardTypographyMissionsCurrent.css'),card=read('public/js/components/card.js'),index=read('public/index.html'),release=read('lib/releaseP58.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
 
-test('P58 compila e carrega depois de P57',()=>{
- assert.doesNotThrow(()=>new Function(js));
- assert.ok(index.indexOf('css/p58.css?v=1.4.58')>index.indexOf('css/p57.css?v=1.4.57'));
- assert.ok(index.indexOf('js/p58.js?v=1.4.58')>index.indexOf('js/p57.js?v=1.4.72'));
- assert.match(index,/js\/components\/card\.js\?v=1\.4\.58/);
-});
+test('owners canônicos preservam a trajetória P58 e o script histórico não executa',()=>{assert.doesNotThrow(()=>new Function(cards));assert.doesNotThrow(()=>new Function(market));assert.doesNotThrow(()=>new Function(profile));assert.doesNotThrow(()=>new Function(genesis));assert.match(index,/<script src="js\/domains\/cardsLibrary\.js\?v=domain-2"><\/script>/);assert.match(index,/<script src="js\/domains\/marketplaceUI\.js\?v=domain-2"><\/script>/);assert.match(index,/<script src="js\/domains\/profileUI\.js\?v=domain-2"><\/script>/);assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p58\.js\?v=1\.4\.58"><\/script>/);for(const file of['cardGapTypographySeedCurrent.css','cardLibraryMetadataCurrent.css','cardCreatorCurrent.css','recyclingMetadataCurrent.css','genesisPreviewCurrent.css'])assert.ok(shim.includes(file),file);});
 
-test('lacuna canônica é underline textual ___ rosa/roxo e não barra contínua',()=>{
- assert.match(card,/black-card-gap[^>]*>___<\/span>/);
- assert.match(js,/black-card-gap[^>]*>___<\/span>/);
- assert.match(css,/\.black-card-gap[\s\S]*color:#d946ef!important/);
- assert.match(css,/border-bottom:0!important/);
-});
+test('lacuna mantém semântica ___; tipografia P58 é residual e desenho final pertence a P59/P60',()=>{assert.match(card,/black-card-gap[^>]*>___<\/span>/);assert.match(cards,/black-card-gap[^>]*>___<\/span>/);assert.match(gapSeed,/font-weight:850!important/);assert.match(gapSeed,/letter-spacing:\.04em!important/);assert.doesNotMatch(shim,/color:#d946ef|border-bottom:0|aspect-ratio/);assert.match(p59,/width:1\.72em!important/);assert.match(p59,/background-image:linear-gradient\(90deg,#d946ef,#d946ef\)!important/);assert.match(p60,/height:\.82em!important/);});
 
-test('Minhas Cartas usa proporção real de baralho e esconde badge redundante sobre a carta',()=>{
- assert.match(css,/\.p57-library-game-card[\s\S]*aspect-ratio:5\/7!important/);
- assert.match(css,/\.p56-card-preview-host \.p57-detail-game-card[\s\S]*aspect-ratio:5\/7!important/);
- assert.match(css,/\.p57-library-game-card \.card-progression-badge[\s\S]*display:none!important/);
-});
+test('Minhas Cartas usa dimensões finais P59 e conserva apenas metadados residuais P58',()=>{assert.match(cards,/p57-library-game-card/);assert.match(cards,/p56-card-art p57-detail-game-card/);assert.match(p59,/\.p57-library-game-card[\s\S]*width:200px!important[\s\S]*aspect-ratio:1\/1!important/);assert.match(libraryMeta,/grid-template-rows:auto auto!important/);assert.match(libraryMeta,/card-progression-badge[\s\S]*display:none!important/);assert.match(libraryMeta,/\.p57-library-favorite\{right:-8px!important;top:-8px!important/);assert.match(libraryMeta,/\.p56-card-preview-host\{display:grid!important;place-items:center!important/);});
 
-test('Reciclagem remove rótulos redundantes de cor e preserva favorito',()=>{
- assert.match(js,/meta\.remove\(\)/);
- assert.match(js,/meta\.textContent='⭐ FAVORITA'/);
- assert.match(js,/cleanRecycleConfirm/);
- assert.match(css,/p41-recycle-card-preview>span\{display:none!important\}/);
-});
+test('Reciclagem preserva favorito e formatação canônica em owner próprio',()=>{assert.match(market,/p58-recycle-favorite/);assert.match(market,/CardComponent\._formatBlackText\(c\.text\)/);assert.match(market,/p41-recycle-card-preview/);assert.match(recyclingCss,/p58-recycle-favorite/);assert.match(recyclingCss,/recycling-card:not\(:has\(>small\)\)/);});
 
-test('criador de Minhas Cartas reutiliza linguagem visual do criador da partida',()=>{
- assert.match(js,/card-creation-screen/);
- assert.match(js,/card-type-tabs/);
- assert.match(js,/clean-stack-grid/);
- assert.match(js,/creation-instruction/);
- assert.match(js,/creation-input-row/);
- assert.match(js,/CartP48\.openLibraryCreator=openLibraryCreator/);
-});
+test('criador de Minhas Cartas reutiliza linguagem visual do criador da partida',()=>{assert.match(cards,/p58-library-creator card-creation-screen/);assert.match(cards,/card-type-tabs/);assert.match(cards,/clean-stack-grid/);assert.match(cards,/creation-input-row/);assert.match(cards,/async function openCreator/);assert.match(creatorCss,/\.p58-library-creator/);assert.match(creatorCss,/\.p58-creator-workspace \.creation-input-row/);});
 
-test('Gênese no Perfil usa órbita de transform único para estabilidade no scroll',()=>{
- assert.match(js,/p58-genesis-preview/);
- assert.match(css,/p58GenesisPreviewOrbit/);
- assert.match(css,/genese-atom-particle[\s\S]*animation:none!important/);
- assert.match(css,/genese-atom-track[\s\S]*will-change:transform!important/);
-});
+test('Gênese no Perfil preserva órbita estável e reduced-motion',()=>{assert.match(profile,/classList\.add\('p57-live-frame-grid','p58-live-frame-grid'\)/);assert.match(profile,/frame\.classList\.add\('p58-genesis-preview'\)/);assert.match(genesis,/STAR_COUNT=6/);assert.match(genesisCss,/p58GenesisPreviewOrbit/);assert.match(genesisCss,/prefers-reduced-motion:reduce/);});
 
-test('P58 permanece publicado e preservado na Central após releases posteriores',()=>{
- assert.match(release,/APP_VERSION='v1\.4\.58'/);
- assert.match(version,/releaseP\d+/);
- assert.match(notifications,/releaseP58/);
- assert.match(notifications,/P58_RELEASE/);
- assert.match(notifications,/P57_RELEASE/);
-});
+test('P58 permanece como proveniência publicada e P77 é a release corrente',()=>{assert.match(release,/APP_VERSION='v1\.4\.58'/);assert.match(version,/releaseP77/);assert.match(notifications,/releaseP77/);assert.match(notifications,/P58_RELEASE/);assert.match(notifications,/P57_RELEASE/);});

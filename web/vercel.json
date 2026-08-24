@@ -1,0 +1,26 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "builds": [
+    { "src": "serverless/auth.js", "use": "@vercel/node" },
+    { "src": "serverless/cards.js", "use": "@vercel/node" },
+    { "src": "serverless/game.js", "use": "@vercel/node" },
+    { "src": "serverless/profile.js", "use": "@vercel/node" },
+    { "src": "serverless/rooms.js", "use": "@vercel/node" },
+    { "src": "serverless/social.js", "use": "@vercel/node" },
+    { "src": "serverless/admin.js", "use": "@vercel/node" },
+    { "src": "serverless/root.js", "use": "@vercel/node" },
+    { "src": "public/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/auth/(?<path>.*)", "dest": "/serverless/auth.js?__path=$path" },
+    { "src": "/api/cards/(?<path>.*)", "dest": "/serverless/cards.js?__path=$path" },
+    { "src": "/api/game/(?<path>.*)", "dest": "/serverless/game.js?__path=$path" },
+    { "src": "/api/profile/(?<path>.*)", "dest": "/serverless/profile.js?__path=$path" },
+    { "src": "/api/rooms/(?<path>.*)", "dest": "/serverless/rooms.js?__path=$path" },
+    { "src": "/api/social/(?<path>.*)", "dest": "/serverless/social.js?__path=$path" },
+    { "src": "/api/admin/(?<path>.*)", "dest": "/serverless/admin.js?__path=$path" },
+    { "src": "/api/(?<path>.*)", "dest": "/serverless/root.js?__path=$path" },
+    { "src": "/", "dest": "/public/index.html" },
+    { "src": "/(?<path>.*)", "dest": "/public/$path" }
+  ]
+}

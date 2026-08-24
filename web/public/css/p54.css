@@ -1,22 +1,4 @@
-/* P54 — consistência das molduras e criação nativa. */
-.avatar-frame.public-avatar-frame>.user-avatar,
-.avatar-frame.public-avatar-frame>img.user-avatar{border:0!important;background:transparent!important;box-shadow:none!important}
-.profile-modal-avatar[class*="frame-"]{box-sizing:content-box!important}
-.profile-modal-avatar[class*="frame-"]>img{border:0!important;background:transparent!important;box-shadow:none!important}
-.profile-modal-frame-grid .profile-modal-frame-item{contain:layout!important;overflow:visible!important}
-.profile-modal-frame-grid .profile-modal-frame-sample{overflow:visible!important}
-.profile-modal-frame-grid .avatar-frame,
-.profile-modal-frame-grid .avatar-frame::before,
-.profile-modal-frame-grid .avatar-frame::after,
-.profile-modal-frame-grid .avatar-frame img{will-change:auto!important}
-.profile-modal-frame-grid .avatar-frame img{transform:none!important;backface-visibility:visible!important;-webkit-backface-visibility:visible!important}
-.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track{animation:none!important;transform:translate(-50%,-50%) rotate(-28deg)!important;will-change:auto!important}
-.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track>.genese-atom-particle{animation:none!important;opacity:.88!important;transform:translate(-50%,-50%) scale(.82)!important;will-change:auto!important}
-.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track>.genese-atom-particle:nth-child(1){left:100%!important;top:50%!important}
-.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track>.genese-atom-particle:nth-child(2){left:75%!important;top:6.7%!important}
-.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track>.genese-atom-particle:nth-child(3){left:25%!important;top:6.7%!important}
-.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track>.genese-atom-particle:nth-child(4){left:0!important;top:50%!important}
-.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track>.genese-atom-particle:nth-child(5){left:25%!important;top:93.3%!important}
-.profile-modal-frame-grid .avatar-frame.frame-genese-celestial>.genese-atom-track>.genese-atom-particle:nth-child(6){left:75%!important;top:93.3%!important}
-.cards-library>.p54-create-card-entry,
-.p41-my-cards-panel>.p54-create-card-entry{width:100%!important;min-height:48px!important;margin:0 0 14px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;flex:0 0 auto!important}
+/* COMPAT P54 — preserva a posição histórica para integridade do avatar e base do botão de criação.
+   SUPERSEDED: regras .profile-modal-frame-grid, pois profileUI troca o grid por p57-live-frame-grid/p58-live-frame-grid antes do estado visual final. */
+@import url('./profileAvatarFrameIntegrityCurrent.css');
+@import url('./cardsCreateEntryCurrent.css');

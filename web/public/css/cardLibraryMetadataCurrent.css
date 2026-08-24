@@ -1,0 +1,7 @@
+/* Owner visual canônico dos metadados residuais da biblioteca após P58; dimensões ficam nos owners P59. */
+.p57-library-card-shell{grid-template-rows:auto auto!important}
+.p57-library-game-card .card-progression-badge,
+.p57-detail-game-card .card-progression-badge{display:none!important}
+.p57-library-favorite{right:-8px!important;top:-8px!important}
+.p57-library-card-meta{align-items:flex-start!important}
+.p56-card-preview-host{display:grid!important;place-items:center!important}

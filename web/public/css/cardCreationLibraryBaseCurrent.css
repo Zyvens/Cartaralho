@@ -1,0 +1,11 @@
+/* Owner visual canônico do grid-base da seleção/reutilização de Cartas de Jogador, originado em P18. */
+.player-card-library-grid,.created-cards-grid{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))!important;gap:12px!important;align-items:stretch}
+.player-card-library-card{width:100%!important;min-width:0!important;min-height:132px!important;height:100%;cursor:pointer;outline:none}
+.player-card-library-card .card-text{font-size:.82rem!important;line-height:1.38!important;padding-right:2px}
+.player-card-library-card .card-watermark{font-size:.5rem!important;letter-spacing:.08em!important;margin-top:10px!important}
+.player-card-library-card:focus-visible{box-shadow:0 0 0 3px rgba(139,92,246,.42),var(--shadow-lg)!important}
+.player-card-library-card.selected{transform:none!important;box-shadow:0 0 0 2px rgba(139,92,246,.42),var(--shadow-md)!important}
+.player-card-library-card.selected::before{top:7px!important;right:7px!important}
+.created-cards-grid .game-card.card-mini{min-height:132px!important}
+@media(max-width:620px){.player-card-library-grid,.created-cards-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:370px){.player-card-library-grid,.created-cards-grid{grid-template-columns:1fr!important}}

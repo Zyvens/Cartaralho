@@ -1,0 +1,15 @@
+/* Owner visual canônico da aparência residual da recompensa em Moedas Sujas; geometria/altura é refinada nas camadas posteriores de Missões. */
+.p52-mission-coin-pill{
+  white-space:nowrap;
+  border-radius:999px;
+  background:rgba(250,204,21,.12);
+  border:1px solid rgba(250,204,21,.38);
+  color:#fde047;
+  font:800 .72rem var(--font-display);
+  letter-spacing:.02em;
+  box-shadow:0 0 0 1px rgba(250,204,21,.03),0 4px 14px rgba(250,204,21,.06);
+}
+.mission-row.done .p52-mission-coin-pill{opacity:.72}
+@media(max-width:620px){
+  .p52-mission-coin-pill,.mission-xp-pill{font-size:.68rem!important}
+}

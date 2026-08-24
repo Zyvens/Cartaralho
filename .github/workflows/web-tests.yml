@@ -1,12 +1,13 @@
 name: Web tests
 on:
   pull_request:
-    paths: ['web/**','.github/workflows/web-tests.yml']
+    paths: ['web/**','.github/workflows/web-tests.yml','.github/workflows/visual-smoke.yml']
   push:
-    branches: [main]
-    paths: ['web/**','.github/workflows/web-tests.yml']
+    branches: [main, 'refactor/**']
+    paths: ['web/**','.github/workflows/web-tests.yml','.github/workflows/visual-smoke.yml']
 permissions:
   contents: read
+  id-token: write
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -21,4 +22,108 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: npm ci
-      - run: npm test
+      - name: Run full contract suite
+        shell: bash
+        run: |
+          set -o pipefail
+          node --test --test-concurrency=1 tests/*.test.js 2>&1 | tee test-output.log
+      - name: Upload test output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-test-output
+          path: web/test-output.log
+
+  visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          mkdir -p /tmp/cartaralho-visual && cd /tmp/cartaralho-visual
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Serve exact branch frontend
+        shell: bash
+        run: |
+          cd web/public
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/cartaralho-http.log 2>&1 &
+          echo $! >/tmp/cartaralho-http.pid
+          for i in $(seq 1 20); do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/cartaralho-http.log
+          exit 1
+      - name: Run browser acceptance
+        env:
+          NODE_PATH: /tmp/cartaralho-visual/node_modules
+          VISUAL_BASE_URL: http://127.0.0.1:4173
+          VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
+        run: node web/tests/browserAcceptance.js
+      - name: Run simulated multi-client browser lifecycle
+        env:
+          NODE_PATH: /tmp/cartaralho-visual/node_modules
+          VISUAL_BASE_URL: http://127.0.0.1:4173
+          VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
+        run: node web/tests/multiplayerBrowserAcceptance.js
+      - name: Mint GitHub OIDC token for Vercel preview
+        if: github.ref == 'refs/heads/refactor/domain-owners' || github.head_ref == 'refactor/domain-owners'
+        id: oidc
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken();
+            core.setSecret(token);
+            core.setOutput('token', token);
+      - name: Verify exact branch preview is the Cartaralho app
+        if: github.ref == 'refs/heads/refactor/domain-owners' || github.head_ref == 'refactor/domain-owners'
+        env:
+          BASE_URL: https://cartaralho-git-refactor-domain-owners-owner-de9f2a3c.vercel.app
+          VERCEL_TRUSTED_OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        shell: bash
+        run: |
+          set -e
+          headers=()
+          if [ -n "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]; then
+            echo 'preview-auth=automation-bypass'
+            headers+=(-H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET")
+          elif [ -n "${VERCEL_TRUSTED_OIDC_TOKEN:-}" ]; then
+            echo 'preview-auth=trusted-oidc'
+            headers+=(-H "x-vercel-trusted-oidc-idp-token: $VERCEL_TRUSTED_OIDC_TOKEN")
+          else
+            echo 'preview-auth=public'
+          fi
+          for i in $(seq 1 12); do
+            body=/tmp/cartaralho-preview.html
+            code=$(curl -L -sS -o "$body" -w '%{http_code}' "${headers[@]}" "$BASE_URL/" || true)
+            title=$(grep -o '<title>[^<]*</title>' "$body" 2>/dev/null | head -1 || true)
+            echo "attempt=$i status=$code title=$title"
+            if [ "$code" = "200" ] && grep -q '<title>CARTARALHO</title>' "$body"; then exit 0; fi
+            if grep -qi '<title>Login .* Vercel</title>' "$body"; then
+              echo 'Preview Protection bloqueou o CI. Habilite GitHub Actions como Trusted Source ou configure o secret VERCEL_AUTOMATION_BYPASS_SECRET.' >&2
+              exit 42
+            fi
+            sleep 5
+          done
+          echo 'Exact branch preview não entregou o HTML do Cartaralho.' >&2
+          exit 1
+      - name: Run real preview multiplayer lifecycle
+        if: github.ref == 'refs/heads/refactor/domain-owners' || github.head_ref == 'refactor/domain-owners'
+        env:
+          NODE_PATH: /tmp/cartaralho-visual/node_modules
+          BASE_URL: https://cartaralho-git-refactor-domain-owners-owner-de9f2a3c.vercel.app
+          VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
+          VERCEL_TRUSTED_OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: node web/tests/realMultiplayerPreview.js
+      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-smoke-evidence
+          path: visual-artifacts
+          if-no-files-found: warn

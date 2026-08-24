@@ -1,0 +1,10 @@
+/* Owner visual canônico da identificação do painel administrativo. */
+.creator-admin-head small{font-size:0!important}
+.creator-admin-head small::after{
+  content:'admin • VitorIvens';
+  display:block;
+  color:#facc15;
+  font-size:.68rem;
+  font-weight:900;
+  letter-spacing:.1em;
+}

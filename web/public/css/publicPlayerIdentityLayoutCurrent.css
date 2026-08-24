@@ -1,0 +1,8 @@
+/* Owner visual canônico do espaçamento da identidade pública no Lobby/placar, preservado de P32. */
+.player-main{display:flex;align-items:center;gap:20px;flex:1;min-width:0}
+.player-main>.player-info{display:grid;gap:5px;align-content:center;min-width:0}
+.player-main .player-name{line-height:1.15}
+.player-main .equipped-title{line-height:1.2;margin:1px 0 0}
+.player-main .player-status-text{line-height:1.2;margin-top:2px}
+.player-meta{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+@media(max-width:520px){.player-main{gap:17px}}

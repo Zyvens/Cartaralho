@@ -1,0 +1,18 @@
+/* Owner visual canônico da base do formulário de regras, originado em P14.
+   Cabeçalhos e config-value recebem refinamentos posteriores em P21; o resumo/editor têm owners P15. */
+.room-rules-card{border:1px solid rgba(139,92,246,.26);border-radius:20px;background:linear-gradient(145deg,rgba(22,22,34,.96),rgba(12,12,22,.96));box-shadow:0 16px 36px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.035);overflow:hidden}
+.room-rules-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:17px 18px 14px;border-bottom:1px solid rgba(255,255,255,.07)}
+.room-rules-heading small{display:block;color:#9c8dbb;font-size:.66rem;font-weight:900;letter-spacing:.12em}
+.room-rules-heading h3{margin:4px 0 3px;font-size:1.08rem}.room-rules-heading p{margin:0;color:var(--text-muted);font-size:.78rem;line-height:1.4}
+.room-rules-fields{display:grid;gap:0;padding:4px 18px 12px}
+.room-rules-card .room-rule-field{padding:13px 0!important;margin:0!important;border-bottom:1px solid rgba(255,255,255,.055)}
+.room-rules-card .room-rule-field:last-child{border-bottom:0}
+.room-rules-card .config-label{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.room-rules-card .config-label label{font-weight:800}
+.room-rules-card input[type='range']{width:100%;accent-color:#8b5cf6}
+.room-rules-card.checkbox-group{display:block!important}
+.room-rules-card .checkbox-group>label{display:flex!important;align-items:flex-start!important;gap:10px!important;width:100%;font-weight:800;line-height:1.3}
+.room-rules-card .checkbox-group>small,.room-rules-card .room-rule-field>small{display:block!important;margin:6px 0 0!important;color:var(--text-muted)!important;line-height:1.42!important;font-size:.75rem!important;max-width:none!important}
+.room-rules-card .checkbox-group input{margin-top:2px;accent-color:#8b5cf6}
+.room-rules-card.is-readonly input{opacity:.48;cursor:not-allowed}.room-rules-card.is-readonly .room-rule-field{opacity:.86}
+@media(max-width:760px){.room-rules-heading{padding:15px}.room-rules-fields{padding:3px 15px 10px}}

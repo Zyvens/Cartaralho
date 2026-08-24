@@ -1,0 +1,12 @@
+/* Owner visual canônico do slot de saldo durante hidratação; a caixa nasce no primeiro paint e somente o valor muda de opacidade. */
+.home-account-bar .p49-balance-slot{
+  visibility:visible!important;
+  opacity:1!important;
+  contain:layout paint;
+}
+.home-account-bar .p49-balance-slot[data-loading="true"] .p49-balance-value{
+  opacity:.58;
+}
+.home-account-bar .p49-balance-value{
+  transition:opacity .12s ease;
+}

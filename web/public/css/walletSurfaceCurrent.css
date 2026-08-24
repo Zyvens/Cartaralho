@@ -1,0 +1,29 @@
+/* Owner visual canônico da superfície da carteira; métricas compactas são refinadas na camada P41 e posição final em P74. */
+.home-account-bar .home-account-balance{
+  box-sizing:border-box!important;
+  align-self:center!important;
+  height:48px!important;
+  min-height:48px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  margin:0!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  border-radius:12px!important;
+  background:rgba(255,255,255,.035)!important;
+  color:#f4f4f6!important;
+  font:900 1.2rem/1 var(--font-display)!important;
+  white-space:nowrap!important;
+}
+.home-account-bar .home-account-balance b,
+.home-account-bar .home-account-balance strong,
+.home-account-bar .home-account-balance span{
+  font-size:inherit!important;
+  line-height:1!important;
+  color:inherit!important;
+}
+@media(max-width:620px){
+  .home-account-bar .home-account-balance{height:46px!important;min-height:46px!important}
+}

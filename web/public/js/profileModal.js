@@ -281,9 +281,5 @@ const ProfileModal={
 };
 
 window.ProfileModal=ProfileModal;
-const previousOpen=HomeScreen.openPanel.bind(HomeScreen);
-HomeScreen.openPanel=async kind=>{
-  if(kind==='profile')return ProfileModal.open('profile');
-  return previousOpen(kind);
-};
+window.CartProfileFoundation={ProfileModal};
 })();

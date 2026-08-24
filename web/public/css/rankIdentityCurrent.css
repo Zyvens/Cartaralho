@@ -1,0 +1,31 @@
+/* Owner visual canônico da identidade pública no Rank: moldura cosmética + título equipado. */
+.rank-player{overflow:visible!important}
+.rank-player>.rank-avatar-frame{
+  width:46px;
+  height:46px;
+  min-width:46px;
+  margin:1px 3px 1px 0;
+}
+.rank-player>.rank-avatar-frame img,
+.rank-player>.rank-avatar-frame .identity-avatar-fallback{
+  width:38px!important;
+  height:38px!important;
+}
+.rank-player>.rank-copy{min-width:0;text-align:left}
+.rank-equipped-title{
+  display:block!important;
+  width:max-content;
+  max-width:100%;
+  margin:2px 0 3px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:.68rem;
+  line-height:1.2;
+  font-weight:850;
+}
+@media(max-width:520px){
+  .rank-player>.rank-avatar-frame{width:43px;height:43px;min-width:43px}
+  .rank-player>.rank-avatar-frame img,
+  .rank-player>.rank-avatar-frame .identity-avatar-fallback{width:36px!important;height:36px!important}
+}

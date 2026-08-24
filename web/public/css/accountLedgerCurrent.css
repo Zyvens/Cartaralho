@@ -1,0 +1,4 @@
+/* Owner visual canônico — atalho da carteira para o Extrato; posição histórica preservada via shim P62. */
+.account-strip .p62-market-ledger-shortcut{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:filter .16s ease,box-shadow .16s ease}
+.account-strip .p62-market-ledger-shortcut:hover{filter:brightness(1.08)}
+.account-strip .p62-market-ledger-shortcut:focus-visible{outline:2px solid rgba(250,204,21,.88);outline-offset:3px}

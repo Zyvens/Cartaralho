@@ -1,0 +1,3 @@
+/* Refinamento visual canônico do botão Criar Carta sobre a base P54. */
+.p56-create-card-entry{min-height:48px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;border-radius:13px!important}
+.p56-create-card-entry>span{width:24px;height:24px;display:grid;place-items:center;border-radius:8px;background:rgba(0,0,0,.08);font-size:1rem}

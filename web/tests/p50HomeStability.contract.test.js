@@ -1,10 +1,60 @@
 'use strict';
-const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
-const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const css=read('public/css/p50.css'),js=read('public/js/p50.js'),index=read('public/index.html'),release=read('lib/releaseP50.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
-test('Jogo de Cartas volta ao fluxo e hero centraliza Cartaralho',()=>{assert.match(css,/\.home-subtitle\{[\s\S]*position:static!important/);assert.match(css,/\.home-logo\{[\s\S]*height:clamp/);});
-test('Amigos mantém seta à direita e contador antes dela',()=>{assert.match(css,/home-action-arrow[\s\S]*right:20px/);assert.match(css,/p48-friends-online-pill[\s\S]*right:48px/);});
-test('Notificações ficam acima de Histórico',()=>{const n=js.indexOf('#notifications-menu-btn'),h=js.indexOf('[data-panel="history"]');assert.ok(n>=0&&h>n);});
-test('Minhas Cartas garante entrada de criação',()=>{assert.match(js,/ensureCardCreator/);assert.match(js,/Criar nova Carta de Jogador/);assert.match(js,/openLibraryCreator/);});
-test('P50 reduz reinicialização recorrente de presença',()=>{assert.match(js,/__p50Started/);assert.match(js,/document\.hidden/);});
-test('P50 permanece carregado e preservado após releases futuros',()=>{assert.match(index,/css\/p50\.css\?v=1\.4\.50/);assert.match(index,/js\/p50\.js\?v=1\.4\.\d+/);assert.match(release,/APP_VERSION='v1\.4\.50'/);assert.match(version,/releaseP(?:50|5[1-9]|[6-9]\d)/);assert.match(notifications,/releaseP(?:50|5[1-9]|[6-9]\d)/);assert.match(notifications,/P50_RELEASE|releaseP50/);assert.match(notifications,/P49_RELEASE/);});
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('fs');
+const path=require('path');
+const root=path.join(__dirname,'..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const heroCss=read('public/css/homeHeroFlowCurrent.css');
+const friendsCss=read('public/css/friendsIndicatorCurrent.css');
+const shim=read('public/css/p50.css');
+const history=read('public/js/p50.js');
+const nav=read('public/js/domains/navigationUI.js');
+const social=read('public/js/domains/socialUI.js');
+const cards=read('public/js/domains/cardsLibrary.js');
+const index=read('public/index.html');
+const release=read('lib/releaseP50.js');
+const version=read('api/version.js');
+const notifications=read('api/notifications.js');
+
+test('Home hero e indicador de Amigos vivem em owners visuais separados',()=>{
+ assert.ok(heroCss.includes('.home-subtitle'));
+ assert.ok(heroCss.includes('.home-logo'));
+ assert.ok(friendsCss.includes('p48-friends-online-pill'));
+ assert.ok(shim.includes('homeHeroFlowCurrent.css'));
+ assert.ok(shim.includes('friendsIndicatorCurrent.css'));
+ assert.ok(!shim.includes('cardsCreateEntryBaseCurrent.css'));
+});
+
+test('entrada p48 de criação foi supersedida pelo fluxo atual P54/P56/P57',()=>{
+ assert.ok(cards.includes('library-create-entry'));
+ assert.ok(cards.includes('p54-create-card-entry p56-create-card-entry p57-create-card-entry'));
+ assert.ok(cards.includes('Criar nova Carta de Jogador'));
+ assert.ok(cards.includes('openCreator'));
+});
+
+test('navigationUI preserva a ordem Notificações antes de Histórico',()=>{
+ const n=nav.indexOf('#notifications-menu-btn');
+ const h=nav.indexOf('[data-panel="history"]');
+ assert.ok(n>=0&&h>n);
+ assert.ok(nav.includes('function orderMenu()'));
+});
+
+test('socialUI preserva presença fora do ciclo de render',()=>{
+ assert.ok(social.includes('async function heartbeat()'));
+ assert.ok(social.includes('document.hidden'));
+ assert.ok(social.includes('timer=setInterval'));
+});
+
+test('P50 é histórico não executável, shim visual, e P75 é corrente',()=>{
+ assert.doesNotThrow(()=>new Function(history));
+ assert.ok(index.includes('css/p50.css?v=1.4.50'));
+ assert.ok(index.includes('type="application/x-cartaralho-legacy" src="js/p50.js?v=1.4.53"'));
+ assert.ok(!index.includes('<script src="js/p50.js'));
+ assert.ok(shim.startsWith('/* COMPAT P50'));
+ assert.ok(release.includes("APP_VERSION='v1.4.50'"));
+ assert.ok(version.includes('releaseP75'));
+ assert.ok(notifications.includes('releaseP75'));
+ assert.ok(notifications.includes('P50_RELEASE'));
+ assert.ok(notifications.includes('P49_RELEASE'));
+});

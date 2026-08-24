@@ -1,58 +1,66 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const js=read('public/js/p74.js'),css=read('public/css/p74.css'),index=read('public/index.html'),release=read('lib/releaseP74.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
+const account=read('public/js/domains/accountUI.js'),market=read('public/js/domains/marketplaceUI.js'),admin=read('public/js/domains/adminUI.js'),history=read('public/js/p74.js'),currentCss=read('public/css/accountCurrent.css'),compatCss=read('public/css/p74.css'),index=read('public/index.html'),release=read('lib/releaseP74.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
 
-test('P74 compila',()=>assert.doesNotThrow(()=>new Function(js)));
-
-test('mostrador fica como filho direto da tag principal da conta e antes das ações',()=>{
- assert.match(js,/querySelector\(':scope > \.account-strip'\)/);
- assert.match(js,/root\.insertBefore\(slot,anchor\|\|null\)/);
- assert.match(js,/p74-wallet-slot/);
- assert.match(css,/#home-account>\.account-strip\.p74-account-strip>\.p74-wallet-slot/);
- assert.match(css,/flex-wrap:nowrap!important/);
- assert.match(css,/position:static!important/);
+test('owners canônicos do contrato P74 compilam e o artefato histórico continua legível',()=>{
+ for(const source of [account,market,admin,history])assert.doesNotThrow(()=>new Function(source));
 });
 
-test('saldo nasce do usuário autenticado e a reconciliação usa a carteira leve',()=>{
- assert.match(js,/typeof AuthClient!==['"]undefined['"]\?AuthClient:window\.AuthClient/);
- assert.match(js,/authClient\(\)\?\.user/);
- assert.match(js,/dirty_balance/);
- assert.match(js,/CartP64\?\.refreshBalance/);
- assert.match(js,/CartP63\?\.fetchAuthoritativeBalance/);
- assert.match(js,/CartP61\?\.syncDirtyBalance/);
- assert.match(js,/\/api\/profile\/wallet\?_fresh=/);
- assert.doesNotMatch(js,/AuthClient\.request\('\/api\/marketplace'\)/);
- assert.match(js,/cartaralho:balance-updated/);
+test('mostrador fica como filho direto da faixa principal da conta e imediatamente antes das ações',()=>{
+ assert.match(account,/querySelector\(':scope > \.account-strip'\)/);
+ assert.match(account,/classList\.add\('home-account-bar','p74-account-strip'\)/);
+ assert.match(account,/CartMarketplaceDomain\?\.mountBalance/);
+ assert.match(account,/strip\.insertBefore\(wallet,actions\|\|null\)/);
+ assert.match(account,/wallet\.nextElementSibling!==actions/);
+ assert.match(market,/root\.insertBefore\(slot,actions\|\|null\)/);
+ assert.match(market,/p74-wallet-slot/);
+ assert.match(currentCss,/#home-account>\.account-strip\.p74-account-strip>\.p74-wallet-slot/);
+ assert.match(currentCss,/flex-wrap:nowrap!important/);
+ assert.match(currentCss,/position:static!important/);
 });
 
-test('render da Home só posiciona o saldo e não dispara nova consulta concorrente',()=>{
- const patch=js.match(/function patchHome\(\)[\s\S]*?function patchProfessionalUI/);assert.ok(patch);
- assert.match(patch[0],/ensureBalance\(\)/);
- assert.doesNotMatch(patch[0],/scheduleAuthoritative|syncAuthoritative/);
+test('CSS P74 vive no owner visual e o arquivo histórico é somente shim de posição da cascata',()=>{
+ assert.match(currentCss,/p74-wallet-slot[\s\S]*order:30!important/);
+ assert.match(currentCss,/p56-account-actions[\s\S]*order:40!important/);
+ assert.match(compatCss,/COMPAT P74/);
+ assert.match(compatCss,/@import url\('\.\/accountCurrent\.css'\)/);
+ assert.doesNotMatch(compatCss,/p74-wallet-slot\s*\{/);
 });
 
-test('recompensa administrativa atualiza pelo evento exato e confirma o saldo real',()=>{
- assert.match(js,/channel\.bind\('balance_updated'/);
- assert.match(js,/channel\.bind\('admin_megaphone'/);
- assert.match(js,/data\.kind!==['"]reward['"]/);
- assert.match(js,/data\?\.balance/);
- assert.match(js,/p74-admin-reward/);
- assert.match(js,/targetUserIds/);
+test('resultado P74 é preservado e a reconciliação remota concorrente foi SUPERSEDED por P75',()=>{
+ assert.match(market,/knownBalance=explicit/);
+ assert.match(market,/AuthClient\?\.user\?\.dirty_balance/);
+ assert.match(market,/localStorage\.getItem\(cacheKey\(\)\)/);
+ assert.match(market,/mountBalance\(explicit=null\)/);
+ assert.match(account,/HomeScreen\.renderAccount=function/);
+ assert.match(account,/decorate\(\);queueMicrotask\(decorate\);requestAnimationFrame\(decorate\)/);
+ assert.doesNotMatch(account,/CartMarketplaceDomain\?\.refreshBalance\?\.\('home_render'\)/);
+ assert.match(market,/walletRefreshPromise/);
+ assert.match(market,/if\(walletRefreshPromise\)return walletRefreshPromise/);
+ assert.match(market,/AuthClient\.request\(`\/api\/profile\/wallet\?_fresh=\$\{Date\.now\(\)\}`\)/);
+ assert.doesNotMatch(market,/AuthClient\.request\('\/api\/marketplace'\)/);
+ assert.match(market,/cartaralho:balance-updated/);
 });
 
-test('P74 se auto-recupera se outro renderer reconstruir a tag da conta',()=>{
- assert.match(js,/new MutationObserver/);
- assert.match(js,/observeAccount/);
- assert.match(js,/scheduleEnsure/);
- assert.doesNotMatch(css,/body\[data-cart-screen="home"\]/);
+test('recompensa administrativa usa saldo exato quando disponível e confirma no backend',()=>{
+ assert.match(admin,/d\?\.balance!==undefined/);
+ assert.match(admin,/CartMarketplaceDomain\?\.applyBalance/);
+ assert.match(admin,/admin_reward_response/);
+ assert.match(market,/channel\.bind\('admin_megaphone'/);
+ assert.match(market,/data\?\.kind==='reward'/);
+ assert.match(market,/targetUserIds/);
+ assert.match(market,/refreshBalance\('reward_megaphone_confirm'\)/);
 });
 
-test('P74 continua histórico e recebe cache-bust do P77',()=>{
- assert.ok(index.indexOf('css/p74.css?v=1.4.77')>index.indexOf('css/p73.css?v=1.4.73'));
- assert.ok(index.indexOf('js/p74.js?v=1.4.77')>index.indexOf('js/p73.js?v=1.4.77'));
+test('P74 permanece histórico não executável e P75 é a versão atual',()=>{
+ assert.ok(index.indexOf('css/p74.css?v=1.4.74')>index.indexOf('css/p73.css?v=1.4.73'));
+ assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p73\.js\?v=1\.4\.73"><\/script>/);
+ assert.match(index,/<script type="application\/x-cartaralho-legacy" src="js\/p74\.js\?v=1\.4\.74"><\/script>/);
+ assert.doesNotMatch(index,/<script src="js\/p74\.js\?v=1\.4\.74"><\/script>/);
  assert.match(release,/APP_VERSION='v1\.4\.74'/);
- assert.match(version,/releaseP77/);
- assert.match(notifications,/releaseP74/);
+ assert.match(version,/releaseP75/);
+ assert.match(notifications,/releaseP75/);
+ assert.match(notifications,/P74_RELEASE/);
  assert.match(notifications,/P73_RELEASE/);
 });

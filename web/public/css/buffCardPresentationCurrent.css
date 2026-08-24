@@ -1,0 +1,9 @@
+/* Owner visual canônico da apresentação de cards de BUFF no Mercado, originado em P16. */
+.market-buff-product{min-height:205px!important;gap:8px!important}
+.market-buff-main{display:grid!important;grid-template-columns:minmax(0,1fr) 48px;gap:12px;align-items:start;flex:1;margin-top:2px!important}
+.market-buff-copy{min-width:0}
+.market-buff-product .market-buff-copy h4{display:block!important;min-height:0!important;margin:0!important;padding:0!important;font-size:.96rem!important;line-height:1.25!important}
+.market-buff-product .market-buff-copy p{margin:6px 0 0!important;padding:0!important;color:var(--text-muted)!important;font-size:.72rem!important;line-height:1.42!important}
+.market-buff-main .market-buff-icon{align-self:start!important;margin:0!important;width:48px!important;height:48px!important}
+.market-buff-product>.market-price{margin-top:4px!important}
+@media(max-width:390px){.market-buff-main{grid-template-columns:minmax(0,1fr) 44px;gap:9px}.market-buff-main .market-buff-icon{width:44px!important;height:44px!important}}

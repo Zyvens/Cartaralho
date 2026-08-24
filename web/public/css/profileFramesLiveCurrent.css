@@ -1,0 +1,4 @@
+/* Owner visual canônico do grid live de molduras após profileUI substituir profile-modal-frame-grid. */
+.p57-live-frame-grid .profile-modal-frame-item{contain:none!important;overflow:visible!important}
+.p57-live-frame-grid .profile-modal-frame-sample{overflow:visible!important}
+.p57-live-frame-grid .avatar-frame{overflow:visible!important}

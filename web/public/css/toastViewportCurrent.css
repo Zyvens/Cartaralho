@@ -1,0 +1,26 @@
+/* Owner visual canônico de toasts responsivos: mensagens longas nunca forçam largura maior que a viewport. */
+#toast-container{
+  width:min(420px,calc(100vw - 24px))!important;
+  max-width:calc(100vw - 24px)!important;
+}
+.toast{
+  width:auto!important;
+  max-width:100%!important;
+  min-width:0!important;
+  align-items:flex-start!important;
+  padding:.78rem .95rem!important;
+  white-space:normal!important;
+}
+.toast-icon{flex:none;line-height:1.35}
+.toast-message{
+  display:block;
+  min-width:0;
+  max-width:100%;
+  line-height:1.38;
+  overflow-wrap:anywhere;
+  word-break:normal;
+  white-space:normal!important;
+}
+@media(max-width:620px){
+  #toast-container{width:calc(100vw - 20px)!important;max-width:calc(100vw - 20px)!important}
+}

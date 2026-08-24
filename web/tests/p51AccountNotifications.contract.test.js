@@ -1,10 +1,53 @@
 'use strict';
-const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
-const root=path.join(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const css=read('public/css/p51.css'),js=read('public/js/p51.js'),index=read('public/index.html'),release=read('lib/releaseP51.js'),version=read('api/version.js'),notifications=read('api/notifications.js');
-test('identidade alinha usuário e título à esquerda do nome',()=>{assert.match(css,/home-account-identity>span,[\s\S]*account-equipped-title[\s\S]*text-align:left!important/);});
-test('Últimas atualizações permanece em uma linha',()=>{assert.match(css,/notifications-spoiler-heading[\s\S]*white-space:nowrap!important/);assert.match(css,/text-overflow:ellipsis!important/);});
-test('pill de novidade vem antes do título, registros e seta',()=>{assert.match(js,/insertBefore\(pill,heading\)/);assert.match(css,/notifications-section-new[\s\S]*order:1/);assert.match(css,/notifications-spoiler-heading[\s\S]*order:2/);assert.match(css,/notifications-spoiler-meta[\s\S]*order:3/);});
-test('registros e seta usam largura fixa compartilhada',()=>{assert.match(css,/notifications-spoiler-meta[\s\S]*width:118px!important/);assert.match(css,/notifications-spoiler-meta small[\s\S]*width:76px!important[\s\S]*text-align:right!important/);});
-test('Missões registram recompensa em Moedas Sujas no release P51',()=>{assert.match(js,/m\?\.coins/);assert.match(js,/p51-mission-coin-pill/);assert.match(css,/p51-mission-coin-pill[\s\S]*#fde047/);});
-test('P51 permanece carregado e preservado após releases futuros',()=>{assert.doesNotThrow(()=>new Function(js));assert.ok(index.indexOf('css/p51.css?v=1.4.51')>index.indexOf('css/p50.css?v=1.4.50'));assert.ok(index.indexOf('js/p51.js?v=1.4.51')>index.indexOf('js/p50.js?v=1.4.'));assert.match(release,/APP_VERSION='v1\.4\.51'/);assert.match(version,/releaseP(?:51|5[2-9]|[6-9]\d)/);assert.match(notifications,/releaseP(?:51|5[2-9]|[6-9]\d)/);assert.match(notifications,/P51_RELEASE|releaseP51/);assert.match(notifications,/P50_RELEASE/);});
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('fs');
+const path=require('path');
+const root=path.join(__dirname,'..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const accountCss=read('public/css/accountIdentityAlignmentCurrent.css');
+const noticesCss=read('public/css/notificationsSummaryCurrent.css');
+const shim=read('public/css/p51.css');
+const history=read('public/js/p51.js');
+const notices=read('public/js/domains/notificationsUI.js');
+const missions=read('public/js/domains/missionsUI.js');
+const index=read('public/index.html');
+const release=read('lib/releaseP51.js');
+const version=read('api/version.js');
+const notifications=read('api/notifications.js');
+
+test('alinhamento da identidade e resumo da Central vivem em owners visuais canônicos',()=>{
+ assert.ok(accountCss.includes('home-account-identity'));
+ assert.ok(accountCss.includes('text-align:left!important'));
+ assert.ok(noticesCss.includes('notifications-spoiler-heading'));
+ assert.ok(noticesCss.includes('white-space:nowrap!important'));
+ assert.ok(noticesCss.includes('notifications-spoiler-meta'));
+ assert.ok(shim.includes('accountIdentityAlignmentCurrent.css'));
+ assert.ok(shim.includes('notificationsSummaryCurrent.css'));
+});
+
+test('pill P51 de Missões foi supersedida pelo contrato P52',()=>{
+ assert.ok(missions.includes('p52-mission-coin-pill'));
+ assert.ok(missions.includes('mission-xp-pill'));
+ assert.ok(!missions.includes('p51-mission-coin-pill'));
+ assert.ok(!shim.includes('p51-mission-coin-pill'));
+});
+
+test('notificationsUI preserva a pill de novidade antes do título',()=>{
+ assert.ok(notices.includes("pill.className='notifications-section-new'"));
+ assert.ok(notices.includes("summary.insertBefore(pill,summary.querySelector('.notifications-spoiler-heading'))"));
+ assert.ok(notices.includes('normalize()'));
+});
+
+test('P51 é histórico não executável, shim visual, e P75 permanece corrente',()=>{
+ assert.doesNotThrow(()=>new Function(history));
+ assert.ok(index.includes('css/p51.css?v=1.4.51'));
+ assert.ok(index.includes('type="application/x-cartaralho-legacy" src="js/p51.js?v=1.4.51"'));
+ assert.ok(!index.includes('<script src="js/p51.js'));
+ assert.ok(shim.startsWith('/* COMPAT P51'));
+ assert.ok(release.includes("APP_VERSION='v1.4.51'"));
+ assert.ok(version.includes('releaseP75'));
+ assert.ok(notifications.includes('releaseP75'));
+ assert.ok(notifications.includes('P51_RELEASE'));
+ assert.ok(notifications.includes('P50_RELEASE'));
+});

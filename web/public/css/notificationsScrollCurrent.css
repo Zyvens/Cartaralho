@@ -1,0 +1,12 @@
+/* Owner visual canônico do scroll interno dos spoilers da Central, refinamento P36. */
+.notifications-spoiler-content{
+  max-height:min(40vh,360px)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-gutter:stable;
+  min-height:0;
+}
+.notifications-spoiler[open]>.notifications-spoiler-content{padding:12px!important}
+@media(max-width:620px){.notifications-spoiler-content{max-height:min(38vh,300px)!important}}
