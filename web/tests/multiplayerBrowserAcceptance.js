@@ -30,7 +30,8 @@ async function harness(page,{role,id,name}){
   await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(body)});
  });
  await page.goto(base,{waitUntil:'domcontentloaded',timeout:30000});
- await page.waitForFunction(()=>typeof AuthClient!=='undefined'&&!!window.App&&typeof SocketClient!=='undefined',{timeout:20000});
+ await page.waitForFunction(()=>typeof AuthClient!=='undefined'&&!!window.App&&typeof SocketClient!=='undefined'&&window.App.__bootstrapOwned===true&&window.App.state.currentScreen==='home',{timeout:20000});
+ await page.waitForTimeout(350);
  await page.evaluate(({u,name,role})=>{AuthClient.user=u;App.state.nickname=name;App.state.isCreator=role==='host';App.state.playMode='local-server';SocketClient.roomCode='MCQA77';},{u,name,role});
 }
 async function state(page){return page.evaluate(()=>({screen:App.state.currentScreen,room:App.state.roomCode,socketRoom:SocketClient.roomCode,nickname:App.state.nickname,isHost:App.state.isHost,hand:(App.state.hand||[]).map(x=>x?.text||x),scores:(App.state.scores||[]).map(x=>({nickname:x.nickname,score:x.score||0,isHost:!!x.isHost})),submissions:(App.state.submissions||[]).length}));}
