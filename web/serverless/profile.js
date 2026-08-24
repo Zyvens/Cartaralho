@@ -1,0 +1,21 @@
+'use strict';
+const{dispatch}=require('./_common');
+module.exports=(req,res)=>dispatch(req,res,{fixed:{
+ 'card-favorite':require('../api/profile/card-favorite'),
+ 'cards-v14':require('../api/profile/cards-v14'),
+ 'cards':require('../api/profile/cards'),
+ 'equip':require('../api/profile/equip'),
+ 'hall-shame':require('../api/profile/hall-shame'),
+ 'history':require('../api/profile/history'),
+ 'legacy':require('../api/profile/legacy'),
+ 'metagame':require('../api/profile/metagame'),
+ 'missions':require('../api/profile/missions'),
+ 'progression':require('../api/profile/progression'),
+ 'public':require('../api/profile/public'),
+ 'rank':require('../api/profile/rank'),
+ 'recovery-code':require('../api/profile/recovery-code'),
+ 'replay':require('../api/profile/replay'),
+ 'settings':require('../api/profile/settings'),
+ 'stats':require('../api/profile/stats'),
+ 'wallet':require('../api/profile/wallet')
+}});
