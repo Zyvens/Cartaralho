@@ -1,30 +1,30 @@
 # Matriz de ownership visual — CSS histórico → owners atuais
 
 > Branch: `refactor/domain-owners`  
-> Baseline funcional: **P75 / v1.4.75**  
+> Baseline funcional: **P77 / v1.4.77**  
 > Regra de segurança: consolidação visual não pode alterar a posição efetiva da cascata antes do gate de comparação/aceite.
 
 ## Estratégia
 
 1. regra vigente sai do PXX e vai para owner nomeado pelo resultado/domínio;
-2. PXX pode permanecer temporariamente como shim `@import` na posição histórica;
+2. PXX pode permanecer temporariamente como shim `@import` na posição histórica quando essa posição ainda faz parte da equivalência observável;
 3. regra comprovadamente substituída vira `SUPERSEDED` e **não** recebe owner novo;
-4. só no fechamento visual os shims podem sair do `index`, após comparação desktop/mobile.
+4. shims neutros só saem do `index` depois de comparação desktop/mobile; essa prova já foi concluída para P14–P23, cujos owners agora são carregados diretamente.
 
 ## Fundação histórica P14–P44
 
 | Trajetória | Resultado vigente | Owner(s) canônico(s) | Estado PXX |
 |---|---|---|---|
-| P14 | formulário-base de regras + molduras cosméticas-base ainda vigentes | `roomRulesCardBaseCurrent.css`, `cosmeticFramesBaseCurrent.css` | shim |
-| P15 | Resumo da partida + editor modal de regras + cards econômicos por colocação | `roomSummaryCurrent.css`, `roomRulesEditorCurrent.css`, `economyPlacementCurrent.css` | shim |
-| P16 | Pronto explícito + superfície-base da Reciclagem + apresentação de BUFFs | `lobbyReadinessCurrent.css`, `recyclingBaseCurrent.css`, `buffCardPresentationCurrent.css` | shim |
-| P17 | molduras de progressão + base animada dos cosméticos | `progressionFramesCurrent.css`, `animatedCosmeticFramesBaseCurrent.css` | shim |
-| P18 | contribuição/Mão de Vaca + grid-base de criação + raridade textual de BUFF + base da Central | `contributionCurrent.css`, `cardCreationLibraryBaseCurrent.css`, `buffRarityCurrent.css`, `notificationsBaseCurrent.css` | shim |
-| P19 | respostas duplas como uma unidade no gameplay | `doubleAnswerCurrent.css` | shim |
-| P20 | identidade pública + backdrop da Home + Player Showcase | `publicIdentityCurrent.css`, `homeBackdropCurrent.css`, `showcaseCurrent.css` | shim |
-| P21 | dashboard/configuração de sala + abas preto/branco + pilhas de Cartas Limpas | `roomSetupDashboardCurrent.css`, `cardTypeTabsCurrent.css`, `cleanCardStackCurrent.css` | shim |
-| P22 | contexto visual da estimativa + overrides semânticos da criação | `rewardEstimateCurrent.css`, `cardCreationSemanticOverridesCurrent.css` | shim |
-| P23 | único rodapé global de Salvar alterações do Perfil | `profileSaveFooterCurrent.css` | shim |
+| P14 | formulário-base de regras + molduras cosméticas-base ainda vigentes | `roomRulesCardBaseCurrent.css`, `cosmeticFramesBaseCurrent.css` | owner direto; shim fora do runtime |
+| P15 | Resumo da partida + editor modal de regras + cards econômicos por colocação | `roomSummaryCurrent.css`, `roomRulesEditorCurrent.css`, `economyPlacementCurrent.css` | owner direto; shim fora do runtime |
+| P16 | Pronto explícito + superfície-base da Reciclagem + apresentação de BUFFs | `lobbyReadinessCurrent.css`, `recyclingBaseCurrent.css`, `buffCardPresentationCurrent.css` | owner direto; shim fora do runtime |
+| P17 | molduras de progressão + base animada dos cosméticos | `progressionFramesCurrent.css`, `animatedCosmeticFramesBaseCurrent.css` | owner direto; shim fora do runtime |
+| P18 | contribuição/Mão de Vaca + grid-base de criação + raridade textual de BUFF + base da Central | `contributionCurrent.css`, `cardCreationLibraryBaseCurrent.css`, `buffRarityCurrent.css`, `notificationsBaseCurrent.css` | owner direto; shim fora do runtime |
+| P19 | respostas duplas como uma unidade no gameplay | `doubleAnswerCurrent.css` | owner direto; shim fora do runtime |
+| P20 | identidade pública + backdrop da Home + Player Showcase | `publicIdentityCurrent.css`, `homeBackdropCurrent.css`, `showcaseCurrent.css` | owner direto; shim fora do runtime |
+| P21 | dashboard/configuração de sala + abas preto/branco + pilhas de Cartas Limpas | `roomSetupDashboardCurrent.css`, `cardTypeTabsCurrent.css`, `cleanCardStackCurrent.css` | owner direto; shim fora do runtime |
+| P22 | contexto visual da estimativa + overrides semânticos da criação | `rewardEstimateCurrent.css`, `cardCreationSemanticOverridesCurrent.css` | owner direto; shim fora do runtime |
+| P23 | único rodapé global de Salvar alterações do Perfil | `profileSaveFooterCurrent.css` | owner direto; shim fora do runtime |
 | P26 | base/arco da Gênese | `genesisFrameBaseCurrent.css` | shim |
 | P27 | nenhuma regra vigente | — | `HISTORICAL` |
 | P28 | skeleton da Reciclagem; órbita Gênese intermediária substituída | `recyclingSkeletonCurrent.css` | shim |
@@ -110,6 +110,7 @@
 - P20 divide identidade pública, Home e Showcase.
 - P21/P22 definem a composição atual de sala/criação/estimativa.
 - P23 deixa um único ponto de persistência visível no Perfil.
+- No P77 reconciliado, `index.html` carrega diretamente os owners acima na mesma ordem efetiva; os arquivos P14–P23 deixaram de participar do runtime após browser acceptance desktop/mobile e contratos permanecerem verdes.
 
 ### P26 → P31 — Gênese
 
@@ -160,10 +161,10 @@ P26 mantém base/arco; P27 é histórico; P28 mantém somente skeleton da Recicl
 
 - toda regra vigente está em owner canônico;
 - regra substituída é explicitamente `SUPERSEDED`;
-- PXX contém no máximo comentário + `@import`, ou marcador histórico;
+- PXX contém no máximo comentário + `@import`, marcador histórico, ou sai completamente do runtime quando a equivalência já foi provada;
 - contratos testam owners atuais e trajetória final;
 - posição de cascata permanece equivalente enquanto houver shim;
-- remoção posterior dos shims exige comparação visual.
+- remoção de shim exige comparação visual; a faixa P14–P23 já cumpriu esse gate.
 
 ## Evidência principal
 
@@ -216,7 +217,9 @@ P26 mantém base/arco; P27 é histórico; P28 mantém somente skeleton da Recicl
 - `tests/cssAccountOwnership.contract.test.js`
 - `tests/p73AccountStripRender.contract.test.js`
 - `tests/p74WalletPlacement.contract.test.js`
+- `tests/browserAcceptance.js`
+- `tests/multiplayerBrowserAcceptance.js`
 
 ## Estado do Gate 16
 
-A faixa histórica **P14–P44** e a faixa recente **P45–P74** estão classificadas por resultado nas ondas auditadas; ownership vigente foi deslocado para folhas nomeadas e regras substituídas foram marcadas como `SUPERSEDED` em vez de recanonizadas. Os shims permanecem deliberadamente na posição histórica da cascata. O Gate 16 continua em **3/4** até comparação visual real desktop/mobile e remoção segura desses shims.
+O Gate 16 está em **4/4**. A faixa histórica e recente continua classificada por resultado; ownership vigente está nas folhas nomeadas e regras substituídas seguem `SUPERSEDED` em vez de ganhar owner artificial. A faixa neutra P14–P23 já foi retirada do runtime e substituída por imports diretos dos owners na mesma ordem efetiva da cascata, com contratos e browser acceptance desktop/mobile verdes. Shims posteriores permanecem somente onde ainda preservam uma etapa observável da trajetória ou uma posição de cascata intencional; sua existência não cria ownership concorrente.
