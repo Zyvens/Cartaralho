@@ -50,8 +50,10 @@ test('Salvar alterações persiste perfil, título e moldura em uma única chama
  assert.ok(settings.includes('equipped_title_key=${titleKey},equipped_frame_key=${frameKey}'));
 });
 
-test('P23 é shim visual histórico e P75 permanece corrente',()=>{
- assert.ok(index.indexOf('css/p23.css')>index.indexOf('css/p22.css'));
+test('P23 preserva shim histórico fora do runtime, owner direto e P75 corrente',()=>{
+ assert.equal(index.indexOf('css/p23.css'),-1);
+ const base=index.indexOf('css/cardCreationSemanticOverridesCurrent.css'),footer=index.indexOf('css/profileSaveFooterCurrent.css'),next=index.indexOf('css/p26.css?v=1.4.26');
+ assert.ok(base>=0&&footer>base&&next>footer);
  assert.ok(shim.startsWith('/* COMPAT P23'));
  assert.ok(notifications.includes('release:p23'));
  assert.ok(notifications.includes("version:'v1.4.23'"));
