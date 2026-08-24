@@ -7,6 +7,7 @@
   const initial=()=>({
     nickname:'',
     roomCode:'',
+    roomRevision:0,
     isCreator:false,
     currentScreen:'home',
     players:[],
@@ -26,6 +27,7 @@
   const reset=current=>({
     nickname:current?.nickname||'',
     roomCode:'',
+    roomRevision:0,
     isCreator:false,
     currentScreen:'home',
     players:[],
