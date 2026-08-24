@@ -63,8 +63,31 @@ async function start(page,code){
   },code);
 }
 
+async function privateRoundState(page,code){
+  return page.evaluate(async code=>{
+    const r=await fetch(`/api/game/hand?code=${encodeURIComponent(code)}`,{headers:AuthClient.headers(),cache:'no-store'});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||d.success===false)throw new Error(d.error||`hand ${r.status}`);
+    return {
+      isHost:!!d.isHost,
+      hand:(d.hand||[]).map(c=>String(c?.text||c||'')),
+      requiredSubmissions:Number(d.requiredSubmissions||0),
+      canSubmitMore:!!d.canSubmitMore,
+      roundNumber:Number(d.roundNumber||0)
+    };
+  },code);
+}
+
 async function snapshot(page){
   return page.evaluate(()=>({screen:App.state.currentScreen,room:App.state.roomCode,socketRoom:SocketClient.roomCode,nickname:App.state.nickname,isCreator:!!App.state.isCreator,isHost:!!App.state.isHost,roundNumber:App.state.roundNumber||0,players:(App.state.players||[]).map(p=>({nickname:p.nickname,cardsReady:!!p.cardsReady,isCreator:!!p.isCreator})),scores:(App.state.scores||[]).map(p=>({nickname:p.nickname,score:p.score||0,isHost:!!p.isHost})),hand:(App.state.hand||[]).length}));
+}
+
+function disjointHands(states){
+  for(let i=0;i<states.length;i++)for(let j=i+1;j<states.length;j++){
+    const right=new Set(states[j].hand);
+    if(states[i].hand.some(card=>right.has(card)))return false;
+  }
+  return true;
 }
 
 (async()=>{
@@ -124,9 +147,15 @@ async function snapshot(page){
     ]);
     hs=await snapshot(host);ps=await snapshot(player);ts=await snapshot(third);
     check('real new_round reached all clients',hs.roundNumber>=1&&ps.roundNumber>=1&&ts.roundNumber>=1,JSON.stringify({hs,ps,ts}));
-    const clients=[hs,ps,ts],hosts=clients.filter(s=>s.isHost),players=clients.filter(s=>!s.isHost);
+    const clients=[hs,ps,ts],hosts=clients.filter(s=>s.isHost);
     check('exactly one client owns host role',hosts.length===1,JSON.stringify({hs,ps,ts}));
-    check('private hand isolation preserved',hosts[0].hand===0&&players.every(s=>s.hand>0),JSON.stringify({hs,ps,ts}));
+
+    const privateStates=await Promise.all([privateRoundState(host,code),privateRoundState(player,code),privateRoundState(third,code)]);
+    const privateHosts=privateStates.filter(s=>s.isHost),privatePlayers=privateStates.filter(s=>!s.isHost);
+    check('all clients retain their own private hand for role rotation',privateStates.every(s=>s.hand.length===5),JSON.stringify(privateStates.map(s=>({isHost:s.isHost,handSize:s.hand.length,requiredSubmissions:s.requiredSubmissions,canSubmitMore:s.canSubmitMore}))));
+    check('Master cannot submit while keeping its future player hand',privateHosts.length===1&&privateHosts[0].requiredSubmissions===0&&privateHosts[0].canSubmitMore===false,JSON.stringify(privateHosts.map(s=>({handSize:s.hand.length,requiredSubmissions:s.requiredSubmissions,canSubmitMore:s.canSubmitMore}))));
+    check('non-Masters can submit from their own hands',privatePlayers.length===2&&privatePlayers.every(s=>s.requiredSubmissions>=1&&s.canSubmitMore),JSON.stringify(privatePlayers.map(s=>({handSize:s.hand.length,requiredSubmissions:s.requiredSubmissions,canSubmitMore:s.canSubmitMore}))));
+    check('private hands are isolated per authenticated client',disjointHands(privateStates),JSON.stringify(privateStates.map(s=>({isHost:s.isHost,handSize:s.hand.length}))));
 
     await Promise.all([
       host.screenshot({path:path.join(out,'real-multi-host.png'),fullPage:true}),
