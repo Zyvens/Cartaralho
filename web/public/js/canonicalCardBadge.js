@@ -12,19 +12,29 @@
   })().finally(()=>{state.loading=null;});
   return state.loading;
  }
+ function isOriginal(source){
+  if(source&&typeof source==='object'&&(source.isOriginal||source.is_original))return true;
+  const id=source&&typeof source==='object'?source.id:source;
+  return id!==undefined&&id!==null&&state.originalIds.has(String(id));
+ }
+ function decorateCard(card,source){
+  if(!card)return;
+  const original=isOriginal(source);
+  const existing=card.querySelector?.('.canonical-original-mark');
+  if(!original){existing?.remove();return;}
+  if(existing)return existing;
+  const mark=document.createElement('span');
+  mark.className='canonical-original-mark';
+  mark.setAttribute('aria-label','Carta Original');
+  mark.textContent='🧬 Original';
+  card.appendChild(mark);
+  return mark;
+ }
  function decorate(root=document){
   root.querySelectorAll?.('.p57-library-card-shell[data-card-id]').forEach(shell=>{
-   const original=state.originalIds.has(String(shell.dataset.cardId));
    shell.querySelector('.canonical-original-badge')?.remove();
    const card=shell.querySelector('.p57-library-game-card,.game-card');
-   const existing=card?.querySelector('.canonical-original-mark');
-   if(!original){existing?.remove();return;}
-   if(!card||existing)return;
-   const mark=document.createElement('span');
-   mark.className='canonical-original-mark';
-   mark.setAttribute('aria-label','Carta Original');
-   mark.textContent='🧬 Original';
-   card.appendChild(mark);
+   decorateCard(card,shell.dataset.cardId);
   });
  }
  async function sync(root=document){await refreshOriginals();decorate(root);}
@@ -37,5 +47,5 @@
  window.addEventListener('pageshow',()=>sync(document));
  window.addEventListener('cartaralho:cards-changed',()=>sync(document));
  setTimeout(()=>sync(document),0);
- window.CanonicalCardOriginalUI={sync,decorate,refreshOriginals,state};
+ window.CanonicalCardOriginalUI={sync,decorate,decorateCard,isOriginal,refreshOriginals,state};
 })();
