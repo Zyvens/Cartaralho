@@ -5,7 +5,7 @@ const RELEASE={
  type:'update',
  icon:'🛠️',
  title:'v1.5.1 — hotfix de interface e configuração de mesa',
- description:'Hotfix da linha 1.5: transforma toda a faixa do link da sala em ação de copiar sem truncar a URL no celular; corrige respiros do cabeçalho de Configurar Mesa; organiza o desktop com Configuração à esquerda e Resumo, Estimativa e Como Jogar à direita; mantém Como Jogar retraído; e recentraliza os botões Perfil e Sair em desktop e mobile.',
+ description:'Hotfix da linha 1.5: transforma toda a faixa do link da sala em ação de copiar sem truncar a URL no celular; corrige respiros do cabeçalho de Configurar Mesa; organiza o desktop com Configuração à esquerda e Resumo, Estimativa e Como Jogar à direita; mantém Como Jogar retraído; e corrige Perfil/Sair com ícones vetoriais centralizados e contenção responsiva para que os botões permaneçam dentro da faixa da conta em desktop e mobile.',
  version:APP_VERSION,
  publishedAt:'2026-08-25T00:31:00.000Z'
 };
