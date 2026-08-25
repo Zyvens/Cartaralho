@@ -32,15 +32,17 @@ test('hero compacto e presença pendente vivem em owners visuais canônicos',()=
  assert.ok(social.includes("pill.classList.remove('p53-presence-pending')"));
 });
 
-test('Missões permanecem fechadas no startup e organizam BUFF na segunda linha',()=>{
+test('Missões permanecem fechadas no startup e o owner atual mantém moedas, XP e BUFF juntos',()=>{
  assert.ok(missions.includes("sessionStorage.setItem('cartaralho_missions_opened','1')"));
  assert.ok(missions.includes('MetaUI.missionOpen=false'));
  assert.ok(missions.includes('p52-mission-coin-pill'));
  assert.ok(missions.includes('mission-xp-pill'));
  assert.ok(missionsCss.includes('grid-template-columns:minmax(0,1fr) auto!important'));
- assert.ok(missionsCss.includes('grid-template-columns:auto auto!important'));
+ assert.ok(missionsCss.includes('.p52-mission-rewards'));
+ assert.ok(missionsCss.includes('display:flex!important'));
  assert.ok(missionsCss.includes('.p10-mission-buff'));
- assert.ok(missionsCss.includes('grid-row:2!important'));
+ assert.ok(missionsCss.includes('padding:4px 10px!important'));
+ assert.ok(!/p10-mission-buff[^}]*grid-row:2!important/.test(missionsCss));
  assert.ok(shim.includes('missionsTwoColumnCurrent.css'));
 });
 
