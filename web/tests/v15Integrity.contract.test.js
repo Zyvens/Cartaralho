@@ -6,11 +6,25 @@ const path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 
-test('v1.5 is the canonical release after P77',()=>{
- const release=read('lib/releaseV15.js'),version=read('api/version.js');
- assert.match(release,/APP_VERSION='v1\.5\.0'/);
- assert.match(version,/releaseV15/);
+test('v1.5.1 is the canonical hotfix after v1.5.0 and P77',()=>{
+ const base=read('lib/releaseV15.js'),hotfix=read('lib/releaseV151.js'),version=read('api/version.js');
+ assert.match(base,/APP_VERSION='v1\.5\.0'/);
+ assert.match(hotfix,/APP_VERSION='v1\.5\.1'/);
+ assert.match(version,/releaseV151/);
+ assert.match(version,/V15_VERSION/);
  assert.match(version,/P77_VERSION/);
+ assert.match(version,/\[P75_VERSION,P76_VERSION,P77_VERSION,V15_VERSION,APP_VERSION\]/);
+});
+
+test('notification center publishes v1.5.1 and preserves v1.5.0 in release history',()=>{
+ const notifications=read('api/notifications.js'),hotfix=read('lib/releaseV151.js');
+ assert.match(notifications,/require\('\.\.\/lib\/releaseV151'\)/);
+ assert.match(notifications,/V15_RELEASE/);
+ assert.match(notifications,/P77_RELEASE/);
+ assert.match(notifications,/const releases=\[RELEASE,V15_RELEASE,P77_RELEASE/);
+ assert.match(hotfix,/hotfix de interface e configuração de mesa/i);
+ assert.match(hotfix,/Link da sala/i);
+ assert.match(hotfix,/Perfil e Sair/i);
 });
 
 test('appearance is transactional and selected inside titles/frames, not Profile selectors',()=>{
