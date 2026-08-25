@@ -62,12 +62,12 @@ jobs:
           VISUAL_BASE_URL: http://127.0.0.1:4173
           VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
         run: node web/tests/browserAcceptance.js
-      - name: Run v1.5.2 focused visual acceptance
+      - name: Run v1.5.3 focused visual acceptance
         env:
           NODE_PATH: /tmp/cartaralho-visual/node_modules
           VISUAL_BASE_URL: http://127.0.0.1:4173
           VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
-        run: node web/tests/v152VisualAcceptance.js
+        run: node web/tests/v153VisualAcceptance.js
       - name: Run simulated multi-client lifecycle without production data
         env:
           NODE_PATH: /tmp/cartaralho-visual/node_modules

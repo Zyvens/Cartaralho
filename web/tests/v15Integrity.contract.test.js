@@ -6,29 +6,32 @@ const path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 
-test('v1.5.2 is the canonical patch after v1.5.1, v1.5.0 and P77',()=>{
- const base=read('lib/releaseV15.js'),v151=read('lib/releaseV151.js'),hotfix=read('lib/releaseV152.js'),version=read('api/version.js');
+test('v1.5.3 is the canonical patch after v1.5.2, v1.5.1, v1.5.0 and P77',()=>{
+ const base=read('lib/releaseV15.js'),v151=read('lib/releaseV151.js'),v152=read('lib/releaseV152.js'),hotfix=read('lib/releaseV153.js'),version=read('api/version.js');
  assert.match(base,/APP_VERSION='v1\.5\.0'/);
  assert.match(v151,/APP_VERSION='v1\.5\.1'/);
- assert.match(hotfix,/APP_VERSION='v1\.5\.2'/);
- assert.match(version,/releaseV152/);
+ assert.match(v152,/APP_VERSION='v1\.5\.2'/);
+ assert.match(hotfix,/APP_VERSION='v1\.5\.3'/);
+ assert.match(version,/releaseV153/);
+ assert.match(version,/V152_VERSION/);
  assert.match(version,/V151_VERSION/);
  assert.match(version,/V15_VERSION/);
  assert.match(version,/P77_VERSION/);
- assert.match(version,/\[P75_VERSION,P76_VERSION,P77_VERSION,V15_VERSION,V151_VERSION,APP_VERSION\]/);
+ assert.match(version,/\[P75_VERSION,P76_VERSION,P77_VERSION,V15_VERSION,V151_VERSION,V152_VERSION,APP_VERSION\]/);
 });
 
-test('notification center publishes v1.5.2 and preserves v1.5.1 + v1.5.0 in release history',()=>{
- const notifications=read('api/notifications.js'),hotfix=read('lib/releaseV152.js');
- assert.match(notifications,/require\('\.\.\/lib\/releaseV152'\)/);
+test('notification center publishes v1.5.3 and preserves v1.5.2 + v1.5.1 + v1.5.0 in release history',()=>{
+ const notifications=read('api/notifications.js'),hotfix=read('lib/releaseV153.js');
+ assert.match(notifications,/require\('\.\.\/lib\/releaseV153'\)/);
+ assert.match(notifications,/V152_RELEASE/);
  assert.match(notifications,/V151_RELEASE/);
  assert.match(notifications,/V15_RELEASE/);
  assert.match(notifications,/P77_RELEASE/);
- assert.match(notifications,/const releases=\[RELEASE,V151_RELEASE,V15_RELEASE,P77_RELEASE/);
- assert.match(hotfix,/acabamento mobile e identidade Original/i);
- assert.match(hotfix,/respiro lateral interno/i);
+ assert.match(notifications,/const releases=\[RELEASE,V152_RELEASE,V151_RELEASE,V15_RELEASE,P77_RELEASE/);
+ assert.match(hotfix,/refinamento visual de cartas, conta e missões/i);
+ assert.match(hotfix,/carteira e o botão Perfil/i);
  assert.match(hotfix,/🧬 Original/);
- assert.match(hotfix,/ficha\/estatísticas da carta/i);
+ assert.match(hotfix,/recompensas das Missões/i);
 });
 
 test('appearance is transactional and selected inside titles/frames, not Profile selectors',()=>{
@@ -56,9 +59,10 @@ test('original card identity uses one canonical mark in library and card detail'
  assert.match(css,/position:absolute/);
  assert.match(css,/rotate\(-13deg\)/);
  assert.match(css,/\.p56-card-preview-host \.p57-detail-game-card\{position:relative!important;overflow:hidden!important/);
+ assert.match(css,/\.p56-card-preview-host \.p57-detail-game-card \.canonical-original-mark\{right:18px!important;bottom:54px!important\}/);
 });
 
-test('account actions stay centered, contained and inset from mobile strip edges',()=>{
+test('account actions stay centered, contained, inset and separated from wallet',()=>{
  const ui=read('public/js/domains/accountUI.js'),actions=read('public/css/accountActionsCurrent.css'),account=read('public/css/accountCurrent.css');
  assert.match(ui,/p56-account-action-svg/);
  assert.match(ui,/viewBox="0 0 24 24"/);
@@ -69,16 +73,21 @@ test('account actions stay centered, contained and inset from mobile strip edges
  assert.match(actions,/max-width:calc\(2 \* 40px \+ 5px\)!important/);
  assert.match(account,/padding-inline:10px!important/);
  assert.match(account,/padding-inline:8px!important/);
- assert.match(account,/max-width:calc\(100% - 89px\)!important/);
+ assert.match(account,/max-width:calc\(100% - 95px\)!important/);
  assert.match(account,/flex:0 0 85px!important/);
+ assert.match(account,/margin-left:6px!important/);
  assert.match(account,/overflow:hidden!important/);
 });
 
-test('mission BUFF reward occupies its own second reward row',()=>{
- const css=read('public/css/missionsTwoColumnCurrent.css');
- assert.match(css,/grid-template-columns:auto auto/);
- assert.match(css,/p10-mission-buff/);
- assert.match(css,/grid-row:2!important/);
+test('mission BUFF reward shares the reward row to the right of XP with lateral breathing room',()=>{
+ const css=read('public/css/missionsTwoColumnCurrent.css'),ui=read('public/js/domains/missionsUI.js');
+ assert.match(css,/p52-mission-rewards[\s\S]*display:flex!important/);
+ assert.match(css,/p10-mission-buff[\s\S]*padding:4px 10px!important/);
+ assert.doesNotMatch(css,/p10-mission-buff[^}]*grid-row:2!important/);
+ const coin=ui.indexOf('p52-mission-coin-pill');
+ const xp=ui.indexOf('mission-xp-pill',coin);
+ const buff=ui.indexOf('${rewardBuff(m)}',xp);
+ assert.ok(coin>=0&&xp>coin&&buff>xp,'reward order must remain coin → XP → BUFF');
 });
 
 test('BUFF rarity is separated to the upper-right',()=>{
