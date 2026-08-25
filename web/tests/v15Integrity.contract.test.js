@@ -6,26 +6,29 @@ const path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 
-test('v1.5.1 is the canonical hotfix after v1.5.0 and P77',()=>{
- const base=read('lib/releaseV15.js'),hotfix=read('lib/releaseV151.js'),version=read('api/version.js');
+test('v1.5.2 is the canonical patch after v1.5.1, v1.5.0 and P77',()=>{
+ const base=read('lib/releaseV15.js'),v151=read('lib/releaseV151.js'),hotfix=read('lib/releaseV152.js'),version=read('api/version.js');
  assert.match(base,/APP_VERSION='v1\.5\.0'/);
- assert.match(hotfix,/APP_VERSION='v1\.5\.1'/);
- assert.match(version,/releaseV151/);
+ assert.match(v151,/APP_VERSION='v1\.5\.1'/);
+ assert.match(hotfix,/APP_VERSION='v1\.5\.2'/);
+ assert.match(version,/releaseV152/);
+ assert.match(version,/V151_VERSION/);
  assert.match(version,/V15_VERSION/);
  assert.match(version,/P77_VERSION/);
- assert.match(version,/\[P75_VERSION,P76_VERSION,P77_VERSION,V15_VERSION,APP_VERSION\]/);
+ assert.match(version,/\[P75_VERSION,P76_VERSION,P77_VERSION,V15_VERSION,V151_VERSION,APP_VERSION\]/);
 });
 
-test('notification center publishes v1.5.1 and preserves v1.5.0 in release history',()=>{
- const notifications=read('api/notifications.js'),hotfix=read('lib/releaseV151.js');
- assert.match(notifications,/require\('\.\.\/lib\/releaseV151'\)/);
+test('notification center publishes v1.5.2 and preserves v1.5.1 + v1.5.0 in release history',()=>{
+ const notifications=read('api/notifications.js'),hotfix=read('lib/releaseV152.js');
+ assert.match(notifications,/require\('\.\.\/lib\/releaseV152'\)/);
+ assert.match(notifications,/V151_RELEASE/);
  assert.match(notifications,/V15_RELEASE/);
  assert.match(notifications,/P77_RELEASE/);
- assert.match(notifications,/const releases=\[RELEASE,V15_RELEASE,P77_RELEASE/);
- assert.match(hotfix,/hotfix de interface e configuração de mesa/i);
- assert.match(hotfix,/link da sala/i);
- assert.match(hotfix,/Perfil\/Sair/i);
- assert.match(hotfix,/dentro da faixa da conta/i);
+ assert.match(notifications,/const releases=\[RELEASE,V151_RELEASE,V15_RELEASE,P77_RELEASE/);
+ assert.match(hotfix,/acabamento mobile e identidade Original/i);
+ assert.match(hotfix,/respiro lateral interno/i);
+ assert.match(hotfix,/🧬 Original/);
+ assert.match(hotfix,/ficha\/estatísticas da carta/i);
 });
 
 test('appearance is transactional and selected inside titles/frames, not Profile selectors',()=>{
@@ -40,17 +43,22 @@ test('appearance is transactional and selected inside titles/frames, not Profile
  assert.match(profile,/P\.close=function\(\)\{this\._appearanceSaved=null/);
 });
 
-test('original card identity is an internal discreet mark',()=>{
+test('original card identity uses one canonical mark in library and card detail',()=>{
  const bridge=read('public/js/canonicalCardBadge.js'),css=read('public/css/cardLibraryPresentationCurrent.css');
+ assert.match(bridge,/function decorateCard\(card,source\)/);
  assert.match(bridge,/canonical-original-mark/);
  assert.match(bridge,/🧬 Original/);
  assert.match(bridge,/card\.appendChild\(mark\)/);
+ assert.match(bridge,/function installDetailBridge\(\)/);
+ assert.match(bridge,/p56-card-preview-host \.p57-detail-game-card/);
+ assert.match(bridge,/decorateCard\(preview,card\)/);
  assert.doesNotMatch(bridge,/CARTA ORIGINAL/);
  assert.match(css,/position:absolute/);
  assert.match(css,/rotate\(-13deg\)/);
+ assert.match(css,/\.p56-card-preview-host \.p57-detail-game-card\{position:relative!important;overflow:hidden!important/);
 });
 
-test('account actions stay centered and contained across desktop/mobile',()=>{
+test('account actions stay centered, contained and inset from mobile strip edges',()=>{
  const ui=read('public/js/domains/accountUI.js'),actions=read('public/css/accountActionsCurrent.css'),account=read('public/css/accountCurrent.css');
  assert.match(ui,/p56-account-action-svg/);
  assert.match(ui,/viewBox="0 0 24 24"/);
@@ -59,6 +67,8 @@ test('account actions stay centered and contained across desktop/mobile',()=>{
  assert.match(actions,/width:40px!important/);
  assert.match(actions,/height:40px!important/);
  assert.match(actions,/max-width:calc\(2 \* 40px \+ 5px\)!important/);
+ assert.match(account,/padding-inline:10px!important/);
+ assert.match(account,/padding-inline:8px!important/);
  assert.match(account,/max-width:calc\(100% - 89px\)!important/);
  assert.match(account,/flex:0 0 85px!important/);
  assert.match(account,/overflow:hidden!important/);
