@@ -1,14 +1,16 @@
-/* Owner visual canônico da configuração/criação de mesa — v1.5 compacta o dashboard preservando conteúdo e regras. */
+/* Owner visual canônico da configuração/criação de mesa — v1.5: duas colunas densas no desktop e header móvel sem sobreposição. */
 .room-rules-card .config-value{
  display:grid!important;place-items:center!important;min-width:42px!important;height:31px!important;padding:0 9px!important;color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important;visibility:visible!important;background:linear-gradient(145deg,rgba(124,58,237,.30),rgba(76,29,149,.22))!important;border:1px solid rgba(167,139,250,.48)!important;border-radius:9px!important;font:900 .86rem/1 var(--font-display)!important;text-shadow:0 1px 4px rgba(0,0,0,.35)!important
 }
+.create-room-screen>h2{margin-bottom:7px!important}
+.create-room-screen>.create-room-subtitle{max-width:760px;margin:0 auto 24px!important;padding:0 18px;line-height:1.48}
 .create-room-dashboard{
- display:grid!important;grid-template-columns:minmax(320px,.9fr) minmax(360px,1.1fr)!important;grid-template-areas:'config summary' 'config estimate' 'howto howto'!important;gap:14px!important;align-items:stretch!important;max-width:1160px!important;margin:0 auto!important
+ display:grid!important;grid-template-columns:minmax(320px,.9fr) minmax(360px,1.1fr)!important;grid-template-areas:'config summary' 'config estimate' 'config howto'!important;gap:14px!important;align-items:start!important;max-width:1160px!important;margin:0 auto!important
 }
-.create-room-dashboard>.dashboard-config-card{grid-area:config!important;height:100%!important}
-.create-room-dashboard>.dashboard-summary-slot{grid-area:summary!important;align-self:start!important}
-.create-room-dashboard>.dashboard-estimate-card{grid-area:estimate!important;align-self:start!important}
-.create-room-dashboard>.how-to-play-card{grid-area:howto!important;margin:0!important}
+.create-room-dashboard>.dashboard-config-card{grid-area:config!important;height:auto!important;align-self:start!important;margin:0!important}
+.create-room-dashboard>.dashboard-summary-slot{grid-area:summary!important;align-self:start!important;margin:0!important}
+.create-room-dashboard>.dashboard-estimate-card{grid-area:estimate!important;align-self:start!important;margin:0!important}
+.create-room-dashboard>.how-to-play-card{grid-area:howto!important;align-self:start!important;margin:0!important}
 .create-room-submit{box-sizing:border-box!important;display:flex!important;justify-content:center!important;max-width:1160px!important;margin:18px auto 0!important;padding:0 0 18px!important}
 .create-room-submit>#create-btn{width:clamp(180px,24vw,240px)!important;margin:0!important}
 .room-rules-heading,.room-summary-heading,.dashboard-section-heading{box-sizing:border-box;display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:14px!important;padding:15px 16px 13px!important;border-bottom:1px solid rgba(255,255,255,.065)!important}
@@ -19,6 +21,8 @@
 .how-to-play-card .rules-list li{padding:9px 0!important;border-bottom:1px solid rgba(255,255,255,.045)!important;color:var(--text-muted)!important;line-height:1.48!important}
 .how-to-play-card .rules-list strong{display:block!important;margin-bottom:3px!important;color:#fff!important}
 @media(max-width:760px){
+ .create-room-screen>h2{margin-top:calc(env(safe-area-inset-top,0px) + 72px)!important;margin-bottom:9px!important;padding:0 12px}
+ .create-room-screen>.create-room-subtitle{margin-bottom:26px!important;padding:0 22px;line-height:1.5}
  .create-room-dashboard{grid-template-columns:1fr!important;grid-template-areas:'config' 'summary' 'estimate' 'howto'!important;max-width:620px!important;gap:12px!important}
  .how-to-play-card .rules-list{grid-template-columns:1fr!important}
  .create-room-submit{max-width:620px!important;margin-top:16px!important;padding-inline:14px!important}
