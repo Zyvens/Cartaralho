@@ -1,0 +1,20 @@
+/* Owner visual canônico do compartilhamento direto de sala — v1.5. */
+#room-share-tools.room-share-copy{
+ appearance:none;-webkit-appearance:none;width:100%;display:grid;gap:7px;box-sizing:border-box;margin:10px 0 14px;padding:13px 16px 11px;border:1px solid rgba(139,92,246,.34);border-radius:16px;background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(67,56,202,.08));color:#f5f3ff;text-align:left;cursor:pointer;box-shadow:inset 0 1px rgba(255,255,255,.035);transition:border-color .16s ease,background .16s ease,transform .16s ease
+}
+#room-share-tools.room-share-copy:hover{border-color:rgba(167,139,250,.56);background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(67,56,202,.11));transform:translateY(-1px)}
+#room-share-tools.room-share-copy:focus-visible{outline:2px solid rgba(196,181,253,.82);outline-offset:3px}
+.room-share-copy-main{min-width:0;display:flex;align-items:center;gap:7px;width:100%}
+.room-share-copy-icon{flex:none;font-size:1rem}
+.room-share-copy-label{flex:none;color:#d8d5e5;font-weight:600;white-space:nowrap}
+.room-share-copy-url{min-width:0;display:block;flex:1;overflow-x:auto;overflow-y:hidden;white-space:nowrap!important;text-overflow:clip!important;scrollbar-width:none;-ms-overflow-style:none;color:#fff;font-weight:800;letter-spacing:.005em;-webkit-overflow-scrolling:touch}
+.room-share-copy-url::-webkit-scrollbar{display:none}
+.room-share-copy-hint{justify-self:center;color:#8d899d;font-size:.64rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;line-height:1}
+@media(max-width:620px){
+ #room-share-tools.room-share-copy{gap:8px;margin:10px 0 16px;padding:12px 13px 10px;border-radius:15px}
+ .room-share-copy-main{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:7px;row-gap:5px}
+ .room-share-copy-icon{grid-column:1;grid-row:1}
+ .room-share-copy-label{grid-column:2;grid-row:1;font-size:.78rem}
+ .room-share-copy-url{grid-column:1/-1;grid-row:2;width:100%;max-width:100%;font-size:.78rem;line-height:1.35}
+ .room-share-copy-hint{font-size:.58rem}
+}
