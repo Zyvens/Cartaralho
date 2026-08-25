@@ -1,5 +1,6 @@
+@import url('roomShareCurrent.css');
 /* Owner visual canônico do Resumo da partida, originado em P15.
-   Cabeçalhos/acordeões recebem refinamentos posteriores em P21/P36. */
+   Cabeçalhos/acordeões recebem refinamentos posteriores em P21/P36. O share de sala possui owner dedicado importado acima. */
 .room-summary-card{border:1px solid rgba(139,92,246,.27);border-radius:20px;background:linear-gradient(145deg,rgba(21,21,33,.96),rgba(11,11,20,.96));box-shadow:0 16px 36px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.035);overflow:hidden}
 .room-summary-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:17px 18px 14px;border-bottom:1px solid rgba(255,255,255,.065)}
 .room-summary-heading>div{min-width:0}.room-summary-heading small{display:block;color:#9c8dbb;font-size:.66rem;font-weight:900;letter-spacing:.12em}.room-summary-heading h3{margin:4px 0 3px;font-size:1.08rem}.room-summary-heading p{margin:0;color:var(--text-muted);font-size:.78rem;line-height:1.4}
