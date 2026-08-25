@@ -66,7 +66,7 @@ test('card detail and room setup owners encode the compact v1.5 layout',()=>{
  assert.match(room,/create-room-submit/);
  assert.match(room,/margin:18px auto 0!important/);
  assert.match(room,/create-room-screen>h2\{margin-top:calc\(env\(safe-area-inset-top,0px\) \+ 72px\)/);
- assert.match(room,/create-room-subtitle\{margin-bottom:26px!important/);
+ assert.match(room,/create-room-subtitle\{[^}]*margin-bottom:26px!important/);
 });
 
 test('create-room owner keeps summary and estimate open while Como Jogar starts collapsed',()=>{
