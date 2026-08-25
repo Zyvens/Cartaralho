@@ -6,11 +6,26 @@ const path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 
-test('v1.5 is the canonical release after P77',()=>{
- const release=read('lib/releaseV15.js'),version=read('api/version.js');
- assert.match(release,/APP_VERSION='v1\.5\.0'/);
- assert.match(version,/releaseV15/);
+test('v1.5.1 is the canonical hotfix after v1.5.0 and P77',()=>{
+ const base=read('lib/releaseV15.js'),hotfix=read('lib/releaseV151.js'),version=read('api/version.js');
+ assert.match(base,/APP_VERSION='v1\.5\.0'/);
+ assert.match(hotfix,/APP_VERSION='v1\.5\.1'/);
+ assert.match(version,/releaseV151/);
+ assert.match(version,/V15_VERSION/);
  assert.match(version,/P77_VERSION/);
+ assert.match(version,/\[P75_VERSION,P76_VERSION,P77_VERSION,V15_VERSION,APP_VERSION\]/);
+});
+
+test('notification center publishes v1.5.1 and preserves v1.5.0 in release history',()=>{
+ const notifications=read('api/notifications.js'),hotfix=read('lib/releaseV151.js');
+ assert.match(notifications,/require\('\.\.\/lib\/releaseV151'\)/);
+ assert.match(notifications,/V15_RELEASE/);
+ assert.match(notifications,/P77_RELEASE/);
+ assert.match(notifications,/const releases=\[RELEASE,V15_RELEASE,P77_RELEASE/);
+ assert.match(hotfix,/hotfix de interface e configuração de mesa/i);
+ assert.match(hotfix,/link da sala/i);
+ assert.match(hotfix,/Perfil\/Sair/i);
+ assert.match(hotfix,/dentro da faixa da conta/i);
 });
 
 test('appearance is transactional and selected inside titles/frames, not Profile selectors',()=>{
@@ -35,12 +50,18 @@ test('original card identity is an internal discreet mark',()=>{
  assert.match(css,/rotate\(-13deg\)/);
 });
 
-test('desktop account actions can shrink instead of clipping',()=>{
- const actions=read('public/css/accountActionsCurrent.css'),account=read('public/css/accountCurrent.css');
- assert.match(actions,/flex:0 1 auto/);
- assert.match(actions,/width:clamp\(/);
- assert.match(account,/min-width:0!important/);
- assert.match(account,/flex:0 1 auto!important/);
+test('account actions stay centered and contained across desktop/mobile',()=>{
+ const ui=read('public/js/domains/accountUI.js'),actions=read('public/css/accountActionsCurrent.css'),account=read('public/css/accountCurrent.css');
+ assert.match(ui,/p56-account-action-svg/);
+ assert.match(ui,/viewBox="0 0 24 24"/);
+ assert.doesNotMatch(ui,/>👤</);
+ assert.match(actions,/width:clamp\(92px,10\.5vw,132px\)!important/);
+ assert.match(actions,/width:40px!important/);
+ assert.match(actions,/height:40px!important/);
+ assert.match(actions,/max-width:calc\(2 \* 40px \+ 5px\)!important/);
+ assert.match(account,/max-width:calc\(100% - 89px\)!important/);
+ assert.match(account,/flex:0 0 85px!important/);
+ assert.match(account,/overflow:hidden!important/);
 });
 
 test('mission BUFF reward occupies its own second reward row',()=>{

@@ -2,13 +2,17 @@
 .room-rules-card .config-value{
  display:grid!important;place-items:center!important;min-width:42px!important;height:31px!important;padding:0 9px!important;color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important;visibility:visible!important;background:linear-gradient(145deg,rgba(124,58,237,.30),rgba(76,29,149,.22))!important;border:1px solid rgba(167,139,250,.48)!important;border-radius:9px!important;font:900 .86rem/1 var(--font-display)!important;text-shadow:0 1px 4px rgba(0,0,0,.35)!important
 }
+.create-room-screen{position:relative!important}
+.create-room-screen>h2{margin-top:82px!important}
+.create-room-screen>.create-room-subtitle{max-width:760px!important;margin:12px auto 30px!important;padding-inline:18px!important}
 .create-room-dashboard{
- display:grid!important;grid-template-columns:minmax(320px,.9fr) minmax(360px,1.1fr)!important;grid-template-areas:'config summary' 'config estimate' 'howto howto'!important;gap:14px!important;align-items:stretch!important;max-width:1160px!important;margin:0 auto!important
+ display:grid!important;grid-template-columns:minmax(320px,.9fr) minmax(360px,1.1fr)!important;grid-template-areas:'config summary' 'config estimate' 'config howto'!important;gap:14px!important;align-items:start!important;max-width:1160px!important;margin:0 auto!important
 }
-.create-room-dashboard>.dashboard-config-card{grid-area:config!important;height:100%!important}
-.create-room-dashboard>.dashboard-summary-slot{grid-area:summary!important;align-self:start!important}
-.create-room-dashboard>.dashboard-estimate-card{grid-area:estimate!important;align-self:start!important}
-.create-room-dashboard>.how-to-play-card{grid-area:howto!important;margin:0!important}
+.create-room-dashboard>.dashboard-config-card{grid-area:config!important;align-self:start!important;height:auto!important}
+.create-room-dashboard>.dashboard-summary-slot{grid-area:summary!important;align-self:start!important;margin:0!important}
+.create-room-dashboard>.dashboard-estimate-card{grid-area:estimate!important;align-self:start!important;margin:0!important}
+.create-room-dashboard>.how-to-play-card{grid-area:howto!important;align-self:start!important;margin:0!important}
+.create-room-dashboard>.room-info-accordion{width:100%!important}
 .create-room-submit{box-sizing:border-box!important;display:flex!important;justify-content:center!important;max-width:1160px!important;margin:18px auto 0!important;padding:0 0 18px!important}
 .create-room-submit>#create-btn{width:clamp(180px,24vw,240px)!important;margin:0!important}
 .room-rules-heading,.room-summary-heading,.dashboard-section-heading{box-sizing:border-box;display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:14px!important;padding:15px 16px 13px!important;border-bottom:1px solid rgba(255,255,255,.065)!important}
@@ -18,9 +22,21 @@
 .how-to-play-card .rules-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;column-gap:22px!important;row-gap:0!important;margin:0!important;padding:0!important;list-style:none!important}
 .how-to-play-card .rules-list li{padding:9px 0!important;border-bottom:1px solid rgba(255,255,255,.045)!important;color:var(--text-muted)!important;line-height:1.48!important}
 .how-to-play-card .rules-list strong{display:block!important;margin-bottom:3px!important;color:#fff!important}
+/* Owner visual da superfície de compartilhamento da sala: o card inteiro copia e o link nunca é truncado. */
+.direct-room-hint.direct-room-copy{box-sizing:border-box!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:7px!important;width:min(100%,1160px)!important;margin:0 auto 18px!important;padding:14px 18px 10px!important;cursor:pointer!important;user-select:none!important;overflow:hidden!important;transition:border-color .16s ease,background .16s ease,transform .16s ease!important}
+.direct-room-hint.direct-room-copy:hover,.direct-room-hint.direct-room-copy:focus-visible{border-color:rgba(167,139,250,.62)!important;background:rgba(124,58,237,.10)!important;outline:none!important}
+.direct-room-hint.direct-room-copy:active{transform:translateY(1px)!important}
+.direct-room-hint.direct-room-copy.is-copied{border-color:rgba(74,222,128,.48)!important}
+.direct-room-link-line{display:block!important;max-width:100%!important;white-space:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;text-overflow:clip!important;word-break:normal!important;overflow-wrap:normal!important;scrollbar-width:thin!important;-webkit-overflow-scrolling:touch!important;font-size:clamp(.78rem,1.5vw,1rem)!important;line-height:1.45!important}
+.direct-room-link-line b{white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important}
+.direct-room-copy-hint{display:block!important;text-align:center!important;color:rgba(203,196,222,.58)!important;font:600 .66rem/1.2 var(--font-body)!important;letter-spacing:.03em!important}
 @media(max-width:760px){
+ .create-room-screen>h2{margin-top:104px!important;padding-inline:82px!important;font-size:clamp(1.55rem,7vw,2rem)!important}
+ .create-room-screen>.create-room-subtitle{margin-top:16px!important;margin-bottom:34px!important;padding-inline:24px!important;font-size:.94rem!important;line-height:1.55!important}
  .create-room-dashboard{grid-template-columns:1fr!important;grid-template-areas:'config' 'summary' 'estimate' 'howto'!important;max-width:620px!important;gap:12px!important}
  .how-to-play-card .rules-list{grid-template-columns:1fr!important}
  .create-room-submit{max-width:620px!important;margin-top:16px!important;padding-inline:14px!important}
  .create-room-submit>#create-btn{width:min(100%,260px)!important}
+ .direct-room-hint.direct-room-copy{width:calc(100% - 24px)!important;margin:0 12px 16px!important;padding:12px 13px 9px!important}
+ .direct-room-link-line{font-size:clamp(.72rem,3.15vw,.88rem)!important}
 }

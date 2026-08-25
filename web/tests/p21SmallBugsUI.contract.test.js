@@ -28,11 +28,14 @@ test('Gênese permanece entitlement especial e concessão oficial também a equi
  assert.ok(metagame.includes('genese-celestial'));
 });
 
-test('criação da mesa mantém ordem semântica e grid responsivo',()=>{
+test('criação da mesa mantém ordem semântica e grid responsivo v1.5.1',()=>{
  const config=create.indexOf('dashboard-config-card'),summary=create.indexOf('dashboard-summary-slot'),estimate=create.indexOf('dashboard-estimate-card'),howto=create.indexOf('how-to-play-card');
  assert.ok(config>=0&&summary>config&&estimate>summary&&howto>estimate);
- assert.ok(roomCss.includes("grid-template-areas:'config summary' 'config estimate' 'howto howto'!important"));
+ assert.ok(roomCss.includes("grid-template-areas:'config summary' 'config estimate' 'config howto'!important"));
  assert.ok(roomCss.includes("grid-template-areas:'config' 'summary' 'estimate' 'howto'!important"));
+ assert.ok(room.includes('openCreateSummary'));
+ assert.ok(room.includes('estimate.open=true'));
+ assert.ok(room.includes('how.open=false'));
  assert.ok(!create.includes('create-room-column'));
 });
 
@@ -66,11 +69,11 @@ test('pilha de Cartas Limpas usa markup atual, consumo superior e slot vazio',()
  assert.ok(shim.includes('cleanCardStackCurrent.css'));
 });
 
-test('P21 preserva shim histórico fora do runtime, owners diretos e P75 corrente',()=>{
+test('P21 preserva shim histórico fora do runtime, owners diretos e linhagem corrente',()=>{
  assert.equal(index.indexOf('css/p21.css'),-1);
  const base=index.indexOf('css/showcaseCurrent.css'),roomPos=index.indexOf('css/roomSetupDashboardCurrent.css'),tabs=index.indexOf('css/cardTypeTabsCurrent.css'),stack=index.indexOf('css/cleanCardStackCurrent.css'),next=index.indexOf('css/rewardEstimateCurrent.css');
  assert.ok(base>=0&&roomPos>base&&tabs>roomPos&&stack>tabs&&next>stack);
  assert.ok(shim.startsWith('/* COMPAT P21'));
  assert.ok(notifications.includes('release:p21'));
- assert.ok(version.includes('releaseP75'));
+ assert.ok(version.includes('releaseV151'));
 });
