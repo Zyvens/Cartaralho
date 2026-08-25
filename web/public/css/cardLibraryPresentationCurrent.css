@@ -1,4 +1,4 @@
-/* Owner visual canônico da biblioteca real de cartas — v1.5 inclui marca Original interna e discreta. */
+/* Owner visual canônico da biblioteca real de cartas — v1.5.2 mantém a marca Original interna também na ficha. */
 .p57-library-card-shell{position:relative;min-width:0;display:grid;gap:8px;outline:none;cursor:pointer}
 .p57-library-card-shell:focus-visible{outline:2px solid rgba(217,70,239,.78);outline-offset:4px;border-radius:18px}
 .p57-library-game-card{position:relative!important;overflow:hidden!important;margin:0!important;animation:none!important;transform:none!important;cursor:pointer;box-shadow:0 14px 34px rgba(0,0,0,.24)!important}
@@ -13,6 +13,6 @@
 .p57-card-origin.native{color:#c8c9d0;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08)}
 .p57-card-origin.player{color:#a8caff;background:rgba(59,130,246,.075);border:1px solid rgba(59,130,246,.18)}
 .p57-card-origin.legacy{color:#858795;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05)}
-.p56-card-preview-host .p57-detail-game-card{margin:0!important;animation:none!important;transform:none!important;box-shadow:0 20px 48px rgba(0,0,0,.36)!important}
+.p56-card-preview-host .p57-detail-game-card{position:relative!important;overflow:hidden!important;margin:0!important;animation:none!important;transform:none!important;box-shadow:0 20px 48px rgba(0,0,0,.36)!important}
 .p56-card-preview-host .p57-detail-game-card .card-watermark{opacity:.38!important}
 @media(max-width:620px){.p57-library-card-meta{padding:0 2px}.canonical-original-mark{right:8px;bottom:29px;font-size:.44rem;opacity:.52}}
