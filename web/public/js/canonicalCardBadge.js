@@ -37,7 +37,20 @@
    decorateCard(card,shell.dataset.cardId);
   });
  }
- async function sync(root=document){await refreshOriginals();decorate(root);}
+ function installDetailBridge(){
+  const detail=window.CardDetailUI;
+  if(!detail||detail.__canonicalOriginalBridge||typeof detail.open!=='function')return !!detail?.__canonicalOriginalBridge;
+  const baseOpen=detail.open.bind(detail);
+  detail.open=function(card){
+   const out=baseOpen(card);
+   const preview=this.overlay?.querySelector?.('.p56-card-preview-host .p57-detail-game-card,.p56-card-preview-host .game-card');
+   decorateCard(preview,card);
+   return out;
+  };
+  detail.__canonicalOriginalBridge=true;
+  return true;
+ }
+ async function sync(root=document){await refreshOriginals();decorate(root);installDetailBridge();}
  const observer=new MutationObserver(records=>{
   if(!AuthClient?.user)return;
   const relevant=records.some(r=>[...r.addedNodes].some(n=>n.nodeType===1&&(n.matches?.('.p57-library-card-shell,.p57-cards-library')||n.querySelector?.('.p57-library-card-shell'))));
@@ -47,5 +60,5 @@
  window.addEventListener('pageshow',()=>sync(document));
  window.addEventListener('cartaralho:cards-changed',()=>sync(document));
  setTimeout(()=>sync(document),0);
- window.CanonicalCardOriginalUI={sync,decorate,decorateCard,isOriginal,refreshOriginals,state};
+ window.CanonicalCardOriginalUI={sync,decorate,decorateCard,isOriginal,installDetailBridge,refreshOriginals,state};
 })();
