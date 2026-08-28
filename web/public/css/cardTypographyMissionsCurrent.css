@@ -91,14 +91,6 @@
   white-space:nowrap!important;
 }
 
-/* Desktop: a fileira de recompensas fica centralizada no eixo real do card. */
-@media(min-width:761px){
-  #mission-card .mission-row>.p52-mission-rewards,
-  .profile-modal-body .mission-row>.p52-mission-rewards{
-    justify-content:center!important;
-  }
-}
-
 @media(max-width:620px){
   .p52-mission-rewards>.p52-mission-coin-pill,
   .p52-mission-rewards>.mission-xp-pill,
