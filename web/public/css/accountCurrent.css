@@ -11,13 +11,13 @@
   position:static!important;inset:auto!important;transform:none!important;flex:0 1 auto!important;min-width:0!important;order:30!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;visibility:visible!important;opacity:1!important;margin-left:8px!important
 }
 #home-account>.account-strip.p74-account-strip>.p56-account-actions{
-  position:static!important;flex:0 0 auto!important;min-width:0!important;order:40!important;margin-left:12px!important
+  position:static!important;flex:0 0 auto!important;min-width:0!important;order:40!important;margin-left:2px!important
 }
 #home-account>.account-strip.p74-account-strip>.p74-wallet-slot .p65-balance-icon,
 #home-account>.account-strip.p74-account-strip>.p74-wallet-slot .p49-balance-value{display:inline-block!important;visibility:visible!important;opacity:1!important}
 @media(min-width:621px) and (max-width:960px){
  #home-account>.account-strip.p74-account-strip>.p74-wallet-slot{margin-left:6px!important}
- #home-account>.account-strip.p74-account-strip>.p56-account-actions{margin-left:12px!important}
+ #home-account>.account-strip.p74-account-strip>.p56-account-actions{margin-left:2px!important}
 }
 @media(max-width:620px){
   .home-account-bar .p56-account-action{grid-template-columns:1fr!important;place-items:center!important;gap:0!important;overflow:hidden!important}
