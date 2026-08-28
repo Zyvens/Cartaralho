@@ -68,6 +68,12 @@ jobs:
           VISUAL_BASE_URL: http://127.0.0.1:4173
           VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
         run: node web/tests/v153VisualAcceptance.js
+      - name: Run desktop account actions acceptance
+        env:
+          NODE_PATH: /tmp/cartaralho-visual/node_modules
+          VISUAL_BASE_URL: http://127.0.0.1:4173
+          VISUAL_OUT: ${{ github.workspace }}/visual-artifacts
+        run: node web/tests/accountActionsDesktopAcceptance.js
       - name: Run desktop mission rewards acceptance
         env:
           NODE_PATH: /tmp/cartaralho-visual/node_modules
