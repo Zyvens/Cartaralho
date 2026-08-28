@@ -40,6 +40,7 @@ async function verifyViewport(browser,width,height,label,file,compact){
   await page.waitForTimeout(500);
   const g=await page.evaluate(()=>{
    const strip=document.querySelector('#home-account>.account-strip');
+   const wallet=strip?.querySelector('.p74-wallet-slot');
    const actions=strip?.querySelector('.p56-account-actions');
    const profile=actions?.querySelector('.p56-profile-action');
    const logout=actions?.querySelector('.p56-logout-action');
@@ -47,17 +48,24 @@ async function verifyViewport(browser,width,height,label,file,compact){
    const logoutIcon=logout?.querySelector('.p56-account-action-icon');
    const profileCopy=profile?.querySelector('.p56-account-action-copy');
    const logoutCopy=logout?.querySelector('.p56-account-action-copy');
-   if(!strip||!actions||!profile||!logout||!profileIcon||!logoutIcon)return null;
+   if(!strip||!wallet||!actions||!profile||!logout||!profileIcon||!logoutIcon)return null;
    const rect=el=>{const r=el.getBoundingClientRect();return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,cx:(r.left+r.right)/2,cy:(r.top+r.bottom)/2};};
-   const p=rect(profile),l=rect(logout),pi=rect(profileIcon),li=rect(logoutIcon);
+   const w=rect(wallet),a=rect(actions),p=rect(profile),l=rect(logout),pi=rect(profileIcon),li=rect(logoutIcon);
+   const actionStyle=getComputedStyle(actions);
+   const borderLeft=parseFloat(actionStyle.borderLeftWidth)||0;
    return{
+    wallet:w,
+    actions:{...a,borderLeft,paddingLeft:parseFloat(actionStyle.paddingLeft)||0},
+    walletToDivider:a.left-w.right,
+    dividerToProfile:p.left-(a.left+borderLeft),
     profile:{button:p,icon:pi,leftGap:pi.left-p.left,rightGap:p.right-pi.right,copyDisplay:profileCopy?getComputedStyle(profileCopy).display:null},
     logout:{button:l,icon:li,leftGap:li.left-l.left,rightGap:l.right-li.right,copyDisplay:logoutCopy?getComputedStyle(logoutCopy).display:null},
-    actionsDisplay:getComputedStyle(actions).display,
     overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth
    };
   });
   assert(`${label}: account action geometry available`,!!g,JSON.stringify(g));
+  assert(`${label}: wallet/divider/Perfil breathing room is symmetric`,Math.abs(g.walletToDivider-g.dividerToProfile)<=1,`walletToDivider=${g.walletToDivider}, dividerToProfile=${g.dividerToProfile}`);
+  assert(`${label}: wallet/divider/Perfil keeps visible breathing room`,g.walletToDivider>=10&&g.dividerToProfile>=10,`walletToDivider=${g.walletToDivider}, dividerToProfile=${g.dividerToProfile}`);
   assert(`${label}: no horizontal page overflow`,g.overflow<=2,`overflow=${g.overflow}`);
   if(compact){
    assert(`${label}: Perfil copy is hidden`,g.profile.copyDisplay==='none',g.profile.copyDisplay);
