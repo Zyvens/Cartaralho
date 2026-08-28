@@ -1,4 +1,4 @@
-/* Owner visual canônico das ações Perfil/Sair na faixa da conta — v1.5.1: alinhamento concêntrico real e contenção mobile. */
+/* Owner visual canônico das ações Perfil/Sair na faixa da conta — alinhamento concêntrico real e contenção responsiva. */
 .p56-account-actions{display:flex!important;align-items:center!important;justify-content:center!important;gap:8px;margin-left:auto;min-width:0;flex:0 0 auto}
 .p56-account-actions .home-header-button{margin-left:0!important}
 .p56-account-action{display:grid!important;grid-template-columns:32px minmax(0,1fr)!important;align-items:center!important;justify-items:stretch!important;gap:9px!important;text-align:left!important;min-width:0!important;line-height:1!important}
@@ -8,10 +8,7 @@
 .p56-account-action-copy b{font:800 .72rem/1.1 var(--font-display);letter-spacing:.01em;white-space:nowrap}
 .p56-account-action-copy small{font:500 .55rem/1.1 var(--font-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(min-width:621px){
- /* O limite esquerdo desta zona é o divisor; o direito é a borda externa da tag.
-    12px replica o padding-right canônico de .home-account-bar, deixando Perfil/Sair
-    geometricamente centrados dentro da área de ações no desktop. */
- .home-account-bar .p56-account-actions{padding-left:12px;margin-left:auto;border-left:1px solid rgba(255,255,255,.07);max-width:min(290px,36vw)}
+ .home-account-bar .p56-account-actions{padding-left:10px;margin-left:auto;border-left:1px solid rgba(255,255,255,.07);max-width:min(290px,36vw)}
  .home-account-bar .p56-account-action{box-sizing:border-box!important;width:clamp(92px,10.5vw,132px)!important;min-width:0!important;height:46px!important;padding:6px 9px 6px 7px!important;border:1px solid rgba(255,255,255,.085)!important;border-radius:13px!important;background:linear-gradient(145deg,rgba(255,255,255,.052),rgba(255,255,255,.018))!important;box-shadow:inset 0 1px rgba(255,255,255,.035),0 8px 20px rgba(0,0,0,.12)!important;transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease!important}
  .home-account-bar .p56-account-action:hover{transform:translateY(-1px)!important;border-color:rgba(255,255,255,.17)!important;background:rgba(255,255,255,.065)!important;box-shadow:0 11px 25px rgba(0,0,0,.18)!important}
  .p56-profile-action .p56-account-action-icon{background:linear-gradient(145deg,rgba(217,70,239,.18),rgba(139,92,246,.10));border:1px solid rgba(217,70,239,.16);color:#bb8cff}
@@ -22,10 +19,12 @@
  .home-account-bar .p56-logout-action:hover{border-color:rgba(248,113,133,.24)!important;background:rgba(248,113,113,.055)!important}
 }
 @media(min-width:621px) and (max-width:960px){
- .home-account-bar .p56-account-actions{gap:6px;max-width:220px}
- .home-account-bar .p56-account-action{grid-template-columns:30px minmax(0,1fr)!important;gap:6px!important;padding-right:7px!important}
- .p56-account-action-icon{width:30px;height:30px}
- .p56-account-action-copy small{display:none}
+ .home-account-bar .p56-account-actions{gap:6px;padding-left:8px;max-width:220px}
+ /* Neste breakpoint o texto some. O botão também precisa perder a segunda coluna;
+    caso contrário o ícone fica preso à coluna esquerda e parece desalinhado. */
+ .home-account-bar .p56-account-action{grid-template-columns:1fr!important;place-items:center!important;gap:0!important;padding:0!important}
+ .home-account-bar .p56-account-action .p56-account-action-icon{width:30px!important;height:30px!important;place-self:center!important;margin:0!important}
+ .p56-account-action-copy,.home-account-bar .p56-account-action .p56-account-action-copy{display:none!important}
 }
 @media(max-width:620px){
  .p56-account-actions,.home-account-bar .p56-account-actions{box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;gap:5px!important;max-width:calc(2 * 40px + 5px)!important;padding:0!important;margin-left:0!important;border-left:0!important;overflow:visible!important}
