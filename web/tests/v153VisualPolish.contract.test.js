@@ -6,11 +6,13 @@ const path=require('node:path');
 const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 
 test('v1.5.3 keeps wallet and Perfil visually separated without undoing mobile containment',()=>{
- const css=read('public/css/accountCurrent.css');
- assert.match(css,/p56-account-actions\{[\s\S]*margin-left:12px!important/);
- assert.match(css,/@media\(max-width:620px\)[\s\S]*p56-account-actions\{[\s\S]*margin-left:6px!important/);
- assert.match(css,/max-width:calc\(100% - 95px\)!important/);
- assert.match(css,/padding-inline:10px!important/);
+ const account=read('public/css/accountCurrent.css');
+ const actions=read('public/css/accountActionsCurrent.css');
+ assert.match(account,/p56-account-actions\{[\s\S]*margin-left:2px!important/);
+ assert.match(actions,/@media\(min-width:621px\)[\s\S]*p56-account-actions\{padding-left:12px/);
+ assert.match(account,/@media\(max-width:620px\)[\s\S]*p56-account-actions\{[\s\S]*margin-left:6px!important/);
+ assert.match(account,/max-width:calc\(100% - 95px\)!important/);
+ assert.match(account,/padding-inline:10px!important/);
 });
 
 test('v1.5.3 gives the Original marker dedicated clearance in card detail',()=>{
