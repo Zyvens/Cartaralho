@@ -1,4 +1,4 @@
-/* Owner visual canônico — refinamento tipográfico da lacuna + simetria das recompensas de Missões; posição preservada via shim P60. */
+/* Owner visual canônico — refinamento tipográfico da lacuna + layout/simetria das recompensas de Missões; posição preservada via shim P60. */
 .black-card-gap,
 .p57-library-game-card .black-card-gap,
 .p57-detail-game-card .black-card-gap,
@@ -10,10 +10,72 @@
   transform:translateY(.09em)!important;
   vertical-align:baseline!important;
 }
+
+/*
+ * A missão sempre é uma pilha vertical: título, descrição, recompensas,
+ * progresso e contador. A especificidade replica o owner histórico para
+ * remover de fato a antiga segunda coluna reservada às recompensas.
+ */
+.mission-card .mission-row,
+.profile-modal-body .mission-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-auto-flow:row!important;
+  column-gap:0!important;
+  row-gap:6px!important;
+  align-items:start!important;
+}
+.mission-row>b,
+.mission-row>.mission-copy,
+.mission-row>.p52-mission-rewards,
+.mission-row>.mission-progress,
+.mission-row>.mission-count,
+.profile-modal-body .mission-row>b,
+.profile-modal-body .mission-row>.mission-copy,
+.profile-modal-body .mission-row>.p52-mission-rewards,
+.profile-modal-body .mission-row>.mission-progress,
+.profile-modal-body .mission-row>.mission-count{
+  grid-column:1!important;
+  grid-row:auto!important;
+  min-width:0!important;
+}
+.mission-row>.mission-copy,
+.profile-modal-body .mission-row>.mission-copy{
+  display:block!important;
+  width:100%!important;
+}
+.mission-row>.p52-mission-rewards,
+.profile-modal-body .mission-row>.p52-mission-rewards{
+  width:auto!important;
+  justify-self:stretch!important;
+  box-sizing:border-box!important;
+  padding-inline:0!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  flex-wrap:wrap!important;
+  gap:8px!important;
+  margin-top:4px!important;
+}
+.mission-row>.mission-progress,
+.profile-modal-body .mission-row>.mission-progress{
+  width:100%!important;
+  margin-top:4px!important;
+}
+.mission-row>.mission-count,
+.profile-modal-body .mission-row>.mission-count{
+  justify-self:start!important;
+}
+
+/* As três recompensas compartilham exatamente a mesma caixa e tipografia. */
 .p52-mission-rewards>.p52-mission-coin-pill,
 .p52-mission-rewards>.mission-xp-pill,
+.p52-mission-rewards>.p10-mission-buff,
 .profile-modal-body .p52-mission-rewards>.p52-mission-coin-pill,
-.profile-modal-body .p52-mission-rewards>.mission-xp-pill{
+.profile-modal-body .p52-mission-rewards>.mission-xp-pill,
+.profile-modal-body .p52-mission-rewards>.p10-mission-buff{
   height:28px!important;
   min-height:28px!important;
   box-sizing:border-box!important;
@@ -21,15 +83,42 @@
   align-items:center!important;
   justify-content:center!important;
   padding:0 9px!important;
+  font-family:var(--font-display)!important;
+  font-size:.72rem!important;
+  font-weight:800!important;
   line-height:1!important;
+  letter-spacing:.02em!important;
+  white-space:nowrap!important;
+}
+
+/* Desktop: a fileira de recompensas fica centralizada no eixo real do card. */
+@media(min-width:761px){
+  #mission-card .mission-row>.p52-mission-rewards,
+  .profile-modal-body .mission-row>.p52-mission-rewards{
+    justify-content:center!important;
+  }
+}
+
+@media(max-width:620px){
+  .p52-mission-rewards>.p52-mission-coin-pill,
+  .p52-mission-rewards>.mission-xp-pill,
+  .p52-mission-rewards>.p10-mission-buff,
+  .profile-modal-body .p52-mission-rewards>.p52-mission-coin-pill,
+  .profile-modal-body .p52-mission-rewards>.mission-xp-pill,
+  .profile-modal-body .p52-mission-rewards>.p10-mission-buff{
+    font-size:.68rem!important;
+  }
 }
 @media(max-width:430px){
   .p52-mission-rewards>.p52-mission-coin-pill,
   .p52-mission-rewards>.mission-xp-pill,
+  .p52-mission-rewards>.p10-mission-buff,
   .profile-modal-body .p52-mission-rewards>.p52-mission-coin-pill,
-  .profile-modal-body .p52-mission-rewards>.mission-xp-pill{
+  .profile-modal-body .p52-mission-rewards>.mission-xp-pill,
+  .profile-modal-body .p52-mission-rewards>.p10-mission-buff{
     height:26px!important;
     min-height:26px!important;
     padding:0 7px!important;
+    font-size:.64rem!important;
   }
 }
