@@ -7,7 +7,7 @@ const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 
 test('v1.5.3 keeps wallet and Perfil visually separated without undoing mobile containment',()=>{
  const css=read('public/css/accountCurrent.css');
- assert.match(css,/p56-account-actions\{[\s\S]*margin-left:14px!important/);
+ assert.match(css,/p56-account-actions\{[\s\S]*margin-left:12px!important/);
  assert.match(css,/@media\(max-width:620px\)[\s\S]*p56-account-actions\{[\s\S]*margin-left:6px!important/);
  assert.match(css,/max-width:calc\(100% - 95px\)!important/);
  assert.match(css,/padding-inline:10px!important/);
