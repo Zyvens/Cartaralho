@@ -38,24 +38,28 @@ function geometryScript(rootSelector){
  const xp=rewards?.querySelector('.mission-xp-pill');
  const buff=rewards?.querySelector('.p10-mission-buff');
  if(!row||!title||!copy||!rewards||!coin||!xp||!buff)return null;
- const rr=row.getBoundingClientRect(),cr=copy.getBoundingClientRect(),rw=rewards.getBoundingClientRect();
- const pills=[coin,xp,buff].map(el=>{const r=el.getBoundingClientRect(),cs=getComputedStyle(el);return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,fontSize:parseFloat(cs.fontSize)||0};});
+ const rr=row.getBoundingClientRect(),cr=copy.getBoundingClientRect(),rw=rewards.getBoundingClientRect(),rowStyle=getComputedStyle(row),rewardStyle=getComputedStyle(rewards);
+ const pills=[coin,xp,buff].map(el=>{const r=el.getBoundingClientRect(),cs=getComputedStyle(el);return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,fontSize:parseFloat(cs.fontSize)||0,marginLeft:parseFloat(cs.marginLeft)||0,marginRight:parseFloat(cs.marginRight)||0,transform:cs.transform};});
  const groupLeft=Math.min(...pills.map(x=>x.left)),groupRight=Math.max(...pills.map(x=>x.right));
  return{
-  rowWidth:rr.width,
+  row:{left:rr.left,right:rr.right,width:rr.width,paddingLeft:parseFloat(rowStyle.paddingLeft)||0,paddingRight:parseFloat(rowStyle.paddingRight)||0},
+  rewards:{left:rw.left,right:rw.right,width:rw.width,paddingLeft:parseFloat(rewardStyle.paddingLeft)||0,paddingRight:parseFloat(rewardStyle.paddingRight)||0,marginLeft:parseFloat(rewardStyle.marginLeft)||0,marginRight:parseFloat(rewardStyle.marginRight)||0,justifyContent:rewardStyle.justifyContent,justifySelf:rewardStyle.justifySelf,transform:rewardStyle.transform},
   copyBottom:cr.bottom,
   rewardsTop:rw.top,
+  groupLeft,groupRight,
   groupCenter:(groupLeft+groupRight)/2,
   rowCenter:(rr.left+rr.right)/2,
+  rewardCenter:(rw.left+rw.right)/2,
   heights:pills.map(x=>x.height),
   fontSizes:pills.map(x=>x.fontSize),
+  pills,
   rewardTexts:[coin.textContent,xp.textContent,buff.textContent]
  };
 }
 function verify(label,g){
  assert(`${label}: geometry available`,!!g,JSON.stringify(g));
  assert(`${label}: rewards are below description`,g.rewardsTop>=g.copyBottom+2,`copyBottom=${g.copyBottom}, rewardsTop=${g.rewardsTop}`);
- assert(`${label}: reward buttons are centered on desktop`,Math.abs(g.groupCenter-g.rowCenter)<=3,`groupCenter=${g.groupCenter}, rowCenter=${g.rowCenter}`);
+ assert(`${label}: reward buttons are centered on desktop`,Math.abs(g.groupCenter-g.rowCenter)<=3,JSON.stringify(g));
  assert(`${label}: coin XP and BUFF have equal height`,Math.max(...g.heights)-Math.min(...g.heights)<=1,`heights=${g.heights.join('/')}`);
  assert(`${label}: coin XP and BUFF have equal text size`,Math.max(...g.fontSizes)-Math.min(...g.fontSizes)<=0.1,`fontSizes=${g.fontSizes.join('/')}`);
  assert(`${label}: BUFF remains present`,String(g.rewardTexts[2]||'').includes('Dedo no Olho'),g.rewardTexts.join(' | '));
@@ -74,16 +78,16 @@ function verify(label,g){
   await page.waitForSelector('#mission-card .mission-row',{state:'visible'});
   await page.waitForTimeout(250);
   const menuGeometry=await page.evaluate(geometryScript,'#mission-card');
-  verify('desktop Missões',menuGeometry);
   await page.screenshot({path:path.join(out,'mission-rewards-desktop-menu.png')});
+  verify('desktop Missões',menuGeometry);
 
   await page.locator('#mission-fab').click();
   await page.evaluate(()=>ProfileModal.open('progress'));
   await page.waitForSelector('.profile-modal-body .mission-row',{state:'visible',timeout:10000});
   await page.waitForTimeout(250);
   const profileGeometry=await page.evaluate(geometryScript,'.profile-modal-body');
-  verify('desktop Perfil > Progressão',profileGeometry);
   await page.screenshot({path:path.join(out,'mission-rewards-desktop-profile-progress.png')});
+  verify('desktop Perfil > Progressão',profileGeometry);
  }finally{
   await browser.close();
   fs.writeFileSync(path.join(out,'mission-rewards-desktop-report.json'),JSON.stringify({base,checks,finishedAt:new Date().toISOString()},null,2));
