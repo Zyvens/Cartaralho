@@ -28,7 +28,7 @@ async function harness(page){
   await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(body)});
  });
 }
-async function verifyViewport(browser,width,height,label,file){
+async function verifyViewport(browser,width,height,label,file,compact){
  const ctx=await browser.newContext({viewport:{width,height}});
  const page=await ctx.newPage();
  try{
@@ -43,34 +43,39 @@ async function verifyViewport(browser,width,height,label,file){
    const actions=strip?.querySelector('.p56-account-actions');
    const profile=actions?.querySelector('.p56-profile-action');
    const logout=actions?.querySelector('.p56-logout-action');
-   if(!strip||!actions||!profile||!logout)return null;
-   const s=strip.getBoundingClientRect(),a=actions.getBoundingClientRect(),p=profile.getBoundingClientRect(),l=logout.getBoundingClientRect();
-   const as=getComputedStyle(actions),ss=getComputedStyle(strip);
+   const profileIcon=profile?.querySelector('.p56-account-action-icon');
+   const logoutIcon=logout?.querySelector('.p56-account-action-icon');
+   const profileCopy=profile?.querySelector('.p56-account-action-copy');
+   const logoutCopy=logout?.querySelector('.p56-account-action-copy');
+   if(!strip||!actions||!profile||!logout||!profileIcon||!logoutIcon)return null;
+   const rect=el=>{const r=el.getBoundingClientRect();return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,cx:(r.left+r.right)/2,cy:(r.top+r.bottom)/2};};
+   const p=rect(profile),l=rect(logout),pi=rect(profileIcon),li=rect(logoutIcon);
    return{
-    strip:{left:s.left,right:s.right,width:s.width,paddingRight:parseFloat(ss.paddingRight)||0,borderRight:parseFloat(ss.borderRightWidth)||0},
-    actions:{left:a.left,right:a.right,width:a.width,paddingLeft:parseFloat(as.paddingLeft)||0,borderLeft:parseFloat(as.borderLeftWidth)||0,justifyContent:as.justifyContent},
-    profile:{left:p.left,right:p.right,width:p.width},
-    logout:{left:l.left,right:l.right,width:l.width},
-    leftBreathing:p.left-a.left,
-    rightBreathing:s.right-l.right,
-    groupCenter:(p.left+l.right)/2,
-    actionZoneCenter:(a.left+s.right)/2,
+    profile:{button:p,icon:pi,leftGap:pi.left-p.left,rightGap:p.right-pi.right,copyDisplay:profileCopy?getComputedStyle(profileCopy).display:null},
+    logout:{button:l,icon:li,leftGap:li.left-l.left,rightGap:l.right-li.right,copyDisplay:logoutCopy?getComputedStyle(logoutCopy).display:null},
+    actionsDisplay:getComputedStyle(actions).display,
     overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth
    };
   });
   assert(`${label}: account action geometry available`,!!g,JSON.stringify(g));
-  assert(`${label}: Perfil/Sair are centered in their tag zone`,Math.abs(g.groupCenter-g.actionZoneCenter)<=1,JSON.stringify(g));
-  assert(`${label}: left and right breathing room are symmetric`,Math.abs(g.leftBreathing-g.rightBreathing)<=1,`left=${g.leftBreathing}, right=${g.rightBreathing}`);
-  assert(`${label}: account actions keep centered flex alignment`,g.actions.justifyContent==='center',g.actions.justifyContent);
   assert(`${label}: no horizontal page overflow`,g.overflow<=2,`overflow=${g.overflow}`);
+  if(compact){
+   assert(`${label}: Perfil copy is hidden`,g.profile.copyDisplay==='none',g.profile.copyDisplay);
+   assert(`${label}: Sair copy is hidden`,g.logout.copyDisplay==='none',g.logout.copyDisplay);
+   assert(`${label}: Perfil icon is centered in its own button`,Math.abs(g.profile.button.cx-g.profile.icon.cx)<=1,JSON.stringify(g.profile));
+   assert(`${label}: Perfil has symmetric inner breathing room`,Math.abs(g.profile.leftGap-g.profile.rightGap)<=1,`left=${g.profile.leftGap}, right=${g.profile.rightGap}`);
+   assert(`${label}: Sair icon is centered in its own button`,Math.abs(g.logout.button.cx-g.logout.icon.cx)<=1,JSON.stringify(g.logout));
+   assert(`${label}: Sair has symmetric inner breathing room`,Math.abs(g.logout.leftGap-g.logout.rightGap)<=1,`left=${g.logout.leftGap}, right=${g.logout.rightGap}`);
+  }
   await page.screenshot({path:path.join(out,file)});
  }finally{await ctx.close();}
 }
 (async()=>{
  const browser=await chromium.launch({headless:true});
  try{
-  await verifyViewport(browser,1440,1000,'desktop 1440','account-actions-desktop-1440.png');
-  await verifyViewport(browser,900,900,'desktop 900','account-actions-desktop-900.png');
+  await verifyViewport(browser,1440,1000,'desktop 1440','account-actions-desktop-1440.png',false);
+  await verifyViewport(browser,900,900,'desktop compact 900','account-actions-desktop-900.png',true);
+  await verifyViewport(browser,760,900,'desktop compact 760','account-actions-desktop-760.png',true);
  }finally{
   await browser.close();
   fs.writeFileSync(path.join(out,'account-actions-desktop-report.json'),JSON.stringify({base,checks,finishedAt:new Date().toISOString()},null,2));
