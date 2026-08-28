@@ -13,10 +13,10 @@
 
 /*
  * A missão sempre é uma pilha vertical: título, descrição, recompensas,
- * progresso e contador. Isso evita que o painel estreito do desktop tente
- * encaixar as pills ao lado do texto só porque a viewport é larga.
+ * progresso e contador. A especificidade replica o owner histórico para
+ * remover de fato a antiga segunda coluna reservada às recompensas.
  */
-.mission-row,
+.mission-card .mission-row,
 .profile-modal-body .mission-row{
   display:grid!important;
   grid-template-columns:minmax(0,1fr)!important;
