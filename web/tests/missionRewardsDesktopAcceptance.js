@@ -31,35 +31,30 @@ async function harness(page){
 }
 function geometryScript(rootSelector){
  const row=document.querySelector(`${rootSelector} .mission-row`);
- const title=row?.querySelector(':scope > b');
  const copy=row?.querySelector(':scope > .mission-copy');
  const rewards=row?.querySelector(':scope > .p52-mission-rewards');
  const coin=rewards?.querySelector('.p52-mission-coin-pill');
  const xp=rewards?.querySelector('.mission-xp-pill');
  const buff=rewards?.querySelector('.p10-mission-buff');
- if(!row||!title||!copy||!rewards||!coin||!xp||!buff)return null;
- const rr=row.getBoundingClientRect(),cr=copy.getBoundingClientRect(),rw=rewards.getBoundingClientRect(),rowStyle=getComputedStyle(row),rewardStyle=getComputedStyle(rewards);
- const pills=[coin,xp,buff].map(el=>{const r=el.getBoundingClientRect(),cs=getComputedStyle(el);return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,fontSize:parseFloat(cs.fontSize)||0,marginLeft:parseFloat(cs.marginLeft)||0,marginRight:parseFloat(cs.marginRight)||0,transform:cs.transform};});
+ if(!row||!copy||!rewards||!coin||!xp||!buff)return null;
+ const rr=row.getBoundingClientRect(),cr=copy.getBoundingClientRect(),rw=rewards.getBoundingClientRect(),rewardStyle=getComputedStyle(rewards);
+ const pills=[coin,xp,buff].map(el=>{const r=el.getBoundingClientRect(),cs=getComputedStyle(el);return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,fontSize:parseFloat(cs.fontSize)||0};});
  const groupLeft=Math.min(...pills.map(x=>x.left)),groupRight=Math.max(...pills.map(x=>x.right));
  return{
-  row:{left:rr.left,right:rr.right,width:rr.width,paddingLeft:parseFloat(rowStyle.paddingLeft)||0,paddingRight:parseFloat(rowStyle.paddingRight)||0},
-  rewards:{left:rw.left,right:rw.right,width:rw.width,paddingLeft:parseFloat(rewardStyle.paddingLeft)||0,paddingRight:parseFloat(rewardStyle.paddingRight)||0,marginLeft:parseFloat(rewardStyle.marginLeft)||0,marginRight:parseFloat(rewardStyle.marginRight)||0,justifyContent:rewardStyle.justifyContent,justifySelf:rewardStyle.justifySelf,transform:rewardStyle.transform},
+  row:{left:rr.left,right:rr.right,width:rr.width},
+  rewards:{left:rw.left,right:rw.right,width:rw.width,justifyContent:rewardStyle.justifyContent},
   copyBottom:cr.bottom,
   rewardsTop:rw.top,
   groupLeft,groupRight,
-  groupCenter:(groupLeft+groupRight)/2,
-  rowCenter:(rr.left+rr.right)/2,
-  rewardCenter:(rw.left+rw.right)/2,
   heights:pills.map(x=>x.height),
   fontSizes:pills.map(x=>x.fontSize),
-  pills,
   rewardTexts:[coin.textContent,xp.textContent,buff.textContent]
  };
 }
 function verify(label,g){
  assert(`${label}: geometry available`,!!g,JSON.stringify(g));
  assert(`${label}: rewards are below description`,g.rewardsTop>=g.copyBottom+2,`copyBottom=${g.copyBottom}, rewardsTop=${g.rewardsTop}`);
- assert(`${label}: reward buttons are centered on desktop`,Math.abs(g.groupCenter-g.rowCenter)<=3,JSON.stringify(g));
+ assert(`${label}: rewards keep normal left alignment`,g.rewards.justifyContent==='flex-start'&&Math.abs(g.groupLeft-g.rewards.left)<=1,JSON.stringify(g));
  assert(`${label}: coin XP and BUFF have equal height`,Math.max(...g.heights)-Math.min(...g.heights)<=1,`heights=${g.heights.join('/')}`);
  assert(`${label}: coin XP and BUFF have equal text size`,Math.max(...g.fontSizes)-Math.min(...g.fontSizes)<=0.1,`fontSizes=${g.fontSizes.join('/')}`);
  assert(`${label}: BUFF remains present`,String(g.rewardTexts[2]||'').includes('Dedo no Olho'),g.rewardTexts.join(' | '));
