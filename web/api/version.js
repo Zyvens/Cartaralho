@@ -1,11 +1,12 @@
 'use strict';
 const{withErrors,ok,requireMethod}=require('../lib/http');
-const{APP_VERSION}=require('../lib/releaseV153');
+const{APP_VERSION}=require('../lib/releaseV154');
+const{APP_VERSION:V153_VERSION}=require('../lib/releaseV153');
 const{APP_VERSION:V152_VERSION}=require('../lib/releaseV152');
 const{APP_VERSION:V151_VERSION}=require('../lib/releaseV151');
 const{APP_VERSION:V15_VERSION}=require('../lib/releaseV15');
 const{APP_VERSION:P77_VERSION}=require('../lib/releaseP77');
 const{APP_VERSION:P76_VERSION}=require('../lib/releaseP76');
 const{APP_VERSION:P75_VERSION}=require('../lib/releaseP75');
-const RELEASE_LINEAGE=[P75_VERSION,P76_VERSION,P77_VERSION,V15_VERSION,V151_VERSION,V152_VERSION,APP_VERSION];
+const RELEASE_LINEAGE=[P75_VERSION,P76_VERSION,P77_VERSION,V15_VERSION,V151_VERSION,V152_VERSION,V153_VERSION,APP_VERSION];
 module.exports=withErrors(async(req,res)=>{if(!requireMethod(req,res,'GET'))return;ok(res,{currentVersion:APP_VERSION,releaseLineage:RELEASE_LINEAGE});});
