@@ -10,7 +10,8 @@ const owners={
  matchSubmit:read('lib/matchSubmit.js'),
  roomConfig:read('lib/roomConfig.js'),
  amigoDeMerda:read('lib/amigoDeMerda.js'),
- achievementBackfill:read('lib/achievementBackfill.js')
+ achievementBackfill:read('lib/achievementBackfill.js'),
+ accountProvisioning:read('lib/accountProvisioning.js')
 };
 const compat={
  creatorAdminP37:read('lib/creatorAdminP37.js'),
@@ -22,7 +23,7 @@ const compat={
  amigoDeMerdaP32:read('lib/amigoDeMerdaP32.js'),
  achievementBackfillP19:read('lib/achievementBackfillP19.js')
 };
-const creatorApi=read('api/admin/creator-tools.js'),buffApi=read('api/buffs.js');
+const creatorApi=read('api/admin/creator-tools.js'),buffApi=read('api/buffs.js'),registerApi=read('api/auth/register.js'),loginApi=read('api/auth/login.js');
 
 test('owners backend canônicos compilam sem depender do nome de pacote',()=>{
  for(const source of Object.values(owners))assert.doesNotThrow(()=>new Function(source));
@@ -34,6 +35,7 @@ test('owners backend canônicos compilam sem depender do nome de pacote',()=>{
  assert.match(owners.roomConfig,/function publicConfig/);
  assert.match(owners.amigoDeMerda,/async function activate/);
  assert.match(owners.achievementBackfill,/async function sync/);
+ assert.match(owners.accountProvisioning,/async function ensureAccountProvisioned/);
 });
 
 test('todos os helpers backend PXX mapeados são aliases sem regra duplicada',()=>{
@@ -55,4 +57,6 @@ test('APIs migradas usam diretamente owners backend sem sufixo PXX',()=>{
  assert.doesNotMatch(creatorApi,/creatorAdminP37|balanceRealtimeP63/);
  assert.match(buffApi,/require\('\.\.\/lib\/amigoDeMerda'\)/);
  assert.doesNotMatch(buffApi,/amigoDeMerdaP32/);
+ assert.match(registerApi,/require\('\.\.\/\.\.\/lib\/accountProvisioning'\)/);
+ assert.match(loginApi,/require\('\.\.\/\.\.\/lib\/accountProvisioning'\)/);
 });
